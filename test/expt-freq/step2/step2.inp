@@ -1,0 +1,17 @@
+Step 2.
+Calculate "experimental" frequencies of HDO using the experimental frequencies of H2O.
+CCSD(T)/cc-pVTZ frequencies:        1463  2828  3895 cm-1
+"experimental" frequencies:         1398  2692  3708 cm-1
+real experimental frequencies:      1402  2727  3707 cm-1
+
+ $contrl
+   qcprog="unimovib"
+   isotop=1
+ $end
+
+ $qcdata
+   fchk="step1.umv"
+ $end
+
+ $IsoMas $End
+ 2  2.01410

@@ -1,0 +1,9 @@
+A test job of PSI.
+
+ $contrl
+   qcprog="psi"
+ $end
+
+ $qcdata
+   fchk="h2o.out"
+ $end

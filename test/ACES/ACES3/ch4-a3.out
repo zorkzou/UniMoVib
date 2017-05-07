@@ -1,0 +1,1850 @@
+ MEMORY ALLOCATION Sucessfull: maxmem =          900 PROC           0
+ ACESIII version, 3.0.8      is run on            2  processors.
+ Running initial xjoda...
+ MEMORY ALLOCATION Sucessfull: maxmem =          900 PROC           1
+
+
+                      ACES STATE VARIABLE REGISTRATION LOG
+     ----------------------------------------------------------------------
+     The ACES State Variables were initialized.
+     Updating (CALCLEVEL,SCF): 'SCF' converts to 'SCF' -> 0
+     Updating (BASIS,3-21G): String copy succeeded.
+     Updating (VIBRATION,exact): 'exact' converts to 'EXACT' -> 1
+     Updating (REFERENCE,RHF): 'RHF' converts to 'RHF' -> 0
+     Updating (COORDINATES,CARTESIAN): 'CARTESIAN' converts to 'CARTESIAN' -> 1
+     ----------------------------------------------------------------------
+
+
+                       ACES STATE VARIABLE VALIDATION LOG
+     ----------------------------------------------------------------------
+     Updating (SYMMETRY,NONE): 'NONE' converts to 'NONE' -> 0
+     Updating (DERIV_LEV,second): 'second' converts to 'TWO' -> 2
+     Updating (GRAD_CALC,analytical): 'analytical' converts to 'ANALYTICAL' -> 1
+     Updating (CC_EXTRAPOL,DIIS): 'DIIS' converts to 'DIIS' -> 1
+     Updating (ORBITALS,standard): 'standard' converts to 'STANDARD' -> 0
+     Updating (PERT_ORB,standard): 'standard' converts to 'STANDARD' -> 0
+     Updating (ESTATE_TOL,5): 4294967295 -> 5
+     Updating (RESTART,0): '0' converts to 'OFF' -> 0
+     Updating (HBARABCD,OFF): 'OFF' converts to 'OFF' -> 1
+     Updating (HBARABCI,OFF): 'OFF' converts to 'OFF' -> 1
+     Updating (ABCDFULL,ON): 'ON' converts to 'ON' -> 1
+     Updating (CACHE_RECS,45): 4294967295 -> 45
+     Updating (FILE_RECSIZ,16384): 4294967295 -> 16384
+     ----------------------------------------------------------------------
+
+          ASV#   ASV KEY DEFINITION =    CURRENT [   DEFAULT] UNITS
+          ------------------------------------------------------------
+            1:                PRINT =          0 [         0] 
+            2:            CALCLEVEL =          0 [         0] 
+            3:            DERIV_LEV =          2 [4294967295] 
+            4:              CC_CONV =          7 [         7] (tol)
+
+            5:             SCF_CONV =          7 [         7] (tol)
+            6:            XFORM_TOL =         11 [        11] (tol)
+            7:            CC_MAXCYC =          0 [         0] cycles
+            8:           LINDEP_TOL =          8 [         8] 
+
+            9:                  RDO = 4294967295 [4294967295] 
+           10:           SCF_EXTRAP =          1 [         1] 
+           11:            REFERENCE =          0 [         0] 
+           12:          CC_EXPORDER =          0 [         0] 
+
+           13:             TAMP_SUM =          0 [         0] 
+           14:            NTOP_TAMP =         15 [        15] 
+           15:              DAMPSCF =         20 [        20] x 0.01
+           16:           SCF_MAXCYC =        150 [       150] cycles
+
+           18:                PROPS =          0 [         0] 
+           19:              DENSITY =          0 [         0] 
+           20:          SCF_EXPORDE =          6 [         6] 
+           21:          CC_EXTRAPOL =          1 [         1] 
+
+           22:            BRUECKNER =          0 [         0] 
+           23:               XFIELD =          0 [         0] x 10-6
+           24:               YFIELD =          0 [         0] x 10-6
+           25:               ZFIELD =          0 [         0] x 10-6
+
+           26:            SAVE_INTS =          0 [         0] 
+           28:               CHARGE =          0 [         0] 
+           29:          MULTIPLICTY =          1 [         1] 
+           30:          CPHF_CONVER =         12 [        12] (tol)
+
+           31:          CPHF_MAXCYC =         64 [        64] cycles
+           35:               INCORE =          0 [         0] 
+           36:          MEMORY_SIZE =   15000000 [  15000000] Words
+           37:          FILE_RECSIZ =      16384 [4294967295] Words
+
+           38:                NONHF =          0 [         0] 
+           39:             ORBITALS =          0 [4294967295] 
+           40:          SCF_EXPSTAR =          8 [         8] 
+           41:          LOCK_ORBOCC =          0 [         0] 
+
+           42:          FILE_STRIPE =          0 [         0] 
+           43:               DOHBAR =          0 [         0] 
+           44:           CACHE_RECS =         45 [4294967295] 
+           45:                GUESS =          0 [         0] 
+
+           46:           JODA_PRINT =          0 [         0] 
+           47:           OPT_METHOD =          0 [         0] 
+           48:          CONVERGENCE =          4 [         4] H/bohr
+           49:          EIGENVECTOR =          1 [         1] 
+
+           50:              NEGEVAL =          2 [         2] 
+           51:          CURVILINEAR =          0 [         0] 
+           52:          STP_SIZ_CTL =          0 [         0] 
+           53:             MAX_STEP =        300 [       300] millibohr
+
+           54:            VIBRATION =          1 [         0] 
+           55:            EVAL_HESS = 4294967295 [4294967295] # of cyc.
+           56:            INTEGRALS =          1 [         1] 
+           57:          FD_STEPSIZE =          0 [         0] 10-4 bohr
+
+           58:               POINTS =          0 [         0] 
+           59:          CONTRACTION =          1 [         1] 
+           60:             SYMMETRY =          0 [         2] 
+           62:            SPHERICAL =          1 [         1] 
+
+           63:          RESET_FLAGS =          0 [         0] 
+           64:             PERT_ORB =          0 [         2] 
+           65:             GENBAS_1 =          0 [         0] 
+           66:             GENBAS_2 =          0 [         0] 
+
+           67:             GENBAS_3 =          0 [         0] 
+           68:          COORDINATES =          1 [         3] 
+           69:            CHECK_SYM =          1 [         1] 
+           70:            SCF_PRINT =          0 [         0] 
+
+           71:                  ECP =          0 [         0] 
+           72:              RESTART =          0 [         1] 
+           73:            TRANS_INV =          0 [         0] 
+           74:          HFSTABILITY =          0 [         0] 
+
+           75:             ROT_EVEC =          0 [         0] 
+           76:           BRUCK_CONV =          4 [         4] (tol)
+           78:                UNITS =          0 [         0] 
+           79:          FD_USEGROUP =          0 [         0] 
+
+           80:           FD_PROJECT =          0 [         0] 
+           83:                VTRAN =          0 [         0] 
+           84:             HF2_FILE =          1 [         1] 
+           85:             SUBGROUP =          0 [         0] 
+
+           86:           SUBGRPAXIS =          0 [         0] 
+           87:               EXCITE =          0 [         0] 
+           88:            ZETA_CONV =         12 [        12] (tol)
+           90:           TREAT_PERT =          0 [         0] 
+
+           91:          ESTATE_PROP =          0 [         0] 
+           92:           OPT_MAXCYC =         50 [        50] 
+           93:             ABCDTYPE =          0 [         0] 
+           95:           AO_LADDERS =          1 [         1] 
+
+           96:                 FOCK =          1 [         1] 
+           97:          ESTATE_MAXC =         20 [        20] 
+           98:           ESTATE_TOL =          5 [4294967295] (tol)
+           99:            TURBOMOLE =          0 [         0] 
+
+          100:           GAMMA_ABCD =          0 [         0] 
+          101:            ZETA_TYPE =          1 [         1] 
+          102:          ZETA_MAXCYC =         50 [        50] 
+          103:             RESRAMAN =          0 [         0] 
+
+          104:                  PSI =          0 [         0] 
+          105:             GEOM_OPT =          0 [         0] 
+          106:             EXTERNAL =          2 [         2] 
+          107:          HESS_UPDATE =          0 [         0] 
+
+          108:         INIT_HESSIAN =          0 [         0] 
+          109:          EXTRAPOLATE =          0 [         0] 
+          150:      STGF12IF12GAMMA =          0 [         0] 
+          201:              EA_CALC =          0 [         0] 
+
+          203:                 TDHF =          0 [         0] 
+          204:           FUNCTIONAL =          4 [         4] 
+          205:           EOM_MAXCYC =         50 [        50] cycles
+          206:              EOMPROP =          0 [         0] 
+
+          207:             ABCDFULL =          1 [         0] 
+          208:           INTGRL_TOL =         14 [        14] (tol)
+          209:             DAMP_TYP =          0 [         0] 
+          210:             DAMP_TOL =         10 [        10] x 0.01
+
+          211:              LSHF_A1 =          0 [         0] x 0.01
+          212:              LSHF_B1 =          0 [         0] x 0.01
+          213:             POLYRATE =          0 [         0] 
+          214:              IP_CALC =          0 [         0] 
+
+          216:            IP_SEARCH =          0 [         0] 
+          217:               EOMREF =          0 [         0] 
+          218:              SOLVENT =          0 [         0] 
+          219:            EE_SEARCH =          0 [         0] 
+
+          220:            EOM_PRJCT =          0 [         0] 
+          221:               NEWVRT =          0 [         0] 
+          222:             HBARABCD =          1 [         0] 
+          223:             HBARABCI =          1 [         0] 
+
+          224:             NT3EOMEE =          0 [         0] 
+          225:              NOREORI =          2 [         2] 
+          227:               KS_POT =          0 [         0] 
+          228:             DIP_CALC =          0 [         0] 
+
+          230:             DEA_CALC =          0 [         0] 
+          232:              PROGRAM =          0 [         0] 
+          233:                CCR12 =          0 [         0] 
+          234:            EOMXFIELD =          0 [         0] x 10-6
+
+          235:            EOMYFIELD =          0 [         0] x 10-6
+          236:            EOMZFIELD =          0 [         0] x 10-6
+          237:              INSERTF =          0 [         0] 
+          238:            GRAD_CALC =          1 [         0] 
+
+          239:            IMEM_SIZE =    3000000 [   3000000] Words
+          240:              MAKERHF =          0 [         0] 
+          241:           GLOBAL_MEM =          0 [         0] Words
+          242:             PRP_INTS =          0 [         0] 
+
+          243:           TRUNC_ORBS =          0 [         0] 
+          244:             FNO_KEEP =          0 [         0] percent
+          245:             FNO_BSSE =          0 [         0] 
+          246:              NATURAL =          0 [         0] 
+
+          248:              UNO_REF =          0 [         0] 
+          249:           UNO_CHARGE =          0 [         0] 
+          250:             UNO_MULT =          1 [         1] 
+          251:                RAMAN =          0 [         0] 
+
+          252:            KUCHARSKI =          0 [         0] 
+          253:             SCF_TYPE =          0 [         0] 
+          254:               DIRECT =          0 [         0] 
+          255:         SINGLE_STORE =          0 [         0] 
+
+          256:             OOMP_CYC =         50 [        50] 
+          257:            DKH_ORDER =          0 [         0] 
+          258:           UNCONTRACT =          0 [         0] 
+          259:          OPT_CONTROL =          0 [         0] 
+
+          ------------------------------------------------------------
+
+                         ACES STATE VARIABLES (STRINGS)
+          ------------------------------------------------------------
+          BASIS = 3-21G
+          OCCUPATION = [ESTIMATED BY SCF]
+          ------------------------------------------------------------
+   Rotational constants (in cm-1): 
+     5.34875        5.34875        5.34875
+********************************************************************************
+The symmetry processing is fully turned off and no symmetry opertion are applied.
+
+   The full molecular point group is C1  .
+   The largest Abelian subgroup of the full molecular point group is C1  .
+   The computational point group is C1  .
+********************************************************************************
+
+         -----------------------------------------------
+         Cartesian coordinates corresponding to internal 
+                 coordinate input (Angstroms) 
+ ----------------------------------------------------------------
+ Z-matrix   Atomic            C o o r d i n a t e s
+  Symbol    Number           X              Y              Z
+ ----------------------------------------------------------------
+     H         1         0.00000000     0.88418541    -0.62521350
+     C         6         0.00000000    -0.00000000     0.00000000
+     H         1         0.00000000    -0.88418541    -0.62521350
+     H         1         0.88418541    -0.00000000     0.62521350
+     H         1        -0.88418541    -0.00000000     0.62521350
+ ----------------------------------------------------------------
+   Interatomic distance matrix (Angstroms) 
+
+                 H             C             H             H             H    
+                [ 1]        [ 2]        [ 3]        [ 4]        [ 5]
+  H    [ 1]     0.00000
+  C    [ 2]     1.08290     0.00000
+  H    [ 3]     1.76837     1.08290     0.00000
+  H    [ 4]     1.76837     1.08290     1.76837     0.00000
+  H    [ 5]     1.76837     1.08290     1.76837     1.76837     0.00000
+ Initial xjoda is complete...
+ Using Default jobflow = SCF_RHF_HESSIAN
+ USE_2DER_INTEGRALS =  T
+ Next SIAL program: scf_aguess.sio                                              
+ Overriding COMPANY parameter, using            2  processes as workers.
+  NBASIS AFTER SIMPLE_INSPECT           17
+ WARNING: ACES has defaulted cc_maxcyc to 0,  resetting to 100.
+ WARNING: ACES has defaulted cc_exporder to 0, resetting to 5.
+  Resetting scf_beg to 2 
+ *** WARNING: ACES has specified a RHF run.  Either use REF=UHF in ACES or run a true RHF SIAL code.***
+  NALPHA_VIRT =          12
+  NBETA_VIRT =          12
+  Computing the NN repulsion energy 
+              5   1.0000000000000000        6.0000000000000000        1.0000000000000000        1.0000000000000000        1.0000000000000000     
+  NN rep computed =    13.523459621956144     
+ SCF ENERGY IS INITIALIZED FROM NUCLEAR-NUCLEAR REPULSION ENERGY:    13.523459621956144     
+ --------- Required data from MOL file -----------
+ Number of centers.....................           5
+ Number of shells......................           6
+ Cartesian flag........................ F
+ Total number of basis functions.......          17
+ Total number of primitive functions...          21
+ Initial SCF energy....................   13.523459621956144     
+ SCF damping factor....................  0.19999998807907104     
+ SCF convergence tolerance.............   9.9999999999999995E-008
+ Number of SCF iterations..............         150
+ Number of SCF histories for DIIS......           6
+ Beginning iteration for SCF DIIS......           2
+ CCSD convergence tolerance............   9.9999999999999995E-008
+ Number of CCSD iterations.............         100
+ Number of CCSD histories for DIIS.....           5
+ Beginning iteration for CCSD DIIS.....           2
+ Excited state computation............. F
+ EOM-CCSD converged tolerance..........   0.0000000000000000     
+ Number of EOM-CCSD roots to find......           0
+ Geometry optimization calc............ F
+ Vibrational frequency calc............ T
+   Shell     Contracted fns.   Primitive Fns. 
+   -----     ---------------   --------------
+     1              2                 3   0.000000000000D+00   0.167086814800D+01  -0.118148219936D+01
+     2              3                 6   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     3              2                 3   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     4              2                 3   0.000000000000D+00  -0.167086814800D+01  -0.118148219936D+01
+     5              2                 3   0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+     6              2                 3  -0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+ ----------- Parameter Summary ----------------
+ DRYRUN........................... T
+ INTEGRAL_PACKAGE.................ERD                                                                             
+ MOLFILE..........................MOL                                                                                                                     
+ MAXMEM...........................         900
+ OCCUPIED.........................           5
+ ALPHA_OCCUPIED...................           5
+ BETA_OCCUPIED....................           5
+ AO SEGMENT SIZE..................          17
+ OCCUPIED SEGMENT SIZE............          17
+ VIRTUAL SEGMENT SIZE.............          17
+ Local scratch directory...........                                                                                                   
+ Number of centers................           5
+ Number of shells.................           6
+ Number of basis functions........          17
+ NO_SERVERS....................... T
+ IGNORE DROPMO PARAMETERS......... T
+ ITRIP............................           1           5
+ IHESS............................           1           5
+ JHESS............................           1           5
+ SIP_SUB_SEGSIZE..................           5
+ SIP_SUB_OCC_SEGSIZE..............           5
+ SIP_SUB_VIRT_SEGSIZE.............           5
+ SIP_SUB_AO_SEGSIZE...............           5
+ REGULARIZER......................   0.0000000000000000     
+  
+ VFL NAME :scf_aguess.sio                                              
+ VFL NAME : T
+  Skipping Calling ECP main 
+  MODROPA in SEND:           0           0
+  MODROPA in SEND:           0           0
+ Gather on company_rank succeeded.
+ norb =            1
+ nocc =            1
+ nvirt =            1
+ bocc =            1
+ eocc =            1
+ bvirt =            2
+ evirt =            2
+ naocc =            1
+ nbocc =            1
+ navirt =            1
+ nbvirt =            1
+ baocc =            1
+ bbocc =            1
+ eaocc =            1
+ ebocc =            1
+ bavirt =            2
+ bbvirt =            2
+ eavirt =            2
+ ebvirt =            2
+ noccorb =            5
+ nvirtorb =            0
+ boccorb =            1
+ eoccorb =            5
+ bvirtorb =            6
+ evirtorb =           17
+ naoccorb =            5
+ nboccorb =            5
+ navirtorb =           12
+ nbvirtorb =           12
+ baoccorb =            1
+ bboccorb =            1
+ eaoccorb =            5
+ eboccorb =            5
+ bavirtorb =            6
+ bbvirtorb =            6
+ eavirtorb =           17
+ ebvirtorb =           17
+ cc_iter =          100
+ cc_hist =            5
+ cc_beg =            2
+ scf_iter =          150
+ scf_hist =            6
+ scf_beg =            2
+ ncenters =            5
+ itrips =            1
+ itripe =            5
+ ihess1 =            1
+ ihess2 =            5
+ jhess1 =            1
+ jhess2 =            5
+ subb =           -1
+ sube =           -1
+ sip_sub_segsize =            5
+ sip_sub_occ_segsize =            5
+ sip_sub_virt_segsize            5
+ sip_sub_ao_segsize =            5
+ Static pre-defined array #          11  is first used on line           71
+ Static pre-defined array #          12  is first used on line           72
+ Static pre-defined array #          13  is first used on line           70
+ Static pre-defined array #          17  is first used on line           68
+ Static pre-defined array #          18  is first used on line           69
+ Allocated                 11760  bytes for static arrays.
+ Allocated             895589184  bytes for blkmgr.
+ Total memory usage                   855  MBytes.
+ Max. possible usage          900  MBytes
+ Total blocks used =         8775
+ *** COMPLETED DRYRUN PASS FOR scf_aguess.sio                                              
+ Next SIAL program: scf_rhf_aguess.sio                                          
+ Overriding COMPANY parameter, using            2  processes as workers.
+  NBASIS AFTER SIMPLE_INSPECT           17
+ WARNING: ACES has defaulted cc_maxcyc to 0,  resetting to 100.
+ WARNING: ACES has defaulted cc_exporder to 0, resetting to 5.
+  Resetting scf_beg to 2 
+ *** WARNING: ACES has specified a RHF run.  Either use REF=UHF in ACES or run a true RHF SIAL code.***
+  NALPHA_VIRT =          12
+  NBETA_VIRT =          12
+  Computing the NN repulsion energy 
+              5   1.0000000000000000        6.0000000000000000        1.0000000000000000        1.0000000000000000        1.0000000000000000     
+  NN rep computed =    13.523459621956144     
+ SCF ENERGY IS INITIALIZED FROM NUCLEAR-NUCLEAR REPULSION ENERGY:    13.523459621956144     
+ --------- Required data from MOL file -----------
+ Number of centers.....................           5
+ Number of shells......................           6
+ Cartesian flag........................ F
+ Total number of basis functions.......          17
+ Total number of primitive functions...          21
+ Initial SCF energy....................   13.523459621956144     
+ SCF damping factor....................  0.19999998807907104     
+ SCF convergence tolerance.............   9.9999999999999995E-008
+ Number of SCF iterations..............         150
+ Number of SCF histories for DIIS......           6
+ Beginning iteration for SCF DIIS......           2
+ CCSD convergence tolerance............   9.9999999999999995E-008
+ Number of CCSD iterations.............         100
+ Number of CCSD histories for DIIS.....           5
+ Beginning iteration for CCSD DIIS.....           2
+ Excited state computation............. F
+ EOM-CCSD converged tolerance..........   0.0000000000000000     
+ Number of EOM-CCSD roots to find......           0
+ Geometry optimization calc............ F
+ Vibrational frequency calc............ T
+   Shell     Contracted fns.   Primitive Fns. 
+   -----     ---------------   --------------
+     1              2                 3   0.000000000000D+00   0.167086814800D+01  -0.118148219936D+01
+     2              3                 6   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     3              2                 3   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     4              2                 3   0.000000000000D+00  -0.167086814800D+01  -0.118148219936D+01
+     5              2                 3   0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+     6              2                 3  -0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+ ----------- Parameter Summary ----------------
+ DRYRUN........................... T
+ INTEGRAL_PACKAGE.................ERD                                                                             
+ MOLFILE..........................MOL                                                                                                                     
+ MAXMEM...........................         900
+ OCCUPIED.........................           5
+ ALPHA_OCCUPIED...................           5
+ BETA_OCCUPIED....................           5
+ AO SEGMENT SIZE..................          17
+ OCCUPIED SEGMENT SIZE............          17
+ VIRTUAL SEGMENT SIZE.............          17
+ Local scratch directory...........                                                                                                   
+ Number of centers................           5
+ Number of shells.................           6
+ Number of basis functions........          17
+ NO_SERVERS....................... T
+ IGNORE DROPMO PARAMETERS......... T
+ ITRIP............................           1           5
+ IHESS............................           1           5
+ JHESS............................           1           5
+ SIP_SUB_SEGSIZE..................           5
+ SIP_SUB_OCC_SEGSIZE..............           5
+ SIP_SUB_VIRT_SEGSIZE.............           5
+ SIP_SUB_AO_SEGSIZE...............           5
+ REGULARIZER......................   0.0000000000000000     
+  
+ VFL NAME :scf_rhf_aguess.sio                                          
+ VFL NAME : T
+  MODROPA in SEND:           0           0
+  MODROPA in SEND:           0           0
+ Gather on company_rank succeeded.
+ norb =            1
+ nocc =            1
+ nvirt =            1
+ bocc =            1
+ eocc =            1
+ bvirt =            2
+ evirt =            2
+ naocc =            1
+ nbocc =            1
+ navirt =            1
+ nbvirt =            1
+ baocc =            1
+ bbocc =            1
+ eaocc =            1
+ ebocc =            1
+ bavirt =            2
+ bbvirt =            2
+ eavirt =            2
+ ebvirt =            2
+ noccorb =            5
+ nvirtorb =            0
+ boccorb =            1
+ eoccorb =            5
+ bvirtorb =            6
+ evirtorb =           17
+ naoccorb =            5
+ nboccorb =            5
+ navirtorb =           12
+ nbvirtorb =           12
+ baoccorb =            1
+ bboccorb =            1
+ eaoccorb =            5
+ eboccorb =            5
+ bavirtorb =            6
+ bbvirtorb =            6
+ eavirtorb =           17
+ ebvirtorb =           17
+ cc_iter =          100
+ cc_hist =            5
+ cc_beg =            2
+ scf_iter =          150
+ scf_hist =            6
+ scf_beg =            2
+ ncenters =            5
+ itrips =            1
+ itripe =            5
+ ihess1 =            1
+ ihess2 =            5
+ jhess1 =            1
+ jhess2 =            5
+ subb =           -1
+ sube =           -1
+ sip_sub_segsize =            5
+ sip_sub_occ_segsize =            5
+ sip_sub_virt_segsize            5
+ sip_sub_ao_segsize =            5
+ Static pre-defined array #           1  is first used on line          684
+ Static pre-defined array #           2  is first used on line          465
+ Static pre-defined array #           4  is first used on line         1412
+ Static pre-defined array #           5  is first used on line          605
+ Static pre-defined array #           6  is first used on line          608
+ Static pre-defined array #           9  is first used on line         3091
+ Static pre-defined array #          12  is first used on line         2724
+ Static pre-defined array #          13  is first used on line         1428
+ Static pre-defined array #          14  is first used on line          461
+ Static pre-defined array #          16  is first used on line         2557
+ Static pre-defined array #          17  is first used on line         1184
+ Static pre-defined array #          18  is first used on line         1185
+ Static pre-defined array #          19  is first used on line          605
+ Allocated                 23216  bytes for static arrays.
+ Allocated             895227008  bytes for blkmgr.
+ Total memory usage                   855  MBytes.
+ Max. possible usage          900  MBytes
+ Total blocks used =         8900
+ *** COMPLETED DRYRUN PASS FOR scf_rhf_aguess.sio                                          
+ Next SIAL program: hess_uhf_scf.sio                                            
+  NBASIS AFTER SIMPLE_INSPECT           17
+ WARNING: ACES has defaulted cc_maxcyc to 0,  resetting to 100.
+ WARNING: ACES has defaulted cc_exporder to 0, resetting to 5.
+  Resetting scf_beg to 2 
+ *** WARNING: ACES has specified a RHF run.  Either use REF=UHF in ACES or run a true RHF SIAL code.***
+  NALPHA_VIRT =          12
+  NBETA_VIRT =          12
+  Computing the NN repulsion energy 
+              5   1.0000000000000000        6.0000000000000000        1.0000000000000000        1.0000000000000000        1.0000000000000000     
+  NN rep computed =    13.523459621956144     
+ SCF ENERGY IS INITIALIZED FROM NUCLEAR-NUCLEAR REPULSION ENERGY:    13.523459621956144     
+ --------- Required data from MOL file -----------
+ Number of centers.....................           5
+ Number of shells......................           6
+ Cartesian flag........................ F
+ Total number of basis functions.......          17
+ Total number of primitive functions...          21
+ Initial SCF energy....................   13.523459621956144     
+ SCF damping factor....................  0.19999998807907104     
+ SCF convergence tolerance.............   9.9999999999999995E-008
+ Number of SCF iterations..............         150
+ Number of SCF histories for DIIS......           6
+ Beginning iteration for SCF DIIS......           2
+ CCSD convergence tolerance............   9.9999999999999995E-008
+ Number of CCSD iterations.............         100
+ Number of CCSD histories for DIIS.....           5
+ Beginning iteration for CCSD DIIS.....           2
+ Excited state computation............. F
+ EOM-CCSD converged tolerance..........   0.0000000000000000     
+ Number of EOM-CCSD roots to find......           0
+ Geometry optimization calc............ F
+ Vibrational frequency calc............ T
+   Shell     Contracted fns.   Primitive Fns. 
+   -----     ---------------   --------------
+     1              2                 3   0.000000000000D+00   0.167086814800D+01  -0.118148219936D+01
+     2              3                 6   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     3              2                 3   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     4              2                 3   0.000000000000D+00  -0.167086814800D+01  -0.118148219936D+01
+     5              2                 3   0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+     6              2                 3  -0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+ ----------- Parameter Summary ----------------
+ DRYRUN........................... T
+ INTEGRAL_PACKAGE.................ERD                                                                             
+ MOLFILE..........................MOL                                                                                                                     
+ MAXMEM...........................         900
+ OCCUPIED.........................           5
+ ALPHA_OCCUPIED...................           5
+ BETA_OCCUPIED....................           5
+ AO SEGMENT SIZE..................          17
+ OCCUPIED SEGMENT SIZE............          17
+ VIRTUAL SEGMENT SIZE.............          17
+ Local scratch directory...........                                                                                                   
+ Number of centers................           5
+ Number of shells.................           6
+ Number of basis functions........          17
+ NO_SERVERS....................... F
+ IGNORE DROPMO PARAMETERS......... F
+ ITRIP............................           1           5
+ IHESS............................           1           5
+ JHESS............................           1           5
+ SIP_SUB_SEGSIZE..................           5
+ SIP_SUB_OCC_SEGSIZE..............           5
+ SIP_SUB_VIRT_SEGSIZE.............           5
+ SIP_SUB_AO_SEGSIZE...............           5
+ REGULARIZER......................   0.0000000000000000     
+  
+ VFL NAME :hess_uhf_scf.sio                                            
+ VFL NAME : T
+  MODROPA in SEND:           0           0
+  MODROPA in SEND:           0           0
+ Gather on company_rank succeeded.
+ norb =            1
+ nocc =            1
+ nvirt =            1
+ bocc =            1
+ eocc =            1
+ bvirt =            2
+ evirt =            2
+ naocc =            1
+ nbocc =            1
+ navirt =            1
+ nbvirt =            1
+ baocc =            1
+ bbocc =            1
+ eaocc =            1
+ ebocc =            1
+ bavirt =            2
+ bbvirt =            2
+ eavirt =            2
+ ebvirt =            2
+ noccorb =            5
+ nvirtorb =            0
+ boccorb =            1
+ eoccorb =            5
+ bvirtorb =            6
+ evirtorb =           17
+ naoccorb =            5
+ nboccorb =            5
+ navirtorb =           12
+ nbvirtorb =           12
+ baoccorb =            1
+ bboccorb =            1
+ eaoccorb =            5
+ eboccorb =            5
+ bavirtorb =            6
+ bbvirtorb =            6
+ eavirtorb =           17
+ ebvirtorb =           17
+ cc_iter =          100
+ cc_hist =            5
+ cc_beg =            2
+ scf_iter =          150
+ scf_hist =            6
+ scf_beg =            2
+ ncenters =            5
+ itrips =            1
+ itripe =            5
+ ihess1 =            1
+ ihess2 =            5
+ jhess1 =            1
+ jhess2 =            5
+ subb =           -1
+ sube =           -1
+ sip_sub_segsize =            5
+ sip_sub_occ_segsize =            5
+ sip_sub_virt_segsize            5
+ sip_sub_ao_segsize =            5
+ Static pre-defined array #           1  is first used on line         4515
+ Static pre-defined array #           2  is first used on line         1081
+ Static pre-defined array #           3  is first used on line         1096
+ Static pre-defined array #           5  is first used on line         4464
+ Static pre-defined array #           9  is first used on line         3632
+ Static pre-defined array #          10  is first used on line         3727
+ Static pre-defined array #          11  is first used on line         4465
+ Static pre-defined array #          12  is first used on line         4464
+ Static pre-defined array #          13  is first used on line         4465
+ Allocated                 16304  bytes for static arrays.
+ Allocated             894774272  bytes for blkmgr.
+ Total memory usage                   855  MBytes.
+ Max. possible usage          900  MBytes
+ Total blocks used =         9234
+ *** COMPLETED DRYRUN PASS FOR hess_uhf_scf.sio                                            
+ Next SIAL program: scf_aguess.sio                                              
+ Overriding COMPANY parameter, using            2  processes as workers.
+  NBASIS AFTER SIMPLE_INSPECT           17
+ WARNING: ACES has defaulted cc_maxcyc to 0,  resetting to 100.
+ WARNING: ACES has defaulted cc_exporder to 0, resetting to 5.
+  Resetting scf_beg to 2 
+ *** WARNING: ACES has specified a RHF run.  Either use REF=UHF in ACES or run a true RHF SIAL code.***
+  NALPHA_VIRT =          12
+  NBETA_VIRT =          12
+  Computing the NN repulsion energy 
+              5   1.0000000000000000        6.0000000000000000        1.0000000000000000        1.0000000000000000        1.0000000000000000     
+  NN rep computed =    13.523459621956144     
+ SCF ENERGY IS INITIALIZED FROM NUCLEAR-NUCLEAR REPULSION ENERGY:    13.523459621956144     
+ --------- Required data from MOL file -----------
+ Number of centers.....................           5
+ Number of shells......................           6
+ Cartesian flag........................ F
+ Total number of basis functions.......          17
+ Total number of primitive functions...          21
+ Initial SCF energy....................   13.523459621956144     
+ SCF damping factor....................  0.19999998807907104     
+ SCF convergence tolerance.............   9.9999999999999995E-008
+ Number of SCF iterations..............         150
+ Number of SCF histories for DIIS......           6
+ Beginning iteration for SCF DIIS......           2
+ CCSD convergence tolerance............   9.9999999999999995E-008
+ Number of CCSD iterations.............         100
+ Number of CCSD histories for DIIS.....           5
+ Beginning iteration for CCSD DIIS.....           2
+ Excited state computation............. F
+ EOM-CCSD converged tolerance..........   0.0000000000000000     
+ Number of EOM-CCSD roots to find......           0
+ Geometry optimization calc............ F
+ Vibrational frequency calc............ T
+   Shell     Contracted fns.   Primitive Fns. 
+   -----     ---------------   --------------
+     1              2                 3   0.000000000000D+00   0.167086814800D+01  -0.118148219936D+01
+     2              3                 6   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     3              2                 3   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     4              2                 3   0.000000000000D+00  -0.167086814800D+01  -0.118148219936D+01
+     5              2                 3   0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+     6              2                 3  -0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+ ----------- Parameter Summary ----------------
+ DRYRUN........................... F
+ INTEGRAL_PACKAGE.................ERD                                                                             
+ MOLFILE..........................MOL                                                                                                                     
+ MAXMEM...........................         900
+ OCCUPIED.........................           5
+ ALPHA_OCCUPIED...................           5
+ BETA_OCCUPIED....................           5
+ AO SEGMENT SIZE..................          17
+ OCCUPIED SEGMENT SIZE............          17
+ VIRTUAL SEGMENT SIZE.............          17
+ Local scratch directory...........                                                                                                   
+ Number of centers................           5
+ Number of shells.................           6
+ Number of basis functions........          17
+ NO_SERVERS....................... T
+ IGNORE DROPMO PARAMETERS......... T
+ ITRIP............................           1           5
+ IHESS............................           1           5
+ JHESS............................           1           5
+ SIP_SUB_SEGSIZE..................           5
+ SIP_SUB_OCC_SEGSIZE..............           5
+ SIP_SUB_VIRT_SEGSIZE.............           5
+ SIP_SUB_AO_SEGSIZE...............           5
+ REGULARIZER......................   0.0000000000000000     
+  
+ VFL NAME :scf_aguess.sio                                              
+ VFL NAME : F
+  MODROPA in SEND:           0           0
+  MODROPA in SEND:           0           0
+ Gather on company_rank succeeded.
+ norb =            1
+ nocc =            1
+ nvirt =            1
+ bocc =            1
+ eocc =            1
+ bvirt =            2
+ evirt =            2
+ naocc =            1
+ nbocc =            1
+ navirt =            1
+ nbvirt =            1
+ baocc =            1
+ bbocc =            1
+ eaocc =            1
+ ebocc =            1
+ bavirt =            2
+ bbvirt =            2
+ eavirt =            2
+ ebvirt =            2
+ noccorb =            5
+ nvirtorb =            0
+ boccorb =            1
+ eoccorb =            5
+ bvirtorb =            6
+ evirtorb =           17
+ naoccorb =            5
+ nboccorb =            5
+ navirtorb =           12
+ nbvirtorb =           12
+ baoccorb =            1
+ bboccorb =            1
+ eaoccorb =            5
+ eboccorb =            5
+ bavirtorb =            6
+ bbvirtorb =            6
+ eavirtorb =           17
+ ebvirtorb =           17
+ cc_iter =          100
+ cc_hist =            5
+ cc_beg =            2
+ scf_iter =          150
+ scf_hist =            6
+ scf_beg =            2
+ ncenters =            5
+ itrips =            1
+ itripe =            5
+ ihess1 =            1
+ ihess2 =            5
+ jhess1 =            1
+ jhess2 =            5
+ subb =           -1
+ sube =           -1
+ sip_sub_segsize =            5
+ sip_sub_occ_segsize =            5
+ sip_sub_virt_segsize            5
+ sip_sub_ao_segsize =            5
+ Static pre-defined array #          11  is first used on line           71
+ Static pre-defined array #          12  is first used on line           72
+ Static pre-defined array #          13  is first used on line           70
+ Static pre-defined array #          17  is first used on line           68
+ Static pre-defined array #          18  is first used on line           69
+ Allocated                 11760  bytes for static arrays.
+ Allocated             895588224  bytes for blkmgr.
+ Total memory usage                   855  MBytes.
+ Max. possible usage          900  MBytes
+ Total blocks used =         8775
+MPI TAG_UB value is 2147483647
+ Task            0  Scalar value =    1.0000000000000000       at line number           84
+ -------------------------------------------
+ Linear dependency threshold   1.0000000000000001E-009
+ -------------------------------------------
+ ===================================================
+ Basis of atomic orbitals contains           0 linear dependecies
+ ====================================================
+  Total SCF energy(-NN) =  -0.49619860938093907     
+  Total SCF energy(-NN) =  -0.49619860938093913     
+ Task            0  Scalar value =    2.0000000000000000       at line number           84
+ -------------------------------------------
+ Linear dependency threshold   1.0000000000000001E-009
+ -------------------------------------------
+ ===================================================
+ Basis of atomic orbitals contains           0 linear dependecies
+ ====================================================
+  Total SCF energy(-NN) =   -52.679807296797371     
+  Total SCF energy(-NN) =   -35.883016700108605     
+  Total SCF energy(-NN) =   -37.389108895447201     
+  Total SCF energy(-NN) =   -37.391362594650651     
+  Total SCF energy(-NN) =   -37.391366446198845     
+  Total SCF energy(-NN) =   -37.391366498575962     
+  Total SCF energy(-NN) =   -37.391366501777028     
+  Total SCF energy(-NN) =   -37.391366501901068     
+ Task            0  Scalar value =    3.0000000000000000       at line number           84
+ -------------------------------------------
+ Linear dependency threshold   1.0000000000000001E-009
+ -------------------------------------------
+ ===================================================
+ Basis of atomic orbitals contains           0 linear dependecies
+ ====================================================
+  Total SCF energy(-NN) =  -0.49619860938093907     
+  Total SCF energy(-NN) =  -0.49619860938093913     
+ Task            0  Scalar value =    4.0000000000000000       at line number           84
+ -------------------------------------------
+ Linear dependency threshold   1.0000000000000001E-009
+ -------------------------------------------
+ ===================================================
+ Basis of atomic orbitals contains           0 linear dependecies
+ ====================================================
+  Total SCF energy(-NN) =  -0.49619860938093907     
+  Total SCF energy(-NN) =  -0.49619860938093913     
+ Task            0  Scalar value =    5.0000000000000000       at line number           84
+ -------------------------------------------
+ Linear dependency threshold   1.0000000000000001E-009
+ -------------------------------------------
+ ===================================================
+ Basis of atomic orbitals contains           0 linear dependecies
+ ====================================================
+  Total SCF energy(-NN) =  -0.49619860938093907     
+  Total SCF energy(-NN) =  -0.49619860938093913     
+ ---------- Finished! ---------------
+ Total energy:    0.0000000000000000     
+ SCF energy:    13.523459621956144     
+ HF Instability Value:    0.0000000000000000     
+ Gradient data:
+ Atom #           1 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           2 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           3 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           4 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           5 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+  
+  Symmetrized gradient information 
+           1   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           2   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           3   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           4   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           5   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Lame calculation - slater-type geminals are not included
+ Elapsed time =   0.18218302726745605       seconds.
+ Next SIAL program: scf_rhf_aguess.sio                                          
+ Overriding COMPANY parameter, using            2  processes as workers.
+  NBASIS AFTER SIMPLE_INSPECT           17
+ WARNING: ACES has defaulted cc_maxcyc to 0,  resetting to 100.
+ WARNING: ACES has defaulted cc_exporder to 0, resetting to 5.
+  Resetting scf_beg to 2 
+ *** WARNING: ACES has specified a RHF run.  Either use REF=UHF in ACES or run a true RHF SIAL code.***
+  NALPHA_VIRT =          12
+  NBETA_VIRT =          12
+  Computing the NN repulsion energy 
+              5   1.0000000000000000        6.0000000000000000        1.0000000000000000        1.0000000000000000        1.0000000000000000     
+  NN rep computed =    13.523459621956144     
+ SCF ENERGY IS INITIALIZED FROM NUCLEAR-NUCLEAR REPULSION ENERGY:    13.523459621956144     
+ --------- Required data from MOL file -----------
+ Number of centers.....................           5
+ Number of shells......................           6
+ Cartesian flag........................ F
+ Total number of basis functions.......          17
+ Total number of primitive functions...          21
+ Initial SCF energy....................   13.523459621956144     
+ SCF damping factor....................  0.19999998807907104     
+ SCF convergence tolerance.............   9.9999999999999995E-008
+ Number of SCF iterations..............         150
+ Number of SCF histories for DIIS......           6
+ Beginning iteration for SCF DIIS......           2
+ CCSD convergence tolerance............   9.9999999999999995E-008
+ Number of CCSD iterations.............         100
+ Number of CCSD histories for DIIS.....           5
+ Beginning iteration for CCSD DIIS.....           2
+ Excited state computation............. F
+ EOM-CCSD converged tolerance..........   0.0000000000000000     
+ Number of EOM-CCSD roots to find......           0
+ Geometry optimization calc............ F
+ Vibrational frequency calc............ T
+   Shell     Contracted fns.   Primitive Fns. 
+   -----     ---------------   --------------
+     1              2                 3   0.000000000000D+00   0.167086814800D+01  -0.118148219936D+01
+     2              3                 6   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     3              2                 3   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     4              2                 3   0.000000000000D+00  -0.167086814800D+01  -0.118148219936D+01
+     5              2                 3   0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+     6              2                 3  -0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+ ----------- Parameter Summary ----------------
+ DRYRUN........................... F
+ INTEGRAL_PACKAGE.................ERD                                                                             
+ MOLFILE..........................MOL                                                                                                                     
+ MAXMEM...........................         900
+ OCCUPIED.........................           5
+ ALPHA_OCCUPIED...................           5
+ BETA_OCCUPIED....................           5
+ AO SEGMENT SIZE..................          17
+ OCCUPIED SEGMENT SIZE............          17
+ VIRTUAL SEGMENT SIZE.............          17
+ Local scratch directory...........                                                                                                   
+ Number of centers................           5
+ Number of shells.................           6
+ Number of basis functions........          17
+ NO_SERVERS....................... T
+ IGNORE DROPMO PARAMETERS......... T
+ ITRIP............................           1           5
+ IHESS............................           1           5
+ JHESS............................           1           5
+ SIP_SUB_SEGSIZE..................           5
+ SIP_SUB_OCC_SEGSIZE..............           5
+ SIP_SUB_VIRT_SEGSIZE.............           5
+ SIP_SUB_AO_SEGSIZE...............           5
+ REGULARIZER......................   0.0000000000000000     
+  
+ VFL NAME :scf_rhf_aguess.sio                                          
+ VFL NAME : F
+  MODROPA in SEND:           0           0
+  MODROPA in SEND:           0           0
+ Gather on company_rank succeeded.
+ norb =            1
+ nocc =            1
+ nvirt =            1
+ bocc =            1
+ eocc =            1
+ bvirt =            2
+ evirt =            2
+ naocc =            1
+ nbocc =            1
+ navirt =            1
+ nbvirt =            1
+ baocc =            1
+ bbocc =            1
+ eaocc =            1
+ ebocc =            1
+ bavirt =            2
+ bbvirt =            2
+ eavirt =            2
+ ebvirt =            2
+ noccorb =            5
+ nvirtorb =            0
+ boccorb =            1
+ eoccorb =            5
+ bvirtorb =            6
+ evirtorb =           17
+ naoccorb =            5
+ nboccorb =            5
+ navirtorb =           12
+ nbvirtorb =           12
+ baoccorb =            1
+ bboccorb =            1
+ eaoccorb =            5
+ eboccorb =            5
+ bavirtorb =            6
+ bbvirtorb =            6
+ eavirtorb =           17
+ ebvirtorb =           17
+ cc_iter =          100
+ cc_hist =            5
+ cc_beg =            2
+ scf_iter =          150
+ scf_hist =            6
+ scf_beg =            2
+ ncenters =            5
+ itrips =            1
+ itripe =            5
+ ihess1 =            1
+ ihess2 =            5
+ jhess1 =            1
+ jhess2 =            5
+ subb =           -1
+ sube =           -1
+ sip_sub_segsize =            5
+ sip_sub_occ_segsize =            5
+ sip_sub_virt_segsize            5
+ sip_sub_ao_segsize =            5
+ Static pre-defined array #           1  is first used on line          684
+ Static pre-defined array #           2  is first used on line          465
+ Static pre-defined array #           4  is first used on line         1412
+ Static pre-defined array #           5  is first used on line          605
+ Static pre-defined array #           6  is first used on line          608
+ Static pre-defined array #           9  is first used on line         3091
+ Static pre-defined array #          12  is first used on line         2724
+ Static pre-defined array #          13  is first used on line         1428
+ Static pre-defined array #          14  is first used on line          461
+ Static pre-defined array #          16  is first used on line         2557
+ Static pre-defined array #          17  is first used on line         1184
+ Static pre-defined array #          18  is first used on line         1185
+ Static pre-defined array #          19  is first used on line          605
+ Allocated                 23216  bytes for static arrays.
+ Allocated             895201344  bytes for blkmgr.
+ Total memory usage                   855  MBytes.
+ Max. possible usage          900  MBytes
+ Total blocks used =         8900
+MPI TAG_UB value is 2147483647
+ Task            0  Scalar value =   0.19999998807907104       at line number         2563
+ Task            0  Scalar value =   0.83333334161175632       at line number         2564
+ Task            0  Scalar value =    2.0000000000000000       at line number         2622
+ Task            0  Scalar value =    6.0000000000000000       at line number         2623
+ Task            0  Scalar value =   -1.0000000000000000       at line number         2690
+ -------------------------------------------
+ Linear dependency threshold   1.0000000000000001E-009
+ -------------------------------------------
+ ===================================================
+ Basis of atomic orbitals contains           0 linear dependecies
+ ====================================================
+ Task            0  Scalar value =   -40.531815703363669       at line number         1414
+ Task            0  Scalar value =   -39.927925860331939       at line number         1414
+ Task            0  Scalar value =    2.0000000000000000       at line number         2873
+ Task            0  Scalar value =   -39.964724444636865       at line number         1414
+ Task            0  Scalar value =    3.0000000000000000       at line number         2873
+ Task            0  Scalar value =    2.0000000000000000       at line number         2889
+ Task            0  Scalar value =   -6.7362441566062747E-002  at line number         2415
+ Task            0  Scalar value =    1.0673624415660627       at line number         2416
+ Task            0  Scalar value =    0.0000000000000000       at line number         2417
+ Task            0  Scalar value =    0.0000000000000000       at line number         2418
+ Task            0  Scalar value =    0.0000000000000000       at line number         2419
+ Task            0  Scalar value =    0.0000000000000000       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =   -39.976284192280922       at line number         1414
+ Task            0  Scalar value =    4.0000000000000000       at line number         2873
+ Task            0  Scalar value =    3.0000000000000000       at line number         2889
+ Task            0  Scalar value =   -1.7466661839211473E-002  at line number         2415
+ Task            0  Scalar value =  -0.27182767946898595       at line number         2416
+ Task            0  Scalar value =    1.2892943413081974       at line number         2417
+ Task            0  Scalar value =    0.0000000000000000       at line number         2418
+ Task            0  Scalar value =    0.0000000000000000       at line number         2419
+ Task            0  Scalar value =    0.0000000000000000       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =   -39.976866461850918       at line number         1414
+ Task            0  Scalar value =    5.0000000000000000       at line number         2873
+ Task            0  Scalar value =    4.0000000000000000       at line number         2889
+ Task            0  Scalar value =   -6.5273509387275136E-004  at line number         2415
+ Task            0  Scalar value =   -1.3236040417923353E-002  at line number         2416
+ Task            0  Scalar value =    3.6384742085130074E-002  at line number         2417
+ Task            0  Scalar value =   0.97750403342666603       at line number         2418
+ Task            0  Scalar value =    0.0000000000000000       at line number         2419
+ Task            0  Scalar value =    0.0000000000000000       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =   -39.976876366439107       at line number         1414
+ Task            0  Scalar value =    6.0000000000000000       at line number         2873
+ Task            0  Scalar value =    5.0000000000000000       at line number         2889
+ Task            0  Scalar value =   -1.6543277173124012E-003  at line number         2415
+ Task            0  Scalar value =    1.2767724689897257E-004  at line number         2416
+ Task            0  Scalar value =    2.3117624977047968E-003  at line number         2417
+ Task            0  Scalar value =   0.14030581165749223       at line number         2418
+ Task            0  Scalar value =   0.85890907631521640       at line number         2419
+ Task            0  Scalar value =    0.0000000000000000       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =   -39.976877391674954       at line number         1414
+ Task            0  Scalar value =    7.0000000000000000       at line number         2873
+ Task            0  Scalar value =    6.0000000000000000       at line number         2889
+ Task            0  Scalar value =    4.0166975435729181E-004  at line number         2415
+ Task            0  Scalar value =   -3.1194955717923872E-003  at line number         2416
+ Task            0  Scalar value =    1.1812443285500181E-002  at line number         2417
+ Task            0  Scalar value =   -2.0478755702117026E-002  at line number         2418
+ Task            0  Scalar value =   -4.2655320263170642E-002  at line number         2419
+ Task            0  Scalar value =    1.0540394584972226       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =   -39.976877529496278       at line number         1414
+ Task            0  Scalar value =    8.0000000000000000       at line number         2873
+ Task            0  Scalar value =    7.0000000000000000       at line number         2889
+ Task            0  Scalar value =   -8.5704686460866481E-005  at line number         2415
+ Task            0  Scalar value =    9.3562354313352449E-004  at line number         2416
+ Task            0  Scalar value =   -4.9147209257799519E-003  at line number         2417
+ Task            0  Scalar value =   -1.2324396991971772E-002  at line number         2418
+ Task            0  Scalar value =    1.7360102539955912E-002  at line number         2419
+ Task            0  Scalar value =   -1.9828839682630695E-003  at line number         2420
+ Task            0  Scalar value =    1.0010119804893862       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =    7.0000000000000000       at line number         2897
+ Task            0  Scalar value =   -39.976877552443980       at line number         1414
+ Task            0  Scalar value =    7.0000000000000000       at line number         2873
+ Task            0  Scalar value =    6.0000000000000000       at line number         2889
+ Task            0  Scalar value =    1.0263641352682782E-004  at line number         2415
+ Task            0  Scalar value =   -7.5392644989254914E-004  at line number         2416
+ Task            0  Scalar value =   -2.5310255415906010E-003  at line number         2417
+ Task            0  Scalar value =    2.5023605919743527E-003  at line number         2418
+ Task            0  Scalar value =   -2.3261782205507207E-002  at line number         2419
+ Task            0  Scalar value =    1.0239417371914892       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =    7.0000000000000000       at line number         2897
+ Task            0  Scalar value =   -39.976877553189688       at line number         1414
+ Task            0  Scalar value =    7.0000000000000000       at line number         2873
+ Task            0  Scalar value =    6.0000000000000000       at line number         2889
+ Task            0  Scalar value =   -1.9137975355061548E-005  at line number         2415
+ Task            0  Scalar value =   -4.1289740320367710E-006  at line number         2416
+ Task            0  Scalar value =    1.2082630801277144E-003  at line number         2417
+ Task            0  Scalar value =   -1.2991102164379735E-003  at line number         2418
+ Task            0  Scalar value =    1.0469892373766686E-002  at line number         2419
+ Task            0  Scalar value =   0.98964422171193067       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =    7.0000000000000000       at line number         2897
+ Task            0  Scalar value =   -39.976877553198754       at line number         1414
+ Task            0  Scalar value =    7.0000000000000000       at line number         2873
+ Task            0  Scalar value =    6.0000000000000000       at line number         2889
+ Task            0  Scalar value =    4.0630421135246083E-005  at line number         2415
+ Task            0  Scalar value =    4.1541839987690727E-004  at line number         2416
+ Task            0  Scalar value =   -8.7819696828230062E-004  at line number         2417
+ Task            0  Scalar value =   -7.2064385150185763E-003  at line number         2418
+ Task            0  Scalar value =   -4.6170072037493341E-002  at line number         2419
+ Task            0  Scalar value =    1.0537986586997821       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =    7.0000000000000000       at line number         2897
+ Task            0  Scalar value =   -39.976877553200339       at line number         1414
+ Task            0  Scalar value =    7.0000000000000000       at line number         2873
+ Task            0  Scalar value =    6.0000000000000000       at line number         2889
+ Task            0  Scalar value =   -6.5684475033869543E-005  at line number         2415
+ Task            0  Scalar value =    9.6349047489679691E-005  at line number         2416
+ Task            0  Scalar value =    1.9527847484027285E-004  at line number         2417
+ Task            0  Scalar value =    5.4939927781709523E-002  at line number         2418
+ Task            0  Scalar value =    7.5199278070021233E-002  at line number         2419
+ Task            0  Scalar value =   0.86963485110097316       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =    7.0000000000000000       at line number         2897
+ Task            0  Scalar value =   -39.976877553200453       at line number         1414
+ Task            0  Scalar value =    7.0000000000000000       at line number         2873
+ Task            0  Scalar value =    6.0000000000000000       at line number         2889
+ Task            0  Scalar value =    2.9719888710140463E-005  at line number         2415
+ Task            0  Scalar value =   -4.6016787608000735E-004  at line number         2416
+ Task            0  Scalar value =    2.7336491983772627E-002  at line number         2417
+ Task            0  Scalar value =    2.7601124685581662E-002  at line number         2418
+ Task            0  Scalar value =   -9.1874336780005408E-002  at line number         2419
+ Task            0  Scalar value =    1.0373671680980210       at line number         2420
+ Task            0  Scalar value =    0.0000000000000000       at line number         2421
+ Task            0  Scalar value =    0.0000000000000000       at line number         2422
+ Task            0  Scalar value =    0.0000000000000000       at line number         2423
+ Task            0  Scalar value =    7.0000000000000000       at line number         2897
+ ---------- Finished! ---------------
+ Total energy:   -39.976877553200453     
+ SCF energy:   -39.976877553200453     
+ HF Instability Value:    0.0000000000000000     
+ Gradient data:
+ Atom #           1 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           2 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           3 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           4 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           5 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+  
+  Symmetrized gradient information 
+           1   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           2   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           3   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           4   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           5   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Lame calculation - slater-type geminals are not included
+ Elapsed time =   0.34976315498352051       seconds.
+ Next SIAL program: hess_uhf_scf.sio                                            
+  NBASIS AFTER SIMPLE_INSPECT           17
+ WARNING: ACES has defaulted cc_maxcyc to 0,  resetting to 100.
+ WARNING: ACES has defaulted cc_exporder to 0, resetting to 5.
+  Resetting scf_beg to 2 
+ *** WARNING: ACES has specified a RHF run.  Either use REF=UHF in ACES or run a true RHF SIAL code.***
+  NALPHA_VIRT =          12
+  NBETA_VIRT =          12
+ --------- Required data from MOL file -----------
+ Number of centers.....................           5
+ Number of shells......................           6
+ Cartesian flag........................ F
+ Total number of basis functions.......          17
+ Total number of primitive functions...          21
+ Initial SCF energy....................  -39.976877553200453     
+ SCF damping factor....................  0.19999998807907104     
+ SCF convergence tolerance.............   9.9999999999999995E-008
+ Number of SCF iterations..............         150
+ Number of SCF histories for DIIS......           6
+ Beginning iteration for SCF DIIS......           2
+ CCSD convergence tolerance............   9.9999999999999995E-008
+ Number of CCSD iterations.............         100
+ Number of CCSD histories for DIIS.....           5
+ Beginning iteration for CCSD DIIS.....           2
+ Excited state computation............. F
+ EOM-CCSD converged tolerance..........   0.0000000000000000     
+ Number of EOM-CCSD roots to find......           0
+ Geometry optimization calc............ F
+ Vibrational frequency calc............ T
+   Shell     Contracted fns.   Primitive Fns. 
+   -----     ---------------   --------------
+     1              2                 3   0.000000000000D+00   0.167086814800D+01  -0.118148219936D+01
+     2              3                 6   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     3              2                 3   0.000000000000D+00  -0.000000000000D+00   0.000000000000D+00
+     4              2                 3   0.000000000000D+00  -0.167086814800D+01  -0.118148219936D+01
+     5              2                 3   0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+     6              2                 3  -0.167086814800D+01  -0.000000000000D+00   0.118148219936D+01
+ ----------- Parameter Summary ----------------
+ DRYRUN........................... F
+ INTEGRAL_PACKAGE.................ERD                                                                             
+ MOLFILE..........................MOL                                                                                                                     
+ MAXMEM...........................         900
+ OCCUPIED.........................           5
+ ALPHA_OCCUPIED...................           5
+ BETA_OCCUPIED....................           5
+ AO SEGMENT SIZE..................          17
+ OCCUPIED SEGMENT SIZE............          17
+ VIRTUAL SEGMENT SIZE.............          17
+ Local scratch directory...........                                                                                                   
+ Number of centers................           5
+ Number of shells.................           6
+ Number of basis functions........          17
+ NO_SERVERS....................... F
+ IGNORE DROPMO PARAMETERS......... F
+ ITRIP............................           1           5
+ IHESS............................           1           5
+ JHESS............................           1           5
+ SIP_SUB_SEGSIZE..................           5
+ SIP_SUB_OCC_SEGSIZE..............           5
+ SIP_SUB_VIRT_SEGSIZE.............           5
+ SIP_SUB_AO_SEGSIZE...............           5
+ REGULARIZER......................   0.0000000000000000     
+  
+ VFL NAME :hess_uhf_scf.sio                                            
+ VFL NAME : F
+  MODROPA in SEND:           0           0
+  MODROPA in SEND:           0           0
+ Gather on company_rank succeeded.
+ norb =            1
+ nocc =            1
+ nvirt =            1
+ bocc =            1
+ eocc =            1
+ bvirt =            2
+ evirt =            2
+ naocc =            1
+ nbocc =            1
+ navirt =            1
+ nbvirt =            1
+ baocc =            1
+ bbocc =            1
+ eaocc =            1
+ ebocc =            1
+ bavirt =            2
+ bbvirt =            2
+ eavirt =            2
+ ebvirt =            2
+ noccorb =            5
+ nvirtorb =            0
+ boccorb =            1
+ eoccorb =            5
+ bvirtorb =            6
+ evirtorb =           17
+ naoccorb =            5
+ nboccorb =            5
+ navirtorb =           12
+ nbvirtorb =           12
+ baoccorb =            1
+ bboccorb =            1
+ eaoccorb =            5
+ eboccorb =            5
+ bavirtorb =            6
+ bbvirtorb =            6
+ eavirtorb =           17
+ ebvirtorb =           17
+ cc_iter =          100
+ cc_hist =            5
+ cc_beg =            2
+ scf_iter =          150
+ scf_hist =            6
+ scf_beg =            2
+ ncenters =            5
+ itrips =            1
+ itripe =            5
+ ihess1 =            1
+ ihess2 =            5
+ jhess1 =            1
+ jhess2 =            5
+ subb =           -1
+ sube =           -1
+ sip_sub_segsize =            5
+ sip_sub_occ_segsize =            5
+ sip_sub_virt_segsize            5
+ sip_sub_ao_segsize =            5
+ Static pre-defined array #           1  is first used on line         4515
+ Static pre-defined array #           2  is first used on line         1081
+ Static pre-defined array #           3  is first used on line         1096
+ Static pre-defined array #           5  is first used on line         4464
+ Static pre-defined array #           9  is first used on line         3632
+ Static pre-defined array #          10  is first used on line         3727
+ Static pre-defined array #          11  is first used on line         4465
+ Static pre-defined array #          12  is first used on line         4464
+ Static pre-defined array #          13  is first used on line         4465
+ Allocated                 16304  bytes for static arrays.
+ Allocated             894718976  bytes for blkmgr.
+ Number of block_map entries          896
+ Servers were initialized with         1412  blocks of        83521  words each.
+ Total memory usage                   855  MBytes.
+ Max. possible usage          900  MBytes
+ Total blocks used =         9234
+ Task            0  Scalar value =    0.0000000000000000       at line number         8073
+ Task            0  Scalar value =    0.0000000000000000       at line number         8075
+ Task            0  Scalar value =    0.0000000000000000       at line number         8091
+ Task            0  Scalar value =    0.0000000000000000       at line number         8100
+ Task            0  Scalar value =    0.0000000000000000       at line number         8116
+ Task            0  Scalar value =    0.0000000000000000       at line number         8127
+ Task            0  Scalar value =    0.0000000000000000       at line number         8133
+ Task            0  Scalar value =    0.0000000000000000       at line number         8141
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         7300
+ Task            0  Scalar value =    0.0000000000000000       at line number         8149
+ Task            0  Scalar value =   0.56490359692311309       at line number         7748
+ Task            0  Scalar value =   0.65259329983616499       at line number         7748
+ Task            0  Scalar value =   0.68886024058756823       at line number         7748
+ Task            0  Scalar value =   0.69564522325614808       at line number         7748
+ Task            0  Scalar value =   0.69573704871292763       at line number         7748
+ Task            0  Scalar value =    1.3108477304525780E-002  at line number         8151
+ Task            0  Scalar value =    1.9379002350040087E-002  at line number         8250
+ Task            0  Scalar value =   -5.0078218069473778E-009  at line number         8250
+ Task            0  Scalar value =    5.0259189456167315E-009  at line number         8250
+ Task            0  Scalar value =   -9.5084541211953328E-003  at line number         8250
+ Task            0  Scalar value =    4.9140732581331272E-009  at line number         8250
+ Task            0  Scalar value =   -1.1658686309120106E-008  at line number         8250
+ Task            0  Scalar value =   -5.5884843814884705E-003  at line number         8250
+ Task            0  Scalar value =    2.1930160557117164E-009  at line number         8250
+ Task            0  Scalar value =    7.9123431843465021E-010  at line number         8250
+ Task            0  Scalar value =   -2.1410352045176939E-003  at line number         8250
+ Task            0  Scalar value =    2.1083780577641480E-002  at line number         8250
+ Task            0  Scalar value =   -1.2470763785431301E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410286428386262E-003  at line number         8250
+ Task            0  Scalar value =   -2.1083782676908996E-002  at line number         8250
+ Task            0  Scalar value =    1.2470769626964383E-002  at line number         8250
+ Task            0  Scalar value =   -4.9960678796142602E-009  at line number         8250
+ Task            0  Scalar value =    4.7974395255165246E-002  at line number         8250
+ Task            0  Scalar value =   -2.0219927142439375E-002  at line number         8250
+ Task            0  Scalar value =    2.4025098089322473E-008  at line number         8250
+ Task            0  Scalar value =   -4.0541916828515989E-002  at line number         8250
+ Task            0  Scalar value =    2.1943954684442442E-002  at line number         8250
+ Task            0  Scalar value =    3.7315441973736422E-009  at line number         8250
+ Task            0  Scalar value =   -3.1504118374812689E-003  at line number         8250
+ Task            0  Scalar value =    2.6665483247208757E-002  at line number         8250
+ Task            0  Scalar value =   -1.6626919255067263E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410369985262597E-003  at line number         8250
+ Task            0  Scalar value =   -1.4194765555519427E-002  at line number         8250
+ Task            0  Scalar value =    1.6626896494492845E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410295906418566E-003  at line number         8250
+ Task            0  Scalar value =   -1.4194745233692269E-002  at line number         8250
+ Task            0  Scalar value =    5.0175832696833212E-009  at line number         8250
+ Task            0  Scalar value =   -2.0219896955856916E-002  at line number         8250
+ Task            0  Scalar value =    3.3676700989988123E-002  at line number         8250
+ Task            0  Scalar value =   -2.5208484885240121E-008  at line number         8250
+ Task            0  Scalar value =    2.1943878913981349E-002  at line number         8250
+ Task            0  Scalar value =   -2.5025148883891388E-002  at line number         8250
+ Task            0  Scalar value =   -2.1170426754691090E-010  at line number         8250
+ Task            0  Scalar value =   -2.6665478313692634E-002  at line number         8250
+ Task            0  Scalar value =    8.7421437614684143E-005  at line number         8250
+ Task            0  Scalar value =    1.4194745150168966E-002  at line number         8250
+ Task            0  Scalar value =    1.2470746352091158E-002  at line number         8250
+ Task            0  Scalar value =   -4.3694810419516398E-003  at line number         8250
+ Task            0  Scalar value =   -1.4194724747563087E-002  at line number         8250
+ Task            0  Scalar value =    1.2470750003476977E-002  at line number         8250
+ Task            0  Scalar value =   -4.3694925017598021E-003  at line number         8250
+ Task            0  Scalar value =   -9.5084693529493315E-003  at line number         8250
+ Task            0  Scalar value =    2.4038208826454924E-008  at line number         8250
+ Task            0  Scalar value =   -2.5217844611341925E-008  at line number         8250
+ Task            0  Scalar value =   0.10010070894140982       at line number         8250
+ Task            0  Scalar value =   -3.8611671469305380E-008  at line number         8250
+ Task            0  Scalar value =    1.6061478130564161E-008  at line number         8250
+ Task            0  Scalar value =   -9.5084690827664242E-003  at line number         8250
+ Task            0  Scalar value =    1.2436094658620570E-008  at line number         8250
+ Task            0  Scalar value =    1.5282757394015703E-008  at line number         8250
+ Task            0  Scalar value =   -4.0541882363473239E-002  at line number         8250
+ Task            0  Scalar value =    6.0811182073782042E-010  at line number         8250
+ Task            0  Scalar value =   -2.1943945672420830E-002  at line number         8250
+ Task            0  Scalar value =   -4.0541888142220060E-002  at line number         8250
+ Task            0  Scalar value =    1.5292562148516157E-009  at line number         8250
+ Task            0  Scalar value =    2.1943939546030015E-002  at line number         8250
+ Task            0  Scalar value =    4.9140551079116281E-009  at line number         8250
+ Task            0  Scalar value =   -4.0541877786914531E-002  at line number         8250
+ Task            0  Scalar value =    2.1943941048833904E-002  at line number         8250
+ Task            0  Scalar value =   -3.8611671227590460E-008  at line number         8250
+ Task            0  Scalar value =   0.10010068586905904       at line number         8250
+ Task            0  Scalar value =    1.9336633978342935E-009  at line number         8250
+ Task            0  Scalar value =   -2.0883830753154395E-009  at line number         8250
+ Task            0  Scalar value =   -4.0541877183368547E-002  at line number         8250
+ Task            0  Scalar value =   -2.1943941872770004E-002  at line number         8250
+ Task            0  Scalar value =    1.7020934407010306E-008  at line number         8250
+ Task            0  Scalar value =   -9.5084632221183810E-003  at line number         8250
+ Task            0  Scalar value =    1.9625063876420820E-008  at line number         8250
+ Task            0  Scalar value =    1.8765064777395308E-008  at line number         8250
+ Task            0  Scalar value =   -9.5084676766572403E-003  at line number         8250
+ Task            0  Scalar value =   -2.0734791126161904E-008  at line number         8250
+ Task            0  Scalar value =   -1.1658643981762306E-008  at line number         8250
+ Task            0  Scalar value =    2.1943948829204581E-002  at line number         8250
+ Task            0  Scalar value =   -2.5025183173720791E-002  at line number         8250
+ Task            0  Scalar value =    1.6061478153115566E-008  at line number         8250
+ Task            0  Scalar value =    1.9336634173337860E-009  at line number         8250
+ Task            0  Scalar value =   0.10010071834518047       at line number         8250
+ Task            0  Scalar value =    4.7317644579896391E-009  at line number         8250
+ Task            0  Scalar value =   -2.1943949893274903E-002  at line number         8250
+ Task            0  Scalar value =   -2.5025183327394424E-002  at line number         8250
+ Task            0  Scalar value =   -2.1943951886319750E-002  at line number         8250
+ Task            0  Scalar value =    8.0070523399694998E-009  at line number         8250
+ Task            0  Scalar value =   -2.5025177749732154E-002  at line number         8250
+ Task            0  Scalar value =    2.1943942751721207E-002  at line number         8250
+ Task            0  Scalar value =   -8.8766453827611525E-009  at line number         8250
+ Task            0  Scalar value =   -2.5025174094332935E-002  at line number         8250
+ Task            0  Scalar value =   -5.5884843814876326E-003  at line number         8250
+ Task            0  Scalar value =    3.7338545165222252E-009  at line number         8250
+ Task            0  Scalar value =   -2.1334132056175913E-010  at line number         8250
+ Task            0  Scalar value =   -9.5084538510151560E-003  at line number         8250
+ Task            0  Scalar value =   -2.0883711706817109E-009  at line number         8250
+ Task            0  Scalar value =    4.7318021989799924E-009  at line number         8250
+ Task            0  Scalar value =    1.9379002216643359E-002  at line number         8250
+ Task            0  Scalar value =   -1.7714815964229181E-009  at line number         8250
+ Task            0  Scalar value =   -3.4310685584728381E-009  at line number         8250
+ Task            0  Scalar value =   -2.1410294530330408E-003  at line number         8250
+ Task            0  Scalar value =   -2.1083781332835123E-002  at line number         8250
+ Task            0  Scalar value =   -1.2470767327703932E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410345311076917E-003  at line number         8250
+ Task            0  Scalar value =    2.1083781458833304E-002  at line number         8250
+ Task            0  Scalar value =    1.2470766240311649E-002  at line number         8250
+ Task            0  Scalar value =    2.1813119587559855E-009  at line number         8250
+ Task            0  Scalar value =   -3.1504118374782713E-003  at line number         8250
+ Task            0  Scalar value =   -2.6665483076799404E-002  at line number         8250
+ Task            0  Scalar value =    1.2449323529879633E-008  at line number         8250
+ Task            0  Scalar value =   -4.0541916227984684E-002  at line number         8250
+ Task            0  Scalar value =   -2.1943955748519303E-002  at line number         8250
+ Task            0  Scalar value =   -1.7691424889537986E-009  at line number         8250
+ Task            0  Scalar value =    4.7974394719159728E-002  at line number         8250
+ Task            0  Scalar value =    2.0219927075737099E-002  at line number         8250
+ Task            0  Scalar value =    1.6626902181300932E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410310483037285E-003  at line number         8250
+ Task            0  Scalar value =    1.4194749596750891E-002  at line number         8250
+ Task            0  Scalar value =   -1.6626915042793924E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410356053933248E-003  at line number         8250
+ Task            0  Scalar value =    1.4194762152830644E-002  at line number         8250
+ Task            0  Scalar value =    7.8294749747105999E-010  at line number         8250
+ Task            0  Scalar value =    2.6665478484100471E-002  at line number         8250
+ Task            0  Scalar value =    8.7421437614839184E-005  at line number         8250
+ Task            0  Scalar value =    1.5292034128344331E-008  at line number         8250
+ Task            0  Scalar value =   -2.1943879740049355E-002  at line number         8250
+ Task            0  Scalar value =   -2.5025149037562443E-002  at line number         8250
+ Task            0  Scalar value =   -3.4293790225037551E-009  at line number         8250
+ Task            0  Scalar value =    2.0219896889151705E-002  at line number         8250
+ Task            0  Scalar value =    3.3676701122490382E-002  at line number         8250
+ Task            0  Scalar value =    1.4194729115187115E-002  at line number         8250
+ Task            0  Scalar value =   -1.2470749669799245E-002  at line number         8250
+ Task            0  Scalar value =   -4.3694908415613650E-003  at line number         8250
+ Task            0  Scalar value =   -1.4194741760789747E-002  at line number         8250
+ Task            0  Scalar value =   -1.2470745963403551E-002  at line number         8250
+ Task            0  Scalar value =   -4.3694826809814258E-003  at line number         8250
+ Task            0  Scalar value =   -2.1410357137658211E-003  at line number         8250
+ Task            0  Scalar value =   -1.6626919255072391E-002  at line number         8250
+ Task            0  Scalar value =    1.4194766437646625E-002  at line number         8250
+ Task            0  Scalar value =   -4.0541921419760527E-002  at line number         8250
+ Task            0  Scalar value =    1.7022499408828153E-008  at line number         8250
+ Task            0  Scalar value =   -2.1943957760472341E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410299761945475E-003  at line number         8250
+ Task            0  Scalar value =    1.6626902181304689E-002  at line number         8250
+ Task            0  Scalar value =    1.4194750402668762E-002  at line number         8250
+ Task            0  Scalar value =    4.7974393478754845E-002  at line number         8250
+ Task            0  Scalar value =   -3.2499785521832249E-009  at line number         8250
+ Task            0  Scalar value =    2.0219926018866921E-002  at line number         8250
+ Task            0  Scalar value =   -3.1504063690342941E-003  at line number         8250
+ Task            0  Scalar value =    3.3012468369789949E-009  at line number         8250
+ Task            0  Scalar value =   -2.6665485098710029E-002  at line number         8250
+ Task            0  Scalar value =    2.1083780577642042E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410364856239666E-003  at line number         8250
+ Task            0  Scalar value =    1.2470764779370659E-002  at line number         8250
+ Task            0  Scalar value =    6.0812620487848055E-010  at line number         8250
+ Task            0  Scalar value =   -9.5084479903789522E-003  at line number         8250
+ Task            0  Scalar value =    8.0070898224136522E-009  at line number         8250
+ Task            0  Scalar value =   -2.1083781332837549E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410305193500481E-003  at line number         8250
+ Task            0  Scalar value =   -1.2470768085737988E-002  at line number         8250
+ Task            0  Scalar value =   -3.2580891674149391E-009  at line number         8250
+ Task            0  Scalar value =    1.9379001183133099E-002  at line number         8250
+ Task            0  Scalar value =   -4.1793000595331791E-009  at line number         8250
+ Task            0  Scalar value =    3.4051584841332632E-009  at line number         8250
+ Task            0  Scalar value =   -5.5884861877801145E-003  at line number         8250
+ Task            0  Scalar value =   -5.2142248614279060E-010  at line number         8250
+ Task            0  Scalar value =   -1.2470745355571577E-002  at line number         8250
+ Task            0  Scalar value =   -1.4194744268046844E-002  at line number         8250
+ Task            0  Scalar value =   -4.3694810419468008E-003  at line number         8250
+ Task            0  Scalar value =   -2.1943883547971298E-002  at line number         8250
+ Task            0  Scalar value =    1.9626089615582040E-008  at line number         8250
+ Task            0  Scalar value =   -2.5025143473242910E-002  at line number         8250
+ Task            0  Scalar value =   -1.2470748907672826E-002  at line number         8250
+ Task            0  Scalar value =    1.4194728309274266E-002  at line number         8250
+ Task            0  Scalar value =   -4.3694908415564497E-003  at line number         8250
+ Task            0  Scalar value =    2.0219895832277665E-002  at line number         8250
+ Task            0  Scalar value =   -4.1735352390454335E-009  at line number         8250
+ Task            0  Scalar value =    3.3676698106933675E-002  at line number         8250
+ Task            0  Scalar value =    2.6665481978938112E-002  at line number         8250
+ Task            0  Scalar value =    5.0621820403262748E-010  at line number         8250
+ Task            0  Scalar value =    8.7417249812412516E-005  at line number         8250
+ Task            0  Scalar value =   -2.1410291753907167E-003  at line number         8250
+ Task            0  Scalar value =    1.6626896494493934E-002  at line number         8250
+ Task            0  Scalar value =   -1.4194746035045412E-002  at line number         8250
+ Task            0  Scalar value =   -4.0541927172157662E-002  at line number         8250
+ Task            0  Scalar value =    1.8763620457014287E-008  at line number         8250
+ Task            0  Scalar value =    2.1943948625850959E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410350497525314E-003  at line number         8250
+ Task            0  Scalar value =   -1.6626915042793573E-002  at line number         8250
+ Task            0  Scalar value =   -1.4194763048268588E-002  at line number         8250
+ Task            0  Scalar value =   -3.1504063690385564E-003  at line number         8250
+ Task            0  Scalar value =    3.3970837299028330E-009  at line number         8250
+ Task            0  Scalar value =    2.6665486742048612E-002  at line number         8250
+ Task            0  Scalar value =    4.7974397766339168E-002  at line number         8250
+ Task            0  Scalar value =   -3.6124045281062078E-009  at line number         8250
+ Task            0  Scalar value =   -2.0219926284585684E-002  at line number         8250
+ Task            0  Scalar value =   -2.1083782676909656E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410290611924006E-003  at line number         8250
+ Task            0  Scalar value =    1.2470768419061085E-002  at line number         8250
+ Task            0  Scalar value =    1.5292719540252311E-009  at line number         8250
+ Task            0  Scalar value =   -9.5084524449032849E-003  at line number         8250
+ Task            0  Scalar value =   -8.8766834757173909E-009  at line number         8250
+ Task            0  Scalar value =    2.1083781458835774E-002  at line number         8250
+ Task            0  Scalar value =   -2.1410350930462455E-003  at line number         8250
+ Task            0  Scalar value =   -1.2470764391071767E-002  at line number         8250
+ Task            0  Scalar value =    3.3098464369411642E-009  at line number         8250
+ Task            0  Scalar value =   -5.5884861877800902E-003  at line number         8250
+ Task            0  Scalar value =    5.1230625290035683E-010  at line number         8250
+ Task            0  Scalar value =   -3.6210445955859181E-009  at line number         8250
+ Task            0  Scalar value =    1.9379002786922089E-002  at line number         8250
+ Task            0  Scalar value =    4.3363878755476141E-009  at line number         8250
+ Task            0  Scalar value =    1.2470751213572948E-002  at line number         8250
+ Task            0  Scalar value =   -1.4194723946207766E-002  at line number         8250
+ Task            0  Scalar value =   -4.3694925017606859E-003  at line number         8250
+ Task            0  Scalar value =    2.1943877402927914E-002  at line number         8250
+ Task            0  Scalar value =   -2.0733682925044291E-008  at line number         8250
+ Task            0  Scalar value =   -2.5025139817845644E-002  at line number         8250
+ Task            0  Scalar value =    1.2470747817098036E-002  at line number         8250
+ Task            0  Scalar value =    1.4194740865348460E-002  at line number         8250
+ Task            0  Scalar value =   -4.3694826809822828E-003  at line number         8250
+ Task            0  Scalar value =   -2.6665480335605247E-002  at line number         8250
+ Task            0  Scalar value =   -5.1570726523640965E-010  at line number         8250
+ Task            0  Scalar value =    8.7417249814983593E-005  at line number         8250
+ Task            0  Scalar value =   -2.0219896097993802E-002  at line number         8250
+ Task            0  Scalar value =    4.3302494436644523E-009  at line number         8250
+ Task            0  Scalar value =    3.3676697750773595E-002  at line number         8250
+ ---------- Finished! ---------------
+ Total energy:   -39.976877553200453     
+ SCF energy:   -39.976877553200453     
+ HF Instability Value:    0.0000000000000000     
+ Gradient data:
+ Atom #           1 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           2 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           3 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           4 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Atom #           5 :    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+  
+  Symmetrized gradient information 
+           1   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           2   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           3   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           4   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+           5   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+  
+  Final Hessian data 
+  ATOM A           1  ATOM B           1
+  
+      0.05655316      0.00000001     -0.00000000
+     -0.00000012      0.27007490     -0.15098264
+      0.00000008     -0.15098266      0.16331429
+  ATOM A           1  ATOM B           2
+  
+     -0.05816650     -0.00000001      0.00000000
+     -0.00000014     -0.24737479      0.13379028
+      0.00000009      0.13379019     -0.15277032
+  ATOM A           1  ATOM B           3
+  
+     -0.00116801      0.00000000     -0.00000000
+      0.00000000     -0.02548173      0.02000409
+     -0.00000000     -0.02000409      0.01610628
+  ATOM A           1  ATOM B           4
+  
+      0.00139066      0.02886062     -0.01859826
+      0.00057056      0.00139066     -0.00140587
+      0.00140586      0.01859826     -0.01332496
+  ATOM A           1  ATOM B           5
+  
+      0.00139067     -0.02886061      0.01859826
+     -0.00057057      0.00139067     -0.00140587
+     -0.00140587      0.01859825     -0.01332496
+  ATOM A           2  ATOM B           1
+  
+     -0.05816650     -0.00000001      0.00000000
+      0.00000012     -0.24737445      0.13379027
+     -0.00000008      0.13379037     -0.15277070
+  ATOM A           2  ATOM B           2
+  
+      0.61108218      0.00000003      0.00000000
+      0.00000003      0.61108218      0.00000000
+     -0.00000029      0.00000028      0.61108217
+  ATOM A           2  ATOM B           3
+  
+     -0.05816650     -0.00000000     -0.00000000
+     -0.00000013     -0.24737478     -0.13379027
+     -0.00000009     -0.13379026     -0.15277070
+  ATOM A           2  ATOM B           4
+  
+     -0.24737445      0.00000011     -0.13379022
+     -0.00000000     -0.05816650     -0.00000000
+     -0.13379037      0.00000008     -0.15277032
+  ATOM A           2  ATOM B           5
+  
+     -0.24737478     -0.00000013      0.13379022
+     -0.00000000     -0.05816650      0.00000000
+      0.13379025      0.00000009     -0.15277032
+  ATOM A           3  ATOM B           1
+  
+     -0.00116801      0.00000000     -0.00000000
+      0.00000000     -0.02548173     -0.02000409
+     -0.00000000      0.02000409      0.01610628
+  ATOM A           3  ATOM B           2
+  
+     -0.05816650     -0.00000001     -0.00000000
+      0.00000013     -0.24737445     -0.13379028
+      0.00000009     -0.13379030     -0.15277032
+  ATOM A           3  ATOM B           3
+  
+      0.05655316      0.00000000      0.00000000
+      0.00000013      0.27007523      0.15098264
+      0.00000009      0.15098255      0.16331429
+  ATOM A           3  ATOM B           4
+  
+      0.00139067     -0.02886061     -0.01859826
+     -0.00057056      0.00139066      0.00140587
+      0.00140587     -0.01859826     -0.01332496
+  ATOM A           3  ATOM B           5
+  
+      0.00139066      0.02886062      0.01859826
+      0.00057056      0.00139066      0.00140586
+     -0.00140587     -0.01859826     -0.01332496
+  ATOM A           4  ATOM B           1
+  
+      0.00139066      0.00057056      0.00140587
+      0.02886062      0.00139066      0.01859826
+     -0.01859826     -0.00140587     -0.01332496
+  ATOM A           4  ATOM B           2
+  
+     -0.24737479     -0.00000013     -0.13379034
+     -0.00000001     -0.05816650     -0.00000000
+     -0.13379019     -0.00000009     -0.15277070
+  ATOM A           4  ATOM B           3
+  
+      0.00139067     -0.00057056      0.00140587
+     -0.02886061      0.00139067     -0.01859826
+     -0.01859826      0.00140586     -0.01332495
+  ATOM A           4  ATOM B           4
+  
+      0.27007490     -0.00000012      0.15098258
+      0.00000000      0.05655317      0.00000000
+      0.15098266     -0.00000008      0.16331393
+  ATOM A           4  ATOM B           5
+  
+     -0.02548174     -0.00000000     -0.02000409
+      0.00000000     -0.00116801      0.00000000
+      0.02000409      0.00000000      0.01610628
+  ATOM A           5  ATOM B           1
+  
+      0.00139067     -0.00057056     -0.00140587
+     -0.02886061      0.00139067      0.01859826
+      0.01859826     -0.00140587     -0.01332495
+  ATOM A           5  ATOM B           2
+  
+     -0.24737445      0.00000012      0.13379034
+     -0.00000001     -0.05816650      0.00000000
+      0.13379030     -0.00000009     -0.15277070
+  ATOM A           5  ATOM B           3
+  
+      0.00139066      0.00057056     -0.00140587
+      0.02886062      0.00139066     -0.01859826
+      0.01859826      0.00140586     -0.01332496
+  ATOM A           5  ATOM B           4
+  
+     -0.02548174      0.00000000      0.02000409
+      0.00000000     -0.00116801     -0.00000000
+     -0.02000409      0.00000000      0.01610628
+  ATOM A           5  ATOM B           5
+  
+      0.27007523      0.00000013     -0.15098258
+      0.00000000      0.05655316     -0.00000000
+     -0.15098255     -0.00000009      0.16331392
+ Lame calculation - slater-type geminals are not included
+ WRITE HESSIANM TO JOBARC: LENGTH =          225
+ Elapsed time =    4.4943850040435791       seconds.
+  @CONVHESS: Write Cartesians FCMINT file
+ The point groupC1  C1  C1  
+ NRX in VIB1:          15
+  Resolution is impossible ! 
+  Resolution is impossible ! 
+                     Normal Coordinate Analysis
+----------------------------------------------------------------
+    Irreducible         Harmonic       Infrared        Type 
+   Representation       Frequency      Intensity 
+----------------------------------------------------------------
+                         (cm-1)        (km/mol)
+----------------------------------------------------------------
+      ----                 1.1614i        0.0000       ROTATION  
+      ----                 0.8465i        0.0000      TRANSLATION
+      ----                 0.2490i        0.0000      TRANSLATION
+      ----                 0.1508i        0.0000      TRANSLATION
+      ----                 0.7954         0.0000       ROTATION  
+      ----                 2.4259         0.0000       ROTATION  
+         A              1520.3238         0.0000       VIBRATION 
+         A              1520.3240         0.0000       VIBRATION 
+         A              1520.3244         0.0000       VIBRATION 
+         A              1739.7779         0.0000       VIBRATION 
+         A              1739.7801         0.0000       VIBRATION 
+         A              3186.7586         0.0000       VIBRATION 
+         A              3280.1192         0.0000       VIBRATION 
+         A              3280.1193         0.0000       VIBRATION 
+         A              3280.1200         0.0000       VIBRATION 
+----------------------------------------------------------------
+
+                                   Normal Coordinates 
+                          [Dimensions are Mass**-1/2 Distance] 
+
+                 A                         A                         A
+              1520.32                   1520.32                   1520.32 
+             VIBRATION                 VIBRATION                 VIBRATION 
+         X       Y       Z         X       Y       Z         X       Y       Z
+H     0.5581 -0.0031 -0.0069    0.0026  0.3202  0.3975    0.0123  0.0735  0.2273
+C    -0.4011  0.0091  0.0001   -0.0019 -0.0775 -0.3937   -0.0089 -0.3936  0.0775
+H     0.5581 -0.0029  0.0067    0.0026 -0.2684  0.2817    0.0123  0.1894 -0.3611
+H     0.1341 -0.0126 -0.3000   -0.2936  0.1078  0.3382    0.0609  0.5475 -0.0735
+H     0.1339 -0.0126  0.2997    0.2949  0.1078  0.3410   -0.0550  0.5475 -0.0603
+
+                 A                         A                         A
+              1739.78                   1739.78                   3186.76 
+             VIBRATION                 VIBRATION                 VIBRATION 
+         X       Y       Z         X       Y       Z         X       Y       Z
+H     0.5000  0.0000  0.0000   -0.0000  0.2887  0.4082    0.0000  0.4082 -0.2887
+C    -0.0000  0.0000 -0.0000    0.0000 -0.0000 -0.0000    0.0000 -0.0000 -0.0000
+H    -0.5000 -0.0000  0.0000   -0.0000 -0.2887  0.4083    0.0000 -0.4082 -0.2887
+H     0.0000  0.5000 -0.0000    0.2887 -0.0000 -0.4082    0.4082 -0.0000  0.2887
+H    -0.0000 -0.5000 -0.0000   -0.2887 -0.0000 -0.4082   -0.4082 -0.0000  0.2887
+
+                 A                         A                         A
+              3280.12                   3280.12                   3280.12 
+             VIBRATION                 VIBRATION                 VIBRATION 
+         X       Y       Z         X       Y       Z         X       Y       Z
+H     0.0234  0.0028 -0.0018    0.0002 -0.5438  0.3671    0.0001  0.3982 -0.3043
+C     0.3008  0.0001  0.0022    0.0021  0.0898 -0.2871    0.0007 -0.2871 -0.0898
+H     0.0234 -0.0030 -0.0020    0.0002  0.2198  0.1282    0.0001  0.6371  0.4593
+H    -0.5453  0.0000 -0.4019    0.3781  0.0070  0.2449    0.1182 -0.0223  0.0766
+H    -0.5395  0.0000  0.3982   -0.3855  0.0070  0.2504   -0.1207 -0.0223  0.0784
+   Vibrational frequencies after rotational projection  of 
+   Cartesian force constants: 
+            1               0.0639i
+            2               0.0419i
+            3               0.0177i
+            4               0.0368 
+            5               0.0490 
+            6               0.0675 
+            7            1520.3238 
+            8            1520.3240 
+            9            1520.3244 
+           10            1739.7779 
+           11            1739.7801 
+           12            3186.7586 
+           13            3280.1192 
+           14            3280.1193 
+           15            3280.1200 
+  Zero-point vibrational energy =   30.1179 kcal/mole.

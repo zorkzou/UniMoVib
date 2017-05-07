@@ -1,0 +1,11 @@
+a test job
+
+ $contrl
+   qcprog="nwchem"
+ $end
+
+ $qcdata
+   fchk="h2o.out"
+   hess="dft.hess"
+   ddip="dft.fd_ddipole"
+ $end

@@ -1,0 +1,9 @@
+a test job
+
+ $contrl
+   qcprog="orca"
+ $end
+
+ $qcdata
+   fchk="h2o.hess"
+ $end

@@ -1,0 +1,801 @@
+
+              ****************************************************
+              * ACES : Advanced Concepts in Electronic Structure *
+              *                    Ver. 2.7.0                    *
+              ****************************************************
+
+                             Quantum Theory Project
+                             University of Florida
+                             Gainesville, FL  32611
+ @ACES2: Executing "rm -f FILES"
+ @ACES2: Executing "xjoda"
+
+
+                      ACES STATE VARIABLE REGISTRATION LOG
+     ----------------------------------------------------------------------
+     The ACES State Variables were initialized.
+     Updating (CALCLEVEL,SCF): 'SCF' converts to 'SCF' -> 0
+     Updating (BASIS,3-21G): String copy succeeded.
+     Updating (VIBRATION,EXACT): 'EXACT' converts to 'EXACT' -> 1
+     ----------------------------------------------------------------------
+
+
+                       ACES STATE VARIABLE VALIDATION LOG
+     ----------------------------------------------------------------------
+     Updating (COORDINATES,INTERNAL): 'INTERNAL' converts to 'INTERNAL' -> 0
+     Updating (PROGRAM,aces2): 'aces2' converts to 'ACES2' -> 2
+     Updating (DERIV_LEV,second): 'second' converts to 'TWO' -> 2
+     Updating (GRAD_CALC,analytical): 'analytical' converts to 'ANALYTICAL' -> 1
+     Updating (CC_EXTRAPOL,DIIS): 'DIIS' converts to 'DIIS' -> 1
+     Updating (ORBITALS,standard): 'standard' converts to 'STANDARD' -> 0
+     Updating (PERT_ORB,standard): 'standard' converts to 'STANDARD' -> 0
+     Updating (ESTATE_TOL,5): -1 -> 5
+     Updating (RESTART,0): '0' converts to 'OFF' -> 0
+     Updating (HBARABCD,OFF): 'OFF' converts to 'OFF' -> 1
+     Updating (HBARABCI,OFF): 'OFF' converts to 'OFF' -> 1
+     Updating (ABCDFULL,ON): 'ON' converts to 'ON' -> 1
+     Updating (CACHE_RECS,91): -1 -> 91
+     Updating (FILE_RECSIZ,8192): -1 -> 8192
+     ----------------------------------------------------------------------
+
+          ASV#   ASV KEY DEFINITION =    CURRENT [   DEFAULT] UNITS
+          ------------------------------------------------------------
+            1:                PRINT =          0 [         0] 
+            2:            CALCLEVEL =          0 [         0] 
+            3:            DERIV_LEV =          2 [        -1] 
+            4:              CC_CONV =          7 [         7] (tol)
+
+            5:             SCF_CONV =          7 [         7] (tol)
+            6:            XFORM_TOL =         11 [        11] (tol)
+            7:            CC_MAXCYC =          0 [         0] cycles
+            8:           LINDEP_TOL =          8 [         8] 
+
+            9:                  RDO =         -1 [        -1] 
+           10:           SCF_EXTRAP =          1 [         1] 
+           11:            REFERENCE =          0 [         0] 
+           12:          CC_EXPORDER =          0 [         0] 
+
+           13:             TAMP_SUM =          0 [         0] 
+           14:            NTOP_TAMP =         15 [        15] 
+           15:              DAMPSCF =         20 [        20] x 0.01
+           16:           SCF_MAXCYC =        150 [       150] cycles
+
+           18:                PROPS =          0 [         0] 
+           19:              DENSITY =          0 [         0] 
+           20:          SCF_EXPORDE =          6 [         6] 
+           21:          CC_EXTRAPOL =          1 [         1] 
+
+           22:            BRUECKNER =          0 [         0] 
+           23:               XFIELD =          0 [         0] x 10-6
+           24:               YFIELD =          0 [         0] x 10-6
+           25:               ZFIELD =          0 [         0] x 10-6
+
+           26:            SAVE_INTS =          0 [         0] 
+           28:               CHARGE =          0 [         0] 
+           29:          MULTIPLICTY =          1 [         1] 
+           30:          CPHF_CONVER =         12 [        12] (tol)
+
+           31:          CPHF_MAXCYC =         64 [        64] cycles
+           35:               INCORE =          0 [         0] 
+           36:          MEMORY_SIZE =   15000000 [  15000000] Words
+           37:          FILE_RECSIZ =       8192 [        -1] Words
+
+           38:                NONHF =          0 [         0] 
+           39:             ORBITALS =          0 [        -1] 
+           40:          SCF_EXPSTAR =          8 [         8] 
+           41:          LOCK_ORBOCC =          0 [         0] 
+
+           42:          FILE_STRIPE =          0 [         0] 
+           43:               DOHBAR =          0 [         0] 
+           44:           CACHE_RECS =         91 [        -1] 
+           45:                GUESS =          0 [         0] 
+
+           46:           JODA_PRINT =          0 [         0] 
+           47:           OPT_METHOD =          0 [         0] 
+           48:          CONVERGENCE =          4 [         4] H/bohr
+           49:          EIGENVECTOR =          1 [         1] 
+
+           50:              NEGEVAL =          2 [         2] 
+           51:          CURVILINEAR =          0 [         0] 
+           52:          STP_SIZ_CTL =          0 [         0] 
+           53:             MAX_STEP =        300 [       300] millibohr
+
+           54:            VIBRATION =          1 [         0] 
+           55:            EVAL_HESS =         -1 [        -1] # of cyc.
+           56:            INTEGRALS =          1 [         1] 
+           57:          FD_STEPSIZE =          0 [         0] 10-4 bohr
+
+           58:               POINTS =          0 [         0] 
+           59:          CONTRACTION =          1 [         1] 
+           60:             SYMMETRY =          2 [         2] 
+           62:            SPHERICAL =          1 [         1] 
+
+           63:          RESET_FLAGS =          0 [         0] 
+           64:             PERT_ORB =          0 [         2] 
+           65:             GENBAS_1 =          0 [         0] 
+           66:             GENBAS_2 =          0 [         0] 
+
+           67:             GENBAS_3 =          0 [         0] 
+           68:          COORDINATES =          0 [         3] 
+           69:            CHECK_SYM =          1 [         1] 
+           70:            SCF_PRINT =          0 [         0] 
+
+           71:                  ECP =          0 [         0] 
+           72:              RESTART =          0 [         1] 
+           73:            TRANS_INV =          0 [         0] 
+           74:          HFSTABILITY =          0 [         0] 
+
+           75:             ROT_EVEC =          0 [         0] 
+           76:           BRUCK_CONV =          4 [         4] (tol)
+           78:                UNITS =          0 [         0] 
+           79:          FD_USEGROUP =          0 [         0] 
+
+           80:           FD_PROJECT =          0 [         0] 
+           83:                VTRAN =          0 [         0] 
+           84:             HF2_FILE =          1 [         1] 
+           85:             SUBGROUP =          0 [         0] 
+
+           86:           SUBGRPAXIS =          0 [         0] 
+           87:               EXCITE =          0 [         0] 
+           88:            ZETA_CONV =         12 [        12] (tol)
+           90:           TREAT_PERT =          0 [         0] 
+
+           91:          ESTATE_PROP =          0 [         0] 
+           92:           OPT_MAXCYC =         50 [        50] 
+           93:             ABCDTYPE =          0 [         0] 
+           95:           AO_LADDERS =          1 [         1] 
+
+           96:                 FOCK =          1 [         1] 
+           97:          ESTATE_MAXC =         20 [        20] 
+           98:           ESTATE_TOL =          5 [        -1] (tol)
+           99:            TURBOMOLE =          0 [         0] 
+
+          100:           GAMMA_ABCD =          0 [         0] 
+          101:            ZETA_TYPE =          1 [         1] 
+          102:          ZETA_MAXCYC =         50 [        50] 
+          103:             RESRAMAN =          0 [         0] 
+
+          104:                  PSI =          0 [         0] 
+          105:             GEOM_OPT =          0 [         0] 
+          106:             EXTERNAL =          2 [         2] 
+          107:          HESS_UPDATE =          0 [         0] 
+
+          108:         INIT_HESSIAN =          0 [         0] 
+          109:          EXTRAPOLATE =          0 [         0] 
+          201:              EA_CALC =          0 [         0] 
+          203:                 TDHF =          0 [         0] 
+
+          204:           FUNCTIONAL =          4 [         4] 
+          205:           EOM_MAXCYC =         50 [        50] cycles
+          206:              EOMPROP =          0 [         0] 
+          207:             ABCDFULL =          1 [         0] 
+
+          208:           INTGRL_TOL =         14 [        14] (tol)
+          209:             DAMP_TYP =          0 [         0] 
+          210:             DAMP_TOL =         10 [        10] x 0.01
+          211:              LSHF_A1 =          0 [         0] x 0.01
+
+          212:              LSHF_B1 =          0 [         0] x 0.01
+          213:             POLYRATE =          0 [         0] 
+          214:              IP_CALC =          0 [         0] 
+          216:            IP_SEARCH =          0 [         0] 
+
+          217:               EOMREF =          0 [         0] 
+          218:              SOLVENT =          0 [         0] 
+          219:            EE_SEARCH =          0 [         0] 
+          220:            EOM_PRJCT =          0 [         0] 
+
+          221:               NEWVRT =          0 [         0] 
+          222:             HBARABCD =          1 [         0] 
+          223:             HBARABCI =          1 [         0] 
+          224:             NT3EOMEE =          0 [         0] 
+
+          225:              NOREORI =          2 [         2] 
+          227:               KS_POT =          0 [         0] 
+          228:             DIP_CALC =          0 [         0] 
+          230:             DEA_CALC =          0 [         0] 
+
+          232:              PROGRAM =          2 [         0] 
+          233:                CCR12 =          0 [         0] 
+          234:            EOMXFIELD =          0 [         0] x 10-6
+          235:            EOMYFIELD =          0 [         0] x 10-6
+
+          236:            EOMZFIELD =          0 [         0] x 10-6
+          237:              INSERTF =          0 [         0] 
+          238:            GRAD_CALC =          1 [         0] 
+          239:            IMEM_SIZE =    3000000 [   3000000] Words
+
+          240:              MAKERHF =          0 [         0] 
+          241:           GLOBAL_MEM =          0 [         0] Words
+          242:             PRP_INTS =          0 [         0] 
+          243:           TRUNC_ORBS =          0 [         0] 
+
+          244:             FNO_KEEP =          0 [         0] percent
+          245:             FNO_BSSE =          0 [         0] 
+          246:              NATURAL =          0 [         0] 
+          248:              UNO_REF =          0 [         0] 
+
+          249:           UNO_CHARGE =          0 [         0] 
+          250:             UNO_MULT =          1 [         1] 
+          251:                RAMAN =          0 [         0] 
+          252:            KUCHARSKI =          0 [         0] 
+
+          253:             SCF_TYPE =          0 [         0] 
+          254:               DIRECT =          0 [         0] 
+          255:         SINGLE_STORE =          0 [         0] 
+          256:             OOMP_CYC =         50 [        50] 
+
+          257:            DKH_ORDER =          0 [         0] 
+          258:           UNCONTRACT =          0 [         0] 
+          259:          OPT_CONTROL =          0 [         0] 
+          ------------------------------------------------------------
+
+                         ACES STATE VARIABLES (STRINGS)
+          ------------------------------------------------------------
+          BASIS = 3-21G
+          OCCUPATION = [ESTIMATED BY SCF]
+          ------------------------------------------------------------
+   5 entries found in Z-matrix 
+ 
+ Job Title : CH4
+ 
+ @FETCHZ: The ordering of the first two atoms in the Z-matrix has been changed.
+  There are                      4  unique internal coordinates.
+  Of these,                      0  will be optimized.
+   User supplied Z-matrix: 
+--------------------------------------------------------------------------------
+       SYMBOL    BOND      LENGTH    ANGLE     ANGLE     DIHED     ANGLE
+                  TO      (ANGST)    WRT      (DEG)      WRT      (DEG)
+--------------------------------------------------------------------------------
+        H    
+        C          1         B1   
+        H          2         B1         1        A2   
+        H          2         B1         1        A2         3        D3   
+        H          2         B1         1        A2         3        D4   
+                  *Initial values for current coordinates* 
+                      Name             Value
+                        B1              1.082902
+                        A2            109.471221
+                        D3            120.000000
+                        D4           -120.000000
+--------------------------------------------------------------------------------
+   Rotational constants (in cm-1): 
+     5.34875        5.34875        5.34875
+   Principal axis orientation for molecule:
+       -0.000000000116   -1.670868153729    1.181482202019
+        0.000000000000    0.000000000023   -0.000000000016
+        0.000000000116    1.670868153729    1.181482202085
+        1.670868153821   -0.000000000254   -1.181482201954
+       -1.670868153821   -0.000000000023   -1.181482201954
+********************************************************************************
+   The full molecular point group is T d .
+   The largest Abelian subgroup of the full molecular point group is C2v .
+   The computational point group is C2v .
+********************************************************************************
+--------------------------------------------------------------------------------
+   Analysis of internal coordinates specified by Z-matrix 
+--------------------------------------------------------------------------------
+   *The nuclear repulsion energy is   13.52346 a.u.
+   *There is   1 degree of freedom within the tot. symm. molecular subspace.
+   *There are   0 degrees of freedom within the tot. symm. molecular subspace.
+   *Z-matrix requests optimization of   0 coordinates.
+   *The optimization is constrained.
+   *The following   4 parameters can have non-zeroderivatives within the 
+    totally symmetric subspace:
+             B1   [  4]  B1   [  7]  B1   [  2]  B1   [  1]
+   *The following   0 parameters are to be optimized:
+
+   *The following coordinates must be varied in an  unconstrained optimization.
+             B1   [  4]  B1   [  7]  B1   [  2]  B1   [  1]
+--------------------------------------------------------------------------------
+         -----------------------------------------------
+         Cartesian coordinates corresponding to internal 
+                 coordinate input (Angstroms) 
+ ----------------------------------------------------------------
+ Z-matrix   Atomic            C o o r d i n a t e s
+  Symbol    Number           X              Y              Z
+ ----------------------------------------------------------------
+     H         1         0.00000000    -0.88418541     0.62521350
+     C         6         0.00000000     0.00000000     0.00000000
+     H         1         0.00000000     0.88418541     0.62521350
+     H         1         0.88418541     0.00000000    -0.62521350
+     H         1        -0.88418541     0.00000000    -0.62521350
+ ----------------------------------------------------------------
+   Interatomic distance matrix (Angstroms) 
+ 
+                 H             C             H             H             H    
+                [ 1]        [ 2]        [ 3]        [ 4]        [ 5]
+  H    [ 1]     0.00000
+  C    [ 2]     1.08290     0.00000
+  H    [ 3]     1.76837     1.08290     0.00000
+  H    [ 4]     1.76837     1.08290     1.76837     0.00000
+  H    [ 5]     1.76837     1.08290     1.76837     1.76837     0.00000
+ @ACES2: Executing "xvmol"
+ One- and two-electron integrals over symmetry-adapted AOs are calculated.\n
+ @READIN: Spherical harmonics are used.
+  @READIN-I, Nuclear repulsion energy :   13.5234595807 a.u.
+  required memory for a1 array                4451690  words 
+  required memory for a2 array                   9286  words 
+  @TWOEL-I,       1090 integrals of symmetry type  I I I I
+  @TWOEL-I,       1420 integrals of symmetry type  I J I J
+  @TWOEL-I,        964 integrals of symmetry type  I I J J
+  @TWOEL-I, Total number of 2-e integrals       3474.
+
+
+ACES ---SYSTEM--- (total sec) ----USER---- (total sec) -WALLCLOCK- (total sec)
+TIME   0: 0: 0.02 (      0.0)   0: 0: 0.01 (      0.0)   0: 0: 0.1 (      0.1)
+ @ACES2: Executing "xvmol2ja"
+
+
+ACES ---SYSTEM--- (total sec) ----USER---- (total sec) -WALLCLOCK- (total sec)
+TIME   0: 0: 0.00 (      0.0)   0: 0: 0.00 (      0.0)   0: 0: 0.0 (      0.0)
+ @ACES2: Executing "xvscf"
+@VSCF: There are   17 functions in the AO basis.
+
+       There are    4 irreducible representations.
+
+
+       Irrep        # of functions
+         1                  9
+         2                  4
+         3                  4
+         4                  0
+ 
+  @VSCF-I, Parameters for SCF calculation: 
+             SCF reference function:  RHF
+       Maximum number of iterations:  150
+          Full symmetry point group: T d 
+          Computational point group: C2v 
+             Initial density matrix: CORE                   
+          SCF convergence tolerance: 10**(- 7)
+           Convergence acceleration: RPP
+               Latest start for RPP:   8
+                          RPP order:   6
+
+  @SYMSIZ-I, Memory information:     754413 words required.
+  @SYMSIZ-I, Fock matrices are constructed from AO integral file.
+  Occupancies from core Hamiltonian:
+
+          Alpha population by irrep:   3    1    1    0
+           Beta population by irrep:   3    1    1    0
+
+
+  --------------------------------------------------------------------
+  Iteration         Total Energy            Largest Error in FDS-SDF
+  --------------------------------------------------------------------
+       0           -32.3253984982              0.1782026006D+01
+       1           -37.3976348650              0.1200832523D+01
+       2           -39.1920172816              0.9996968660D+00
+       3           -39.8409991927              0.3609796369D+00
+       4           -39.9547294474              0.1570553355D+00
+       5           -39.9735023391              0.5679464900D-01
+       6           -39.9768774736              0.3649986570D-03
+       7           -39.9768775458              0.6451031264D-04
+       8           -39.9768775528              0.1793873888D-04
+       9           -39.9768775532              0.6120975113D-06
+      10           -39.9768775532              0.3825871508D-08
+
+@VSCF: SCF has converged.
+
+     E(SCF)=       -39.9768775532
+
+ The AOBASMOS? F
+ Vib calc & AOBASMOS?                     1 F
+ Creating The AOBASMOS file
+
+
+      Trace of projected alpha density matrix =   1.000000000
+
+      Alpha part of wavefunction is symmetric.
+
+
+  ORBITAL EIGENVALUES (ALPHA)  (1H = 27.2113957 eV)
+
+       MO #        E(hartree)               E(eV)           FULLSYM    COMPSYM
+       ----   --------------------   --------------------   -------   ---------
+    1     1         -11.1444590986        -303.2562863948      A1        A1 (1)
+    2     2          -0.9458815763         -25.7387578591      A1        A1 (1)
+    3    10          -0.5448379738         -14.8258016969      T2        B1 (2)
+    4    14          -0.5448379738         -14.8258016967      T2        B2 (3)
+    5     3          -0.5448379738         -14.8258016966      T2        A1 (1)
+  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    6     4           0.2966776894           8.0730140013      A1        A1 (1)
+    7     5           0.3525749060           9.5940552812      T2        A1 (1)
+    8    11           0.3525749060           9.5940552817      T2        B1 (2)
+    9    15           0.3525749061           9.5940552842      T2        B2 (3)
+   10     6           0.9230944227          25.1186876035      T2        A1 (1)
+   11    16           0.9230944227          25.1186876035      T2        B2 (3)
+   12    12           0.9230944227          25.1186876037      T2        B1 (2)
+   13     7           1.3332894913          36.2806679315      A1        A1 (1)
+   14    17           1.3589770987          36.9796635799      T2        B2 (3)
+   15     8           1.3589770987          36.9796635799      T2        A1 (1)
+   16    13           1.3589770987          36.9796635801      T2        B1 (2)
+   17     9           1.9558557075          53.2215635882      A1        A1 (1)
+
+
+
+
+ACES ---SYSTEM--- (total sec) ----USER---- (total sec) -WALLCLOCK- (total sec)
+TIME   0: 0: 0.02 (      0.0)   0: 0: 0.01 (      0.0)   0: 0: 0.1 (      0.1)
+ @ACES2: Executing "xvtran"
+  Partial RHF integral transformation
+
+
+ACES ---SYSTEM--- (total sec) ----USER---- (total sec) -WALLCLOCK- (total sec)
+TIME   0: 0: 0.01 (      0.0)   0: 0: 0.01 (      0.0)   0: 0: 0.1 (      0.1)
+ @ACES2: Executing "xintprc"
+ 
+ 
+ performing integral processing for standard CC
+  Processing integrals for SCF second derivatives.
+  @GMOIAA-I, Processing MO integrals for spin case AA.
+  @GMOIAA-I, Generation of integral list completed.
+                      TYPE            NUMBER
+                      ----           --------
+                      PPPP                  0
+                      PPPH               1267
+                      PPHH                496
+                      PHPH                346
+                      PHHH                251
+                      HHHH                 41
+
+                     TOTAL               2401
+
+  @FORMT2-I, Second-order MBPT correlation energies:
+              ----------------------------------------------
+              E(SCF)                =  -39.976877553200 a.u.
+              E2(AA)                =   -0.008241971219 a.u.
+              E2(AB)                =   -0.083508052948 a.u.
+              E2(TOT)               =   -0.099991995386 a.u.
+              Total MBPT(2) energy  =  -40.076869548586 a.u.
+               @FORMT2-I, MR-BWCC or SCF Hessian Polyrate Run. MBPT(2) energy not written. 
+              ----------------------------------------------
+   Largest T2 amplitudes for spin case AB:
+       _       _                 _       _                 _       _
+   i   j   a   b             i   j   a   b             i   j   a   b
+-----------------------------------------------------------------------------
+[  5   5  15  15]-0.03526 [  4   4  12  12]-0.03526 [  3   3   7   7]-0.02365
+[  5   5  16  16]-0.02264 [  4   4  13  13]-0.02264 [  4   4  14  14]-0.02205
+[  5   5  17  17]-0.02205 [  3   3   8   8]-0.01829 [  5   5  15  17] 0.01798
+[  5   5  17  15] 0.01798 [  4   4  12  14] 0.01798 [  4   4  14  12] 0.01798
+[  5   3  15   7]-0.01697 [  3   5   7  15]-0.01697 [  4   3  12   7] 0.01697
+-----------------------------------------------------------------------------
+   Norm of T2AB vector (     1062 symmetry allowed elements):  0.1713828252.
+-----------------------------------------------------------------------------
+ 
+ Shannon Index =    0.3676130
+ 
+
+
+ACES ---SYSTEM--- (total sec) ----USER---- (total sec) -WALLCLOCK- (total sec)
+TIME   0: 0: 0.03 (      0.0)   0: 0: 0.01 (      0.0)   0: 0: 0.1 (      0.1)
+ @ACES2: Executing "xvdint"
+ One- and two-electron integral derivatives are calculated
+ for RHF hessians and dipole derivatives.
+ Spherical gaussians are used.
+
+  Cartesian Coordinates
+  ---------------------
+
+  Total number of coordinates: 15
+
+
+   1   H #1 1   x     -0.0000000001
+   2            y     -1.6708681537
+   3            z      1.1814822020
+
+   4   H #1 2   x     -0.0000000001
+   5            y      1.6708681537
+   6            z      1.1814822020
+
+   7   C #2     x      0.0000000000
+   8            y      0.0000000000
+   9            z      0.0000000000
+
+  10   H #3 1   x      1.6708681538
+  11            y     -0.0000000003
+  12            z     -1.1814822020
+
+  13   H #3 2   x     -1.6708681538
+  14            y     -0.0000000003
+  15            z     -1.1814822020
+
+
+  Symmetry Coordinates
+  --------------------
+
+  Number of coordinates in each symmetry:   5  4  4  2
+   1   H #1  y    2  -  5
+   2   H #1  z    3  +  6
+   3   C #2  z    9
+   4   H #3  x   10  - 13
+   5   H #3  z   12  + 15
+   6   H #1  x    1  +  4
+   7   C #2  x    7
+   8   H #3  x   10  + 13
+   9   H #3  z   12  - 15
+  10   H #1  y    2  +  5
+  11   H #1  z    3  -  6
+  12   C #2  y    8
+  13   H #3  y   11  + 14
+  14   H #1  x    1  -  4
+  15   H #3  y   11  - 14
+  relation for x-direction :
+                        1  =  - (                         2 
+                        3 )
+  relation for y-direction :
+                        1  =  - (                         3 
+                        4 )
+  relation for z-direction :
+                        2  =  - (                         3 
+                        5 )
+                        5                        4                        4 
+                        2
+ Translational invariance is used.
+
+                         H #1 y     0.0000001003
+                         H #1 z    -0.0000000709
+                         C #2 z     0.0000000000
+                         H #3 x    -0.0000001003
+                         H #3 z     0.0000000709
+
+
+ H #1 1     0.0000000000            0.0000000502           -0.0000000355
+ H #1 2     0.0000000000           -0.0000000502           -0.0000000355
+ C #2       0.0000000000            0.0000000000            0.0000000000
+ H #3 1    -0.0000000501            0.0000000000            0.0000000355
+ H #3 2     0.0000000501            0.0000000000            0.0000000355
+
+
+
+                            Molecular hessian
+                            -----------------
+
+
+                     Total dipole momemt derivatives
+                     -------------------------------
+
+
+           Symmetry 1
+                              Ez
+
+               H #1 y    -0.49168581
+               H #1 z     0.70227030
+               C #2 z    -1.40454059
+               H #3 x    -0.49168581
+               H #3 z     0.70227030
+
+           Symmetry 2
+                              Ex
+
+               H #1 x     0.35459593
+               C #2 x    -1.40454059
+               H #3 x     1.04994466
+               H #3 z    -0.49168581
+
+           Symmetry 3
+                              Ey
+
+               H #1 y     1.04994466
+               H #1 z    -0.49168581
+               C #2 y    -1.40454059
+               H #3 y     0.35459593
+
+
+
+                       Ex          Ey          Ez
+
+      H #11   x    0.177298    0.000000    0.000000
+      H #11   y    0.000000    0.524972   -0.245843
+      H #11   z    0.000000   -0.245843    0.351135
+
+      H #12   x    0.177298    0.000000    0.000000
+      H #12   y    0.000000    0.524972    0.245843
+      H #12   z    0.000000    0.245843    0.351135
+
+      C #2    x   -1.404541    0.000000    0.000000
+      C #2    y    0.000000   -1.404541    0.000000
+      C #2    z    0.000000    0.000000   -1.404541
+
+      H #31   x    0.524972    0.000000   -0.245843
+      H #31   y    0.000000    0.177298    0.000000
+      H #31   z   -0.245843    0.000000    0.351135
+
+      H #32   x    0.524972    0.000000    0.245843
+      H #32   y    0.000000    0.177298    0.000000
+      H #32   z    0.245843    0.000000    0.351135
+
+
+
+ACES ---SYSTEM--- (total sec) ----USER---- (total sec) -WALLCLOCK- (total sec)
+TIME   0: 0: 0.02 (      0.0)   0: 0: 0.04 (      0.0)   0: 0: 0.1 (      0.1)
+ACES2: Total elapsed time is        2.0 seconds
+ @ACES2: Executing "xcphf"
+ Coupled-perturbed HF (CPHF) equations 
+ are solved for RHF hessian and dipole derivatives.
+ There are 5 perturbations within irrep 1.
+ CPHF converged after  12 iterations.
+ There are 4 perturbations within irrep 2.
+ CPHF converged after  11 iterations.
+ There are 4 perturbations within irrep 3.
+ CPHF converged after  11 iterations.
+ There are 2 perturbations within irrep 4.
+ CPHF converged after   6 iterations.
+
+                          Static polarizability
+                          ---------------------
+
+                         Ex          Ey          Ez
+
+            Ex      11.452261    0.000000    0.000000
+            Ey       0.000000   11.452261    0.000000
+            Ez       0.000000    0.000000   11.452261
+
+
+
+                        Static hyperpolarizability
+                        --------------------------
+
+                         Ex          Ey          Ez
+
+            xx       0.000000    0.000000   27.790688
+            xy       0.000000    0.000000    0.000000
+            xz      27.790688    0.000000    0.000000
+            yy       0.000000    0.000000  -27.790688
+            yz       0.000000  -27.790688    0.000000
+            zz       0.000000    0.000000    0.000000
+
+
+
+
+ACES ---SYSTEM--- (total sec) ----USER---- (total sec) -WALLCLOCK- (total sec)
+TIME   0: 0: 0.02 (      0.0)   0: 0: 0.01 (      0.0)   0: 0: 0.1 (      0.1)
+ @ACES2: Executing "xjoda"
+   0.00000  -1.67087   1.18148
+   0.00000   0.00000   0.00000
+   0.00000   1.67087   1.18148
+   1.67087   0.00000  -1.18148
+  -1.67087   0.00000  -1.18148
+  @CONVHESS: the FCMINT is in internals
+ The point groupT d C2v C2v 
+  Atom 3 is to be connected to atom 2
+  Internal vibrational coordinates will be wrong
+  see Reconstruct Zmat at beginning of output file
+                     Normal Coordinate Analysis
+----------------------------------------------------------------
+    Irreducible         Harmonic       Infrared        Type 
+   Representation       Frequency      Intensity 
+----------------------------------------------------------------
+                         (cm-1)        (km/mol)
+----------------------------------------------------------------
+      ----                 0.8868i        0.0000       ROTATION  
+      ----                 0.8867i        0.0000       ROTATION  
+      ----                 0.8863i        0.0000       ROTATION  
+      ----                 0.0314i        0.0000      TRANSLATION
+      ----                 0.0257i        0.0000      TRANSLATION
+      ----                 0.0129         0.0000      TRANSLATION
+        T2              1520.3241        21.2672       VIBRATION 
+        T2              1520.3241        21.2672       VIBRATION 
+        T2              1520.3241        21.2672       VIBRATION 
+         E              1739.7776         0.0000       VIBRATION 
+         E              1739.7776         0.0000       VIBRATION 
+        A1              3186.7592         0.0000       VIBRATION 
+        T2              3280.1200        30.0711       VIBRATION 
+        T2              3280.1200        30.0711       VIBRATION 
+        T2              3280.1200        30.0711       VIBRATION 
+----------------------------------------------------------------
+ 
+                                   Normal Coordinates 
+                          [Dimensions are Mass**-1/2 Distance] 
+
+                T2                        T2                        T2
+              1520.32                   1520.32                   1520.32 
+             VIBRATION                 VIBRATION                 VIBRATION 
+         X       Y       Z         X       Y       Z         X       Y       Z
+H     0.0000 -0.2999 -0.3461    0.0000  0.1340  0.2999    0.5582  0.0000  0.0000
+C     0.0000  0.0000  0.4012    0.0000 -0.4012  0.0000   -0.4012  0.0000  0.0000
+H     0.0000  0.2999 -0.3461    0.0000  0.1340 -0.2999    0.5582  0.0000  0.0000
+H    -0.2999  0.0000 -0.3461    0.0000  0.5582  0.0000    0.1340  0.0000  0.2999
+H     0.2999  0.0000 -0.3461    0.0000  0.5582  0.0000    0.1340  0.0000 -0.2999
+
+                 E                         E                        A1
+              1739.78                   1739.78                   3186.76 
+             VIBRATION                 VIBRATION                 VIBRATION 
+         X       Y       Z         X       Y       Z         X       Y       Z
+H     0.0000  0.2887  0.4082    0.5000  0.0000  0.0000    0.0000  0.4082 -0.2887
+C     0.0000  0.0000  0.0000    0.0000  0.0000  0.0000    0.0000  0.0000  0.0000
+H     0.0000 -0.2887  0.4082   -0.5000  0.0000  0.0000    0.0000 -0.4082 -0.2887
+H    -0.2887  0.0000 -0.4082    0.0000 -0.5000  0.0000   -0.4082  0.0000  0.2887
+H     0.2887  0.0000 -0.4082    0.0000  0.5000  0.0000    0.4082  0.0000  0.2887
+
+                T2                        T2                        T2
+              3280.12                   3280.12                   3280.12 
+             VIBRATION                 VIBRATION                 VIBRATION 
+         X       Y       Z         X       Y       Z         X       Y       Z
+H     0.0000  0.4001 -0.2595    0.0000  0.5424 -0.4001    0.0234  0.0000  0.0000
+C     0.0000  0.0000  0.3008    0.0000 -0.3008  0.0000    0.3008  0.0000  0.0000
+H     0.0000 -0.4001 -0.2595    0.0000  0.5424  0.4001    0.0234  0.0000  0.0000
+H     0.4001  0.0000 -0.2595    0.0000 -0.0234  0.0000   -0.5424  0.0000  0.4001
+H    -0.4001  0.0000 -0.2595    0.0000 -0.0234  0.0000   -0.5424  0.0000 -0.4001
+ 
+                      Normal modes in internal coordinates 
+---------------------------------------------------------------------------
+              0.887         0.887         0.886         0.031         0.026
+---------------------------------------------------------------------------
+B1         0.000000      0.000000      0.000000      0.000000      0.000000
+B1         0.000000      0.000000      0.000000      0.000000      0.000000
+A2         0.000000      0.000000      0.000000      0.000000      0.000000
+B1         0.000000      0.000000      0.000000      0.000000      0.000000
+A2         0.000000      0.000000      0.000000      0.000000      0.000000
+D3         0.000000      0.000000      0.000000      0.000000      0.000000
+B1         0.000000      0.000000      0.000000      0.000000      0.000000
+A2         0.000000      0.000000      0.000000      0.000000      0.000000
+D4         0.000000      0.000000      0.000000      0.000000      0.000000
+---------------------------------------------------------------------------
+              0.013      1520.324      1520.324      1520.324      1739.778
+---------------------------------------------------------------------------
+B1         0.000000     -0.030938     -0.049335      0.000000      0.000000
+B1         0.000000     -0.030938      0.049335      0.000000      0.000000
+A2         0.000000      0.754480      0.000000      0.000000     -0.769800
+B1         0.000000      0.030938      0.000000      0.027704      0.000000
+A2         0.000000      0.000000      0.601553     -0.337802      0.384900
+D3         0.000000      0.462023     -0.368375     -0.620582      0.235702
+B1         0.000000      0.030938      0.000000     -0.027704      0.000000
+A2         0.000000      0.000000      0.601553      0.337802      0.384900
+D4         0.000000     -0.462023      0.368375     -0.620582     -0.235702
+---------------------------------------------------------------------------
+           1739.778      3186.759      3280.120      3280.120      3280.120
+---------------------------------------------------------------------------
+B1         0.000000     -0.500000     -0.498982     -0.705975      0.000000
+B1         0.000000     -0.500000     -0.498982      0.705975      0.000000
+A2         0.000000      0.000000      0.048215      0.000000      0.000000
+B1         0.000000     -0.500000      0.498982      0.000000     -0.703524
+A2        -0.603023      0.000000      0.000000      0.034108      0.033990
+D3         0.369274      0.000000      0.029526     -0.020887      0.062443
+B1         0.000000     -0.500000      0.498982      0.000000      0.703524
+A2         0.603023      0.000000      0.000000      0.034108     -0.033990
+D4         0.369274      0.000000     -0.029526      0.020887      0.062443
+---------------------------------------------------------------------------
+ 
+----------------------------------------------------------------
+                    Dipole Moment Function
+                   (Normal Coordinate Basis)
+----------------------------------------------------------------
+    Mode     Symmetry    d(Mu(x))/dQ   d(Mu(y))/dQ   d(Mu(z))/dQ
+----------------------------------------------------------------
+     Q7          T2        0.000015     -0.000373     -0.147700
+     Q8          T2        0.000000      0.147700     -0.000373
+     Q9          T2        0.147701      0.000000      0.000015
+     Q10          E        0.000000      0.000000      0.000000
+     Q11          E        0.000000      0.000000      0.000000
+     Q12         A1        0.000000      0.000000      0.000000
+     Q13         T2       -0.000002      0.000011      0.175631
+     Q14         T2        0.000000     -0.175631      0.000011
+     Q15         T2        0.175631      0.000000      0.000002
+----------------------------------------------------------------
+   Vibrational frequencies after rotational projection  of 
+   Cartesian force constants: 
+            1               0.0006i
+            2               0.0004i
+            3               0.0003 
+            4               0.0005 
+            5               0.0005 
+            6               0.0010 
+            7            1520.3241 
+            8            1520.3241 
+            9            1520.3241 
+           10            1739.7776 
+           11            1739.7776 
+           12            3186.7592 
+           13            3280.1200 
+           14            3280.1200 
+           15            3280.1200 
+  Zero-point vibrational energy =   30.1177 kcal/mole.
+ @ACES2: Executing "xa2proc molden"
+ @MOLDEN_MAIN: successfully created MOLDEN.INPUT                    
+
+
+ @ACES2: The ACES2 program has completed successfully in                      3 
+  seconds.
+
+

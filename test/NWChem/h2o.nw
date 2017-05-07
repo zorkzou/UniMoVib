@@ -1,0 +1,25 @@
+START dft
+
+geometry
+ zmatrix
+ O
+ H1 O OH
+ H2 O OH H1 HOH
+ variables
+  OH    0.99104763
+  HOH 104.51804533
+ end
+end
+
+BASIS SPHERICAL
+ H library 3-21g
+ O library 3-21g
+END
+
+dft
+ xc  pbe0
+end
+
+TASK dft freq
+
+

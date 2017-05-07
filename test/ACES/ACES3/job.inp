@@ -1,0 +1,9 @@
+a test job of ACES 3.
+
+ $contrl
+   qcprog="aces"
+ $end
+
+ $qcdata
+   fchk="ch4-a3.out"
+ $end

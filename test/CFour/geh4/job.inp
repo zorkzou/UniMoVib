@@ -1,0 +1,10 @@
+a test job
+
+ $contrl
+   qcprog="cfour"
+ $end
+
+ $qcdata
+   fchk="geh4.out"
+   geom="GRD"
+ $end

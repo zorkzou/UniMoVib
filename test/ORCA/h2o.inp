@@ -1,0 +1,21 @@
+! pbe0 3-21g usesym Opt Freq
+
+%MaxCore 16000
+
+%pal nprocs 4
+end
+
+%coords
+ CTyp      internal
+ pardef
+   r1=1.0;
+   a1=104.0;
+ end
+ coords
+O   0 0 0   0    0    0
+H   1 0 0 {r1}   0    0
+H   1 2 0 {r1} {a1}   0
+ end
+end
+
+

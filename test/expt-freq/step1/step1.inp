@@ -1,0 +1,19 @@
+Step 1.
+Save data file using experimental frequencies of H2O.
+The normal modes should be calculated at high level of theory.
+
+ $contrl
+   qcprog="cfour"
+   ifsave=.true.
+   ifexp=.true.
+ $end
+
+ $qcdata
+   fchk="h2o.out"
+   geom="GRD"
+ $end
+
+ $expfrq mode=1 $end
+ 1   1595
+ 2   3657
+ 3   3756   B2

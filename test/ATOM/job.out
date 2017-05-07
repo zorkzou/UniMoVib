@@ -1,0 +1,36 @@
+ =======================================================================================================================
+       _/     _/                _/     _/            _/     _/
+      _/     _/            _/  _/|  _/_/            _/     _/  _/  _/        UniMoVib:          A unified interface for
+     _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
+    _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
+   _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.0, MAY 02, 2017
+   _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
+ =======================================================================================================================
+
+
+ Atomic thermochemistry calculation
+
+
+ *********************************************
+ ***   Thermal Contributions to Energies   ***
+ *********************************************
+
+ Temperature          :   298.150000 Kelvin
+ Pressure             :     1.000000 Atm
+ Atomic mass          :    19.992440 AMU
+ Elec. total energy   :  -126.604525 Hartree
+
+ Thermal correction energies                              Hartree            kcal/mol
+ Zero-point Energy                          :            0.000000            0.000000
+ Thermal correction to Energy               :            0.001416            0.888728
+ Thermal correction to Enthalpy             :            0.002360            1.481214
+ Thermal correction to Gibbs Free Energy    :           -0.014231           -8.930035
+
+ Sum of electronic and zero-point Energies  :         -126.604525
+ Sum of electronic and thermal Energies     :         -126.603109
+ Sum of electronic and thermal Enthalpies   :         -126.602165
+ Sum of electronic and thermal Free Energies:         -126.618756
+
+
+ Job terminated correctly! Tue May 02 15:57:51 2017

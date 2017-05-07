@@ -1,0 +1,68 @@
+%-----------------------------------------------------主文档 格式定义---------------------------------
+\addtolength{\headsep}{-0.1cm}        %页眉位置
+%\addtolength{\footskip}{0.4cm}       %页脚位置
+%-----------------------------------------------------设定字体等------------------------------
+\setmainfont{Times New Roman}    % 缺省字体
+\setCJKfamilyfont{song}{SimSun}
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
+\setCJKfamilyfont{fs}{FangSong}
+\setCJKfamilyfont{li}{LiSu}
+\setCJKfamilyfont{you}{YouYuan}
+\setCJKfamilyfont{yahei}{Microsoft YaHei}
+\setCJKfamilyfont{xingkai}{STXingkai}
+\setCJKfamilyfont{xinwei}{STXinwei}
+\setCJKfamilyfont{fzyao}{FZYaoTi}
+\setCJKfamilyfont{fzshu}{FZShuTi}
+%-------------------------------------------------------------------
+%  CTex/XeLaTeX和(Windows) TexLive/XeLaTeX通用
+\newcommand{\song}{\CJKfamily{song}}           % 宋体   (Windows自带simsun.ttf)
+\newcommand{\fs}{\CJKfamily{fs}}               % 仿宋体 (Windows自带simfs.ttf)
+\newcommand{\kai}{\CJKfamily{kai}}             % 楷体   (Windows自带simkai.ttf)
+\newcommand{\hei}{\CJKfamily{hei}}             % 黑体   (Windows自带simhei.ttf)
+\newcommand{\li}{\CJKfamily{li}}               % 隶书   (Windows自带simli.ttf)
+%  或者，仅TexLive/XeLaTeX，支持更多字体
+%\newCJKfontfamily\song{SimSun}
+%\newCJKfontfamily\hei{SimHei}
+%\newCJKfontfamily\kai{KaiTi}
+%\newCJKfontfamily\fs{FangSong}
+%\newCJKfontfamily\li{LiSu}
+%\newCJKfontfamily\you{YouYuan}
+%\newCJKfontfamily\yahei{Microsoft YaHei}
+%\newCJKfontfamily\xingkai{STXingkai}
+%\newCJKfontfamily\xinwei{STXinwei}
+%\newCJKfontfamily\fzyao{FZYaoTi}
+%\newCJKfontfamily\fzshu{FZShuTi}
+%------------------------------------------------------------定义颜色--------------
+\definecolor{blueblack}{cmyk}{0,0,0,0.35}%浅黑
+\definecolor{darkblue}{cmyk}{1,0,0,0}%纯蓝
+\definecolor{lightblue}{cmyk}{0.15,0,0,0}%浅蓝
+%--------------------------------------------------------设定标题颜色------------------
+\CTEXsetup[format+={\color{darkblue}}]{chapter}
+\CTEXsetup[format+={\color{darkblue}}]{section}
+\CTEXsetup[format+={\color{darkblue}}]{subsection}
+%--------------------------------------------------------表格边框颜色------------------
+\arrayrulecolor{darkblue}
+%------------------------------------------------------定义、定理环境------------------
+\newcounter{myDefinition}[chapter]\def\themyDefinition{\thechapter.\arabic{myDefinition}}
+\newcounter{myTheorem}[chapter]\def\themyTheorem{\thechapter.\arabic{myTheorem}}
+\newcounter{myCorollary}[chapter]\def\themyCorollary{\thechapter.\arabic{myCorollary}}
+
+\tcbmaketheorem{defi}{定义}{fonttitle=\bfseries\upshape, fontupper=\slshape, arc=0mm, colback=lightblue,colframe=darkblue}{myDefinition}{Definition}
+\tcbmaketheorem{theo}{定理}{fonttitle=\bfseries\upshape, fontupper=\slshape, arc=0mm, colback=lightblue,colframe=darkblue}{myTheorem}{Theorem}
+\tcbmaketheorem{coro}{推论}{fonttitle=\bfseries\upshape, fontupper=\slshape, arc=0mm, colback=lightblue,colframe=darkblue}{myCorollary}{Corollary}
+%--------------------------------------------------------------------------------------
+\newtheorem{proof}{\indent\hei \textcolor{darkblue}{证明}}
+\newtheorem{Solution}{\indent\hei \textcolor{darkblue}{解}}
+%----------------------------------------------------定义页眉下单隔线-------------------
+\newcommand{\makeheadrule}{\makebox[0pt][l]{\color{darkblue}\rule[.7\baselineskip]{\headwidth}{0.3pt}}\vskip-.8\baselineskip}
+%-----------------------------------------------定义页眉下双隔线----------------
+\makeatletter
+\renewcommand{\headrule}{{\if@fancyplain\let\headrulewidth\plainheadrulewidth\fi\makeheadrule}}
+\pagestyle{fancy}
+\fancyhf{} %清空页眉
+\fancyhead[RO]{\kai{\footnotesize.~\color{darkblue}\thepage~.}}         % 奇数页码显示左边
+\fancyhead[LE]{\kai{\footnotesize.~\color{darkblue}\thepage~.}}         % 偶数页码显示右边
+\fancyhead[CO]{\song\footnotesize\color{darkblue}\rightmark} % 奇数页码中间显示节标题
+\fancyhead[CE]{\song\footnotesize\color{darkblue}\leftmark}  % 偶数页码中间显示章标题
+%---------------------------------------------------------------------------------------------------------------------

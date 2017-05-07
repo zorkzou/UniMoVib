@@ -1,0 +1,9 @@
+a test job
+
+ $contrl
+   qcprog="molpro"
+ $end
+
+ $qcdata
+   fchk="ch4.out"
+ $end

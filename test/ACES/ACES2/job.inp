@@ -1,0 +1,10 @@
+a test job of ACES 2.
+Note: The atoms have been reordered in the output file.
+
+ $contrl
+   qcprog="aces"
+ $end
+
+ $qcdata
+   fchk="ch4-a2.out"
+ $end

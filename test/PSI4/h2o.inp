@@ -1,0 +1,17 @@
+#! Frequencies for H2O
+
+memory 250 mb
+
+molecule h2o {
+  O 
+  H 1 0.9463
+  H 1 0.9463 2 104.575
+}
+
+set basis cc-pVDZ
+set print 3
+
+optimize('b3lyp')
+
+frequencies('b3lyp')
+

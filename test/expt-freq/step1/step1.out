@@ -1,0 +1,123 @@
+ =======================================================================================================================
+       _/     _/                _/     _/            _/     _/
+      _/     _/            _/  _/|  _/_/            _/     _/  _/  _/        UniMoVib:          A unified interface for
+     _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
+    _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
+   _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.0, MAY 02, 2017
+   _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
+ =======================================================================================================================
+
+
+ QC Program:      CFOUR
+ UniMoVib file:   step1.umv
+ FCHK file:       h2o.out
+ GEOM file:       GRD
+
+
+ Cartesian coordinates (Angstrom)
+ ------------------------------------------------------------------------------------------
+   No.   Atom    ZA                 X             Y             Z                Mass
+ ------------------------------------------------------------------------------------------
+     1    H       1            0.00000000   -0.75387902    0.52702010            1.00782503
+     2    H       1            0.00000000    0.75387902    0.52702010            1.00782503
+     3    O       8            0.00000000    0.00000000   -0.06641412           15.99491463
+ ------------------------------------------------------------------------------------------
+
+
+ <<< SYMMETRY >>>
+ Molecular Point Group (Z)   :   C2v 
+ Molecular Point Group (Z+M) :   C2v 
+
+
+ ************************************
+ ***  Properties of Normal Modes  ***
+ ************************************
+
+ Results of vibrations:
+ Normal frequencies (cm**-1), reduced masses (AMU),
+ force constants (mDyn/A), IR intensities (km/mol)
+
+                                                   1                                 2                                 3
+          Irreps                                  A1                                A1                                B2
+     Frequencies                           1668.8782                         3840.9225                         3945.5316
+  Reduced masses                              1.0826                            1.0453                            1.0809
+ Force constants                              1.7764                            9.0855                            9.9143
+  IR intensities                             62.9909                            3.2140                           39.0255
+        Atom  ZA               X         Y         Z             X         Y         Z             X         Y         Z
+           1   1         0.00000   0.42835   0.56038       0.00000  -0.58431   0.39666       0.00000   0.55426  -0.43630
+           2   1         0.00000  -0.42835   0.56038       0.00000   0.58431   0.39666       0.00000   0.55426   0.43630
+           3   8         0.00000   0.00000  -0.07062       0.00000  -0.00000  -0.04999       0.00000  -0.06985   0.00000
+
+ Results of translations and rotations:
+
+                                                   1                                 2                                 3
+          Irreps                                  B1                                B2                                A1
+     Frequencies                              0.0000                           -2.0980                           -2.0980
+  Reduced masses                              6.0035                            6.0035                            6.0035
+ Force constants                              0.0000                           -0.0000                           -0.0000
+  IR intensities                              0.0000                            0.0000                            0.0000
+        Atom  ZA               X         Y         Z             X         Y         Z             X         Y         Z
+           1   1         0.57735   0.00000   0.00000       0.00000   0.57735   0.00000       0.00000   0.00000   0.57735
+           2   1         0.57735   0.00000   0.00000       0.00000   0.57735   0.00000       0.00000   0.00000   0.57735
+           3   8         0.57735   0.00000   0.00000       0.00000   0.57735   0.00000       0.00000   0.00000   0.57735
+
+                                                   4                                 5                                 6
+          Irreps                                  B1                                A2                                B2
+     Frequencies                              0.0000                            0.0000                           -1.6987
+  Reduced masses                              1.1259                            1.0078                            1.0468
+ Force constants                              0.0000                            0.0000                           -0.0000
+  IR intensities                            245.8250                            0.0000                           87.2579
+        Atom  ZA               X         Y         Z             X         Y         Z             X         Y         Z
+           1   1         0.70432   0.00000   0.00000       0.70711   0.00000   0.00000       0.00000  -0.40461  -0.57878
+           2   1         0.70432   0.00000   0.00000      -0.70711   0.00000  -0.00000       0.00000  -0.40461   0.57878
+           3   8        -0.08876  -0.00000  -0.00000       0.00000   0.00000   0.00000       0.00000   0.05099   0.00000
+
+
+ ************************************
+ ***     Frequency Correction     ***
+ ************************************
+
+ ----------------------------------------------------
+ No.      Symm    Expt.Freq    Theo.Freq        Corr.
+ ----------------------------------------------------
+     1    A1      1595.0000    1668.8782     -73.8782
+     2    A1      3657.0000    3840.9225    -183.9225
+     3    B2      3756.0000    3945.5316    -189.5316
+ ----------------------------------------------------
+
+ <<< NOTE >>>
+ The corrected frequencies will be used in the following analysis.
+
+
+ *********************************************
+ ***   Thermal Contributions to Energies   ***
+ *********************************************
+
+ Temperature               :       298.150000    Kelvin
+ Pressure                  :         1.000000    Atm
+ Molecular mass            :        18.010565    AMU
+ Elec. total energy        :         0.000000    Hartree
+ Scale factor of Frequency :         1.000000
+ Rot. symmetry number      :         2
+ The C2v  point group is used to calculate rotational entropy.
+
+ Principal axes and moments of inertia in atomic units:
+                                     1                   2                   3
+     Eigenvalues --                  2.251194            4.090878            6.342072
+           X                         0.000000            0.000000            1.000000
+           Y                         1.000000            0.000000            0.000000
+           Z                         0.000000            1.000000            0.000000
+
+ Rotational temperatures            38.474605           21.172427           13.657021    Kelvin
+ Rot. constants A, B, C             26.741222           14.715591            9.492116    cm**-1
+                                   801.681656          441.162315          284.566481    GHz
+
+ Thermal correction energies                              Hartree            kcal/mol
+ Zero-point Energy                          :            0.020522           12.877581
+ Thermal correction to Energy               :            0.023358           14.657110
+ Thermal correction to Enthalpy             :            0.024302           15.249596
+ Thermal correction to Gibbs Free Energy    :            0.002881            1.808082
+
+
+ Job terminated correctly, Tue May 02 19:08:45 2017

@@ -1,0 +1,9 @@
+a test job
+
+ $contrl
+   qcprog="mopac"
+ $end
+
+ $qcdata
+   fchk="CH4.out"
+ $end

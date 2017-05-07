@@ -1,0 +1,11 @@
+This is a test job
+
+ $contrl
+   qcprog="molden"
+   ifconc=.t.
+   ISyTol=42
+ $end
+
+ $qcdata
+   fchk="C6H6-VIBRATIONS-1.ref.mol"
+ $end

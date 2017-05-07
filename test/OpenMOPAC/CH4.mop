@@ -1,0 +1,9 @@
+ AM1 FORCE DFORCE
+
+CH4. The geometry has been optimized by the keywords AM1 GRADIENTS
+C   0.0000 0    0.0000 0    0.0000 0    0 0 0
+H   1.1116 0    0.0000 0    0.0000 0    1 0 0
+H   1.1116 0  109.4712 0    0.0000 0    1 2 0
+H   1.1116 0  109.4712 0  120.0000 0    1 2 3
+H   1.1116 0  109.4712 0 -120.0000 0    1 2 3
+

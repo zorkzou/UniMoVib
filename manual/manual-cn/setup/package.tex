@@ -1,0 +1,46 @@
+%-------------------------------------宏包引用---------------------------------------------------
+\usepackage[paperwidth=216mm,paperheight=279mm,textwidth=176mm,textheight=239mm,left=20mm,right=20mm, top=25mm, bottom=20mm]{geometry}            %定义版面: letter
+%--------------------------------------------------------------------------------------
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+\usepackage{everb}
+\usepackage{listings}
+\usepackage{mdwlist}
+\usepackage{longtable}
+\usepackage{amsfonts,amssymb}
+%--------------------------------------------------------------------------------------
+\usepackage[skins,listings,breakable,theorems]{tcolorbox}
+%\newtcblisting{molprojob}{
+%breakable,colback=green!5!white,colframe=green!75!black,left=7mm,
+%enhanced,
+%listing only,
+%listing options={aboveskip=0pt,belowskip=0pt,basicstyle=\ttfamily,numbers=left,
+%    numberstyle=\scriptsize\color{red!75!black}},
+%overlay={\begin{tcbclipinterior}\fill[red!20!blue!20!white] (frame.south west)
+%    rectangle ([xshift=5mm]frame.north west);\end{tcbclipinterior}}
+%}
+
+\newtcblisting{commandshell}{colback=black,colupper=white,colframe=yellow!75!black,
+listing only,listing options={style=tcblatex,language=sh,numbers=none},
+every listing line={\textcolor{red}{\small\ttfamily\bfseries UserID \$> }}}
+
+\lstset{
+numbers=left,
+numberstyle=\scriptsize\color{red!75!black},
+extendedchars=false,
+showspaces=false
+}
+
+\usepackage{fancybox}                 % 边框,有阴影,fancybox提供了五种式样\fbox,\shadowbox,\doublebox,\ovalbox,\Ovalbox。
+\usepackage{colortbl}                 % 单元格加背景
+\usepackage{fancyhdr}                 % 页眉和页脚的相关定义
+\usepackage[unicode, colorlinks, bookmarksnumbered=true,pdfstartview=FitH,linkcolor=blue,citecolor=red,urlcolor=magenta]{hyperref}   % 书签功能，选项去掉链接红色方框
+
+\usepackage{chngcntr}                 % 公式、图的编号不显示章节号
+\counterwithout{equation}{chapter}
+\counterwithout{equation}{section}
+\counterwithout{figure}{chapter}
+\counterwithout{figure}{section}
+
+\usepackage{bigfoot}                  % use \verb in footnote

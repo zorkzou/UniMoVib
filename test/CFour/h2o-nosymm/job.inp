@@ -1,0 +1,10 @@
+H2O without symmetry
+
+ $contrl
+   qcprog="cfour"
+ $end
+
+ $qcdata
+   fchk="h2o-c1.out"
+   geom="GRD"
+ $end
