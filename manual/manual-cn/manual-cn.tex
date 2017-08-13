@@ -275,6 +275,9 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \verb|Eel|：来自量子化学计算的总能量（单位：Hartree）。默认：0。
 
 \bigskip{}
+\verb|NDeg|：自旋-轨道态的简并度。默认：1。
+
+\bigskip{}
 \verb|Temp|：温度（单位：K）。默认：298.15。
 
 \bigskip{}
@@ -301,7 +304,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \begin{description}
 \item[ ]\verb|  $Contrl|输入组（参见第\ref{sec:inp-contrl}节）：需要指定\verb|qcprog="atomcalc"|。
 \item[ ]\verb|  $IsoMas|输入组（参见第\ref{sec:inp-isomas}节）：需要提供原子质量（\verb|$Contrl|输入组中的\verb|Isotop|永远被程序设定为2）。
-\item[ ]\verb|  $Thermo|输入组（参见第\ref{sec:inp-thermo}节）：可以指定\verb|Eel|，\verb|Temp|，\verb|Press|，都是可选的。
+\item[ ]\verb|  $Thermo|输入组（参见第\ref{sec:inp-thermo}节）：可以指定\verb|Eel|，\verb|NDeg|，\verb|Temp|，\verb|Press|，都是可选的。
 \end{description}
 其它的 namelist和关键词不起作用，会被忽略。参见示例\ref{sec:exp1}。
 

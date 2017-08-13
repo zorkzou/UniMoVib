@@ -1,0 +1,15 @@
+Note: The Ih group is not supported by rotational entropy in Gaussian, so the C1
+symmetry has to be used instead to reproduce Gaussian's Gibbs free energy.
+
+ $contrl
+   qcprog="gaussian"
+   IFConc=.t.
+ $end
+
+ $qcdata
+   fchk="c60.fchk"
+ $end
+
+ $thermo
+   pg="c1"
+ $end

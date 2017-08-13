@@ -3,7 +3,7 @@
 ! UniMoVib: a unified interface for molecular harmonic vibrational frequency calculations.
 !
 ! Wenli Zou,  Email: qcband@gmail.com
-! Institute of Modern Physics, Northwest University, Xi¡¯an, China
+! Institute of Modern Physics, Northwest University, Xi'an, China
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 program UniMoVib
@@ -17,7 +17,7 @@ logical       :: Intact, ifopen
 real(kind=8),allocatable :: AMass(:), ZA(:), XYZ(:), FFx(:), APT(:), AL(:), Scr1(:), Scr2(:), Scr3(:), Scr4(:), Work(:)
 
 ver="1.0.0"
-dat="MAY 02, 2017"
+dat="AUG 13, 2017"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O

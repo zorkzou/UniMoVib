@@ -474,6 +474,10 @@ This group controls the thermochemistry calculation. Keywords:
 \verb|Eel|: total energy taken from quantum chemistry calculation (in Hartree). Default: 0.
 
 \bigskip{}
+\index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{NDeg}}
+\verb|NDeg|: degeneracy of the (spin-orbit) electronic state, which affects the entropy and Gibbs free energy. Default: 1.
+
+\bigskip{}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Temp}}
 \verb|Temp|: temperature (in K). Default: 298.15.
 
@@ -517,9 +521,11 @@ optional total energy. Three groups of keywords may be provided:
 \index{{\texttt{\$IsoMas} group}@{\texttt{\$IsoMas} group}}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{Isotop}}
 \item[ ]\verb|  $IsoMas| group (section \ref{sec:inp-isomas}): the atomic mass should be specified (\verb|Isotop| in the \verb|$Contrl| group is always 2).
+\index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Eel}}
+\index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{NDeg}}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Temp}}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Press}}
-\item[ ]\verb|  $Thermo| group (section \ref{sec:inp-thermo}): \verb|Eel|, \verb|Temp|, and \verb|Press| can be specified, which are optional.
+\item[ ]\verb|  $Thermo| group (section \ref{sec:inp-thermo}): \verb|Eel|, \verb|NDeg|, \verb|Temp|, and \verb|Press| can be specified, which are optional.
 \end{description}
 The other namelists and keywords do not make sense and will be ignored. See Example \ref{sec:exp1}.
 

@@ -29,7 +29,7 @@ parameter(                                       &          ! the parameters are
 real(kind=8) :: AMass(NAtom),XYZ(3,NAtom),Freq(NAtm3,*),Sc1(3,*),Sc2(*)
 character*4 :: PGNAME(2),PG
 character*1 :: L2U
-real(kind=8) :: energy(3),entropy(3)
+real(kind=8) :: energy(3),entropy(4)
 logical :: Intact,IFAtom,IFLin
 
 ! Eel     : Total electronic energy from Q.C. calculation (a.u.)
@@ -39,12 +39,13 @@ logical :: Intact,IFAtom,IFLin
 ! PG =1   : use the point group without mass
 !     2   : use the point group with mass (default)
 !     xxxx: specify the name of point group, for example, D10h
-namelist/Thermo/Eel,temp,press,scale,PG
+namelist/Thermo/Eel,NDeg,temp,press,scale,PG
 
 write(iout,"(//,1x,45('*'),/, ' ***   Thermal Contributions to Energies   ***',/, 1x,45('*'))")
 
 Pi=acos(-1.0d0)
 Eel=0.d0
+NDeg=1
 temp=298.15d0
 press=1.d0
 scale=1.d0
@@ -153,8 +154,8 @@ else if(IFLin)then
   entropy(2)=Rval*(1.0d0 + log(entropy(2)) )
 else
   energy(2)=Rval*temp*1.5d0
-  entropy(2)=sqrt(Pi*temp*temp*temp/AMultip(Sc1,3,.True.,tolr))
-  entropy(2)=Rval*(1.5d0 + log(entropy(2)/dble(NSigma)) )
+  entropy(2)=Pi*temp*temp*temp/AMultip(Sc1,3,.True.,tolr/cf1)
+  entropy(2)=Rval*(1.5d0 + log(sqrt(entropy(2))/dble(NSigma)) )
 end if
 
 ! vibration
@@ -170,11 +171,15 @@ do i=1,NVib
   VT = Freq(i,IFrq)*scale0/cf4
   VTT= VT/temp
   ! neglect small freq. because it leads to big errors
-  if(VT <= 10.d0) cycle
+  if(VT <= 1.d0) cycle
 
   energy(3)=energy(3) + Rval * VT / (exp(VTT) - 1.d0)
   entropy(3)=entropy(3) + Rval * ( VTT/(exp(VTT) - 1.d0) - log(1.d0 - exp(-VTT)) )
 end do
+
+! electronic contribution
+!energy(4) = Eel
+entropy(4)=Rval*log(dble(NDeg))
 
 ! ZPE
 zpe=0.d0
@@ -191,8 +196,9 @@ zpe=zpe*0.5d0*Rval/cf4
 
 ! print results
 eu=zpe+ASum(energy,3)
+
 eh=eu+Rval*temp
-eg=eh-temp*ASum(entropy,3)
+eg=eh-temp*ASum(entropy,4)
 write(iout,"(/,                                                 &
 ' Thermal correction energies',30x,'Hartree',12x,'kcal/mol',/,  &
 ' Zero-point Energy                          :',2f20.6,/,       &
