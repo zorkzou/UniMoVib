@@ -2,10 +2,11 @@
 A unified interface for molecular harmonic vibrational frequency calculations. It was initially written in Fortran 77 during 2014 and 2015, but its ancient predecessor has been started since 2009. After being rewritten in Fortran 90 recently, UniMoVib is released as a stand-alone program.
 
 ## Latest Version
-Version 1.0.0 (Aug/13/2017).
+Version 1.0.0 (Aug/23/2017).
 
 1. Electronic contribution to entropy.
 2. Bug fix for small rotational constants.
+3. Physical constants have been updated.
 
 ## Features
 

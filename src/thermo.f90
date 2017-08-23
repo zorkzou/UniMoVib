@@ -15,17 +15,24 @@
 subroutine Thermochem(iinp,iout,Intact,NAtom,NAtm3,NVib,IFAtom,IExpt,PGNAME,AMass,XYZ,Freq,Sc1,Sc2)
 implicit real(kind=8) (a-h,o-z)
 parameter(tolr=0.01d0)
-parameter(                                       &          ! the parameters are taken from Gaussian09 manual
-           au2kcal  = 627.5095d0,                &          ! Hartree to kcal/mol
-           light    = 2.99792458d+08,            &          ! m/s
-           planck   = 6.62606896d-34,            &          ! Js
-           avogadro = 6.02214179d+23,            &          ! particle/mol
-           boltzman = 1.38065040d-23,            &          ! J/K
-           amu2kg   = 1.66053878d-27,            &          ! amu to kilogram
-           b2met    = 0.5291772086d-10,          &          ! Bohr to metre
-           Atm2Pa   = 1.01325d5,                 &          ! pressure unit: 1 atm = 101325 pa
-           H2kJ     = 2625.5001d0,               &          ! Hartree to kJ/mol
-           Rval     = avogadro*boltzman/(1.0d3*H2kJ)  )     ! R =8.31447247 J/(K*Mol) = 3.16681476d-6 au/K
+parameter( pi       = acos(-1.0d0),                                  &
+!          the parameters are taken from Gaussian09 manual
+           au2ang   = 0.52917720859d0,                               &   ! a.u. (length) to Angstrom
+           clight   = 2.99792458d+08,                                &   ! m/s
+           planck   = 6.62606896d-34,                                &   ! Js
+           avogadro = 6.02214179d+23,                                &   ! particle/mol
+           boltzman = 1.38065040d-23,                                &   ! J/K
+           amu2kg   = 1.660538782d-27,                               &   ! amu to kilogram
+           Atm2Pa   = 1.01325d+05,                                   &   ! pressure unit: 1 atm = 101325 pa
+           Cal2Jou  = 4.184d0,                                       &   ! Cal to Joule
+           H2Jou    = 0.435974394d-17,                               &   ! Hartree to Joule
+!          derived factors
+           b2met    = au2ang*1.0d-10,                                &   ! Bohr to metre
+           H2kJ     = H2Jou*avogadro*1.0d-03,                        &   ! Hartree to kJ/mol
+           H2kcal   = H2kJ/Cal2Jou,                                  &   ! Hartree to kcal/mol
+           Rval     = avogadro*boltzman/(1.0d3*H2kJ),                &   ! R =8.31447247 J/(K*Mol) = 3.16681476d-6 au/K
+           au2wn    = sqrt(avogadro*H2Jou/1.0d1)/(2*pi*clight*b2met) )   ! au (freq) to wavenumber (=5140.4871)
+
 real(kind=8) :: AMass(NAtom),XYZ(3,NAtom),Freq(NAtm3,*),Sc1(3,*),Sc2(*)
 character*4 :: PGNAME(2),PG
 character*1 :: L2U
@@ -43,7 +50,6 @@ namelist/Thermo/Eel,NDeg,temp,press,scale,PG
 
 write(iout,"(//,1x,45('*'),/, ' ***   Thermal Contributions to Energies   ***',/, 1x,45('*'))")
 
-Pi=acos(-1.0d0)
 Eel=0.d0
 NDeg=1
 temp=298.15d0
@@ -56,9 +62,9 @@ cf1 = planck * planck / (boltzman*8.d0*Pi*Pi*b2met*b2met*amu2kg)
 ! rot temperatures to rot constants (GHZ)
 cf2 = 1.0d-9 * boltzman / planck
 ! rot temperatures to rot constants (CM^-1)
-cf3 = boltzman / (planck * 1.0d2 * light)
+cf3 = boltzman / (planck * 1.0d2 * clight)
 ! temperature to Hartree
-cf4 = cf3/5140.48715246d0
+cf4 = cf3/au2wn
 
 rewind(iinp)
 read(iinp,Thermo,err=2000,end=100)
@@ -204,7 +210,7 @@ write(iout,"(/,                                                 &
 ' Zero-point Energy                          :',2f20.6,/,       &
 ' Thermal correction to Energy               :',2f20.6,/,       &
 ' Thermal correction to Enthalpy             :',2f20.6,/,       & 
-' Thermal correction to Gibbs Free Energy    :',2f20.6)") zpe,zpe*au2kcal,eu,eu*au2kcal,eh,eh*au2kcal,eg,eg*au2kcal
+' Thermal correction to Gibbs Free Energy    :',2f20.6)") zpe,zpe*H2kcal,eu,eu*H2kcal,eh,eh*H2kcal,eg,eg*H2kcal
 if(abs(Eel) > tolr)write(iout,"(/,                        &
 ' Sum of electronic and zero-point Energies  :',f20.6,/,  &
 ' Sum of electronic and thermal Energies     :',f20.6,/,  &

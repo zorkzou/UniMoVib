@@ -2560,7 +2560,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdHyper(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
-parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48715246d0)
+parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*69 :: tag
@@ -2634,7 +2634,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdJaguar(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
-parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48715246d0)
+parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*53 :: tag
@@ -2770,7 +2770,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdMOLDEN(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
-parameter(One=1.d0,wn2au=One/5140.48715246d0)
+parameter(One=1.d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*15 :: tag
@@ -2906,7 +2906,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdCry(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
-parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48715246d0)
+parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*60 :: tag
@@ -3265,7 +3265,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdACES(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
-parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48715246d0)
+parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(3,NAtm,*),SC3(*),WORK(*)
 character*200 :: ctmp
 character*98 :: tag
@@ -3424,7 +3424,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine SavMDN(imdn,NAtm,NAtm3,NVib,ZA,XYZ,IExpt,AL,Freq)
 implicit real(kind=8) (a-h,o-z)
-parameter(au2wn=5140.48715246d0,au2ang=0.529177d0)
+parameter(au2wn=5140.48714376d0,au2ang=0.529177d0)
 real(kind=8) :: ZA(*),XYZ(3,*),AL(NAtm3,*),Freq(NAtm3,*)
 character*3 :: Elm
 

@@ -72,7 +72,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Reslt,expf,IRNAME,Ifexpf,ctmp)
 implicit real(kind=8) (a-h,o-z)
-parameter(au2wn=5140.48715246d0,epsfrq=5.0d-5,one=1.d0)
+parameter(au2wn=5140.48714376d0,epsfrq=5.0d-5,one=1.d0)
 real(kind=8) :: Reslt(NAtm3,*),expf(*)
 character*100 :: ctmp
 character*4 :: IRNAME(NAtm3)
@@ -348,7 +348,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine PrtNFq(iout,irep,NAtm,NAtm3,NVib,IfSim,IPrint,ZA,AL,Reslt,IRNAME)
 implicit real(kind=8) (a-h,o-z)
-parameter(au2wn=5140.48715246d0,au2dy=15.56893d0,cf=31.22307d0)
+parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0)
 real(kind=8) :: ZA(*),AL(3,NAtm,*),Reslt(NAtm3,*)
 character*4 :: IRNAME(NAtm3)
 logical :: IfSim
