@@ -4,7 +4,7 @@
      _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
     _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
    _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
-  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.0, MAY 02, 2017
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.1, OCT 15, 2017
    _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
  =======================================================================================================================
 
@@ -51,9 +51,9 @@
 
                                                    1                                 2                                 3
           Irreps                                  A"                                A'                                A'
-     Frequencies                              0.0000                           -0.0183                            0.0118
+     Frequencies                              0.0000                            0.0091                            0.0105
   Reduced masses                              6.3389                            6.3389                            6.3389
- Force constants                              0.0000                           -0.0000                            0.0000
+ Force constants                              0.0000                            0.0000                            0.0000
   IR intensities                              0.0000                            0.0000                            0.0000
         Atom  ZA               X         Y         Z             X         Y         Z             X         Y         Z
            1   1         0.57735   0.00000   0.00000       0.00000   0.57735   0.00000       0.00000   0.00000   0.57735
@@ -62,9 +62,9 @@
 
                                                    4                                 5                                 6
           Irreps                                  A"                                A"                                A'
-     Frequencies                              0.0000                            0.0000                            0.0188
+     Frequencies                              0.0000                            0.0000                           -0.0075
   Reduced masses                              1.1988                            1.7879                            1.5664
- Force constants                              0.0000                            0.0000                            0.0000
+ Force constants                              0.0000                            0.0000                           -0.0000
   IR intensities                            179.6100                           11.6786                           60.0110
         Atom  ZA               X         Y         Z             X         Y         Z             X         Y         Z
            1   1         0.96364   0.00000   0.00000      -0.54318  -0.00000  -0.00000       0.00000   0.38874   0.61821
@@ -93,13 +93,13 @@
 
  Rotational temperatures            32.634113           13.188279            9.392521    Kelvin
  Rot. constants A, B, C             22.681871            9.166324            6.528137    cm**-1
-                                   679.985393          274.799475          195.708620    GHz
+                                   679.985393          274.799474          195.708620    GHz
 
  Thermal correction energies                              Hartree            kcal/mol
- Zero-point Energy                          :            0.017766           11.148585
- Thermal correction to Energy               :            0.020606           12.930761
- Thermal correction to Enthalpy             :            0.021551           13.523246
+ Zero-point Energy                          :            0.017766           11.148586
+ Thermal correction to Energy               :            0.020606           12.930762
+ Thermal correction to Enthalpy             :            0.021551           13.523248
  Thermal correction to Gibbs Free Energy    :           -0.001084           -0.680241
 
 
- Job terminated correctly, Tue May 02 19:12:05 2017
+ Job terminated correctly, Sun Oct 15 21:46:03 2017

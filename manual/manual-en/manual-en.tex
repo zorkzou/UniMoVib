@@ -51,7 +51,7 @@
 
 \begin{document}
 
-\title{User's Guide of the Program \textsc{UniMoVib} \\ \vspace{10 mm} (Ver. 1.0.0)  \vspace{70 mm}}
+\title{User's Guide of the Program \textsc{UniMoVib} \\ \vspace{10 mm} (Ver. 1.0.1)  \vspace{70 mm}}
 
 \date{\today}
 
@@ -113,7 +113,7 @@ Others            & $R_3$, $T$, $T_d$, $T_h$, $O$, $O_h$, $I$, $I_h$, $C_{\infty
 \end{tabular}
 \end{table}
 
-Two point groups will be printed by the program, \emph{i.e.} "\verb|Point Group (Z)|" and "\verb|Point Group (Z+M)|". \verb|Point Group (Z)| is independent of isotopic masses whereas \verb|Point Group (Z+M)| is. Isotopes may lead to lower symmetry of vibrational normal modes, so the latter point group should be used to analyze vibrations and do thermochemistry calculations. However, some quantum chemistry programs use the former symmetry, which is not correct, and the \emph{irreps.} cannot be correctly analyzed. A extreme case is the fullerence $^{12}$C$_{59}{}^{13}$C, which has $I_h$ symmetry for geometry and electronic structures, but $C_1$ for vibration and rotation. If $I_h$ is used for thermochemistry calculations, the error in Gibbs free energy will be as large as 2.5 kcal/mol!
+Two point groups will be printed by the program, \emph{i.e.} "\verb|Point Group (Z)|" and "\verb|Point Group (Z+M)|". \verb|Point Group (Z)| is independent of isotopic masses whereas \verb|Point Group (Z+M)| is. Isotopes may lead to lower symmetry of vibrational normal modes, so the latter point group should be used to analyze vibrations and do thermochemistry calculations. However, some quantum chemistry programs use the former symmetry, which is not correct, and therefore the \emph{irreps.} cannot be correctly analyzed. A extreme case is the fullerence $^{12}$C$_{59}{}^{13}$C, which has $I_h$ symmetry for geometry and electronic structure, but $C_1$ for vibration and rotation. If $I_h$ is used in thermochemistry calculations, the error in Gibbs free energy will be as large as 2.5 kcal/mol!
 
 \pagebreak{}
 
@@ -693,7 +693,7 @@ in your frequency calculation (this is default in \textsc{Aces}) to generate a \
 \index{{UniMoVib format}@{UniMoVib format}}
 
 The UniMoVib data file is an ASCII one in free format.
-\begin{Verbatim}[frame=single,label=Format,labelposition=topline,rulecolor=\color{green},fontsize=\small,baselinestretch=1.0]
+\begin{Verbatim}[frame=single,label=Format(Ver.1.0.1 2017.10.15),labelposition=topline,rulecolor=\color{green},fontsize=\small,baselinestretch=1.0]
 (One title line)
 NATM
   (An positive integer)
@@ -702,14 +702,20 @@ AMASS
 ZA
   (NATM number of nuclear charge numbers)
 XYZ
-  (3*NATM elements, Cartesian coordinates in a.u.; Use XYZANG instead if in Angstrom)
-APT
-  (3*3NATM elements, APT data values; Use NOAPT instead if no APT data provided)
+  (3*NATM elements of Cartesian coordinates in a.u.;
+  Use XYZANG instead if in Angstrom)
 FFX
-  (3NATM*3NATM elements, Hessian matrix elements; Use FFXLT instead for L.T. matrix)
+  (3NATM*3NATM elements of Hessian matrix;
+  Use FFXLT instead for L.T. matrix)
+APT
+  (3*3NATM elements of APT data;
+  Use NOAPT instead if no APT data provided)
+DPR
+  (6*3NATM elements of polarizability derivatives;
+  Use DPRSQ instead if in the form of 9*3NATM;
+  Use NODPR instead if no DPR data provided)
 \end{Verbatim}
-Raman intensities are not supported at present.
-
+DPR data and Raman intensities are not supported at present.
 
 \pagebreak{}
 

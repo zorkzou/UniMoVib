@@ -4,7 +4,7 @@
      _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
     _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
    _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
-  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.0, MAY 02, 2017
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.1, OCT 15, 2017
    _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
  =======================================================================================================================
 
@@ -114,10 +114,10 @@
                                    801.681656          441.162315          284.566481    GHz
 
  Thermal correction energies                              Hartree            kcal/mol
- Zero-point Energy                          :            0.020522           12.877581
- Thermal correction to Energy               :            0.023358           14.657110
- Thermal correction to Enthalpy             :            0.024302           15.249596
+ Zero-point Energy                          :            0.020522           12.877582
+ Thermal correction to Energy               :            0.023358           14.657112
+ Thermal correction to Enthalpy             :            0.024302           15.249598
  Thermal correction to Gibbs Free Energy    :            0.002881            1.808082
 
 
- Job terminated correctly, Tue May 02 19:08:45 2017
+ Job terminated correctly, Sun Oct 15 21:44:13 2017

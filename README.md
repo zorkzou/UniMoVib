@@ -2,11 +2,12 @@
 A unified interface for molecular harmonic vibrational frequency calculations. It was initially written in Fortran 77 during 2014 and 2015, but its ancient predecessor has been started since 2009. After being rewritten in Fortran 90 recently, UniMoVib is released as a stand-alone program.
 
 ## Latest Version
-Version 1.0.0 (Aug/23/2017).
+Version 1.0.1 (Oct/15/2017).
 
 1. Electronic contribution to entropy.
 2. Bug fix for small rotational constants.
 3. Physical constants have been updated.
+4. The format of UniMoVib data file has been a little changed.
 
 ## Features
 
@@ -16,3 +17,7 @@ Version 1.0.0 (Aug/23/2017).
 4. Save a Molden file for animation of normal modes.
 5. Set up isotopic masses, temperature, pressure, scale factor and/or experimental frequencies, and so on.
 6. Can be used as a third party module for frequency and thermochemistry calculations in a quantum chemistry program.
+
+### To be done:
+1. Raman intensities.
+2. Construct Hessian matrix from force constants of redundant or 3N-L non-redundant internal coordinates.

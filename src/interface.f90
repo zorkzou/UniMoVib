@@ -1046,11 +1046,6 @@ read(ifchk,*,err=1030,end=1030)(XYZ(i),i=1,NAtm3)
 ! Ang --> a.u.
 call AScale(NAtm3,Scr(1),XYZ,XYZ)
 
-! read APT in a.u. (optional)
-read(ifchk,"(a100)",err=1040,end=1040)ctmp
-call charl2u(ctmp)
-if(index(ctmp,"NOAPT") == 0) read(ifchk,*,err=1040,end=1040)(APT(i),i=1,NAtm9)
-
 ! read square or L.T. FFX in a.u.
 read(ifchk,"(a100)",err=1050,end=1050)ctmp
 call charl2u(ctmp)
@@ -1061,13 +1056,31 @@ else
   call LT2Sqr(NAtm3,Scr,FFx)
 end if
 
+! read APT in a.u.
+read(ifchk,"(a100)",err=1060,end=1060)ctmp
+call charl2u(ctmp)
+if(index(ctmp,"NOAPT") == 0) read(ifchk,*,err=1060,end=1060)(APT(i),i=1,NAtm9)
+
+! read DPR in a.u.
+read(ifchk,"(a100)",err=1070,end=1070)ctmp
+call charl2u(ctmp)
+if(index(ctmp,"NODPR") == 0) then
+!  if(index(ctmp,"DPRSQ") == 0) then
+!    read(ifchk,*,err=1070,end=1070)
+!  else
+!    read(ifchk,*,err=1070,end=1070)
+!  end if
+end if
+
 return
+
 1010  call XError(Intact,"Please check AMASS data!")
 1020  call XError(Intact,"Please check ZA data!")
 1030  call XError(Intact,"Please check XYZ data!")
-1040  call XError(Intact,"Please check APT data!")
 1050  call XError(Intact,"Please check FFX data!")
 1051  call XError(Intact,"Please check FFXLT data!")
+1060  call XError(Intact,"Please check APT data!")
+1070  call XError(Intact,"Please check DPR data!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3371,8 +3384,9 @@ end
 ! AMass
 ! ZA
 ! XYZ (in a.u.)
-! APT (in a.u.)
 ! FFX (square matrix in a.u.)
+! APT (in a.u.)
+! DPR (in a.u.)
 !
 ! If the frequencies are corrected by the experimental ones (saved in Freq(:,5)), the force constant matrix will be recalculated.
 !
@@ -3384,7 +3398,7 @@ real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFX(*),APT(*),AL(*),Freq(NAtm3,*), SC1(*),
 NAtm9 = NAtm * 9
 NSS = NAtm3 * NAtm3
 
-write(ialm,"(' UniMoVib DATA FILE (YOU CAN MODIFY THIS LINE)')")
+write(ialm,"(' UniMoVib DATA FILE (THIS TITLE CAN BE MODIFIED)')")
 
 write(ialm,"('NATM')")
 write(ialm,"(i5)")NAtm
@@ -3398,9 +3412,6 @@ write(ialm,"(5d20.10)")(ZA(i),i=1,NAtm)
 write(ialm,"('XYZ')")
 write(ialm,"(5d20.10)")(XYZ(i),i=1,NAtm3)
 
-write(ialm,"('APT')")
-write(ialm,"(5d20.10)")(APT(i),i=1,NAtm9)
-
 write(ialm,"('FFX')")
 if(IExpt == 0)then
   write(ialm,"(5d20.10)")(FFX(i),i=1,NSS)
@@ -3409,6 +3420,11 @@ else
   call Frq2FFX(NAtm3,NVib,AMass,Freq(1,5),AL,SC1,SC2,WORK,EIG)
   write(ialm,"(5d20.10)")(SC1(i),i=1,NSS)
 end if
+
+write(ialm,"('APT')")
+write(ialm,"(5d20.10)")(APT(i),i=1,NAtm9)
+
+write(ialm,"('NODPR')")
 
 write(ialm,"(/)")
 
