@@ -56,7 +56,7 @@ if(IOP(7) == 1) call SavMDN(imdn,NAtm,NAtm3,NVib,ZA,XYZ,IOP(3),AL,Scr1)
 
 1000  continue
 ! Thermochemistry calculation. Frequencies are saved in Scr1(1:NVib,3/5) in a.u.
-call Thermochem(iinp,iout,Intact,NAtm,NAtm3,NVib,IFAtom,IOP(3),PGNAME,AMass,XYZ,Scr1,Scr2,Scr3)
+call Thermochem(iinp,iout,Intact,NAtm,NAtm3,NVib,IFAtom,IOP(3),PGNAME,AMass,XYZ,Scr1,Scr2,Scr3,ctmp)
 
 return
 end

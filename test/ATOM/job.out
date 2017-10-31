@@ -4,7 +4,7 @@
      _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
     _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
    _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
-  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.0, MAY 02, 2017
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.2, OCT 26, 2017
    _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
  =======================================================================================================================
 
@@ -16,21 +16,88 @@
  ***   Thermal Contributions to Energies   ***
  *********************************************
 
- Temperature          :   298.150000 Kelvin
- Pressure             :     1.000000 Atm
- Atomic mass          :    19.992440 AMU
- Elec. total energy   :  -126.604525 Hartree
+ Atomic mass               :        19.992440    AMU
+ Elec. total energy        :      -126.604525    Hartree
+
+
+ #   1    Temperature =       298.15000 Kelvin         Pressure =         1.00000 Atm
+ ====================================================================================
 
  Thermal correction energies                              Hartree            kcal/mol
  Zero-point Energy                          :            0.000000            0.000000
  Thermal correction to Energy               :            0.001416            0.888728
  Thermal correction to Enthalpy             :            0.002360            1.481214
- Thermal correction to Gibbs Free Energy    :           -0.014231           -8.930035
+ Thermal correction to Gibbs Free Energy    :           -0.014231           -8.930036
 
  Sum of electronic and zero-point Energies  :         -126.604525
  Sum of electronic and thermal Energies     :         -126.603109
  Sum of electronic and thermal Enthalpies   :         -126.602165
  Sum of electronic and thermal Free Energies:         -126.618756
+ ====================================================================================
 
 
- Job terminated correctly! Tue May 02 15:57:51 2017
+ #   2    Temperature =        10.00000 Kelvin         Pressure =         0.00000 Atm
+ ====================================================================================
+
+ Thermal correction energies                              Hartree            kcal/mol
+ Zero-point Energy                          :            0.000000            0.000000
+ Thermal correction to Energy               :            0.000048            0.029808
+ Thermal correction to Enthalpy             :            0.000079            0.049680
+ Thermal correction to Gibbs Free Energy    :           -0.000573           -0.359636
+
+ Sum of electronic and zero-point Energies  :         -126.604525
+ Sum of electronic and thermal Energies     :         -126.604478
+ Sum of electronic and thermal Enthalpies   :         -126.604446
+ Sum of electronic and thermal Free Energies:         -126.605098
+ ====================================================================================
+
+
+ #   3    Temperature =       100.00000 Kelvin         Pressure =         0.50000 Atm
+ ====================================================================================
+
+ Thermal correction energies                              Hartree            kcal/mol
+ Zero-point Energy                          :            0.000000            0.000000
+ Thermal correction to Energy               :            0.000475            0.298081
+ Thermal correction to Enthalpy             :            0.000792            0.496802
+ Thermal correction to Gibbs Free Energy    :           -0.004128           -2.590172
+
+ Sum of electronic and zero-point Energies  :         -126.604525
+ Sum of electronic and thermal Energies     :         -126.604050
+ Sum of electronic and thermal Enthalpies   :         -126.603733
+ Sum of electronic and thermal Free Energies:         -126.608653
+ ====================================================================================
+
+
+ #   4    Temperature =       200.00000 Kelvin         Pressure =         1.00000 Atm
+ ====================================================================================
+
+ Thermal correction energies                              Hartree            kcal/mol
+ Zero-point Energy                          :            0.000000            0.000000
+ Thermal correction to Energy               :            0.000950            0.596162
+ Thermal correction to Enthalpy             :            0.001583            0.993603
+ Thermal correction to Gibbs Free Energy    :           -0.008914           -5.593572
+
+ Sum of electronic and zero-point Energies  :         -126.604525
+ Sum of electronic and thermal Energies     :         -126.603575
+ Sum of electronic and thermal Enthalpies   :         -126.602942
+ Sum of electronic and thermal Free Energies:         -126.613439
+ ====================================================================================
+
+
+ #   5    Temperature =       300.00000 Kelvin         Pressure =         2.00000 Atm
+ ====================================================================================
+
+ Thermal correction energies                              Hartree            kcal/mol
+ Zero-point Energy                          :            0.000000            0.000000
+ Thermal correction to Energy               :            0.001425            0.894243
+ Thermal correction to Enthalpy             :            0.002375            1.490405
+ Thermal correction to Gibbs Free Energy    :           -0.013675           -8.581437
+
+ Sum of electronic and zero-point Energies  :         -126.604525
+ Sum of electronic and thermal Energies     :         -126.603100
+ Sum of electronic and thermal Enthalpies   :         -126.602150
+ Sum of electronic and thermal Free Energies:         -126.618200
+ ====================================================================================
+
+
+ Job terminated correctly! Tue Oct 31 13:00:01 2017

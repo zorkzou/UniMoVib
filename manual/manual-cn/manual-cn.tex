@@ -7,7 +7,7 @@
 %---------------------------------------------------封面--------------------------
 \title{\vspace{-2cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\ \vspace{1cm}
-\zihao{3}（1.0.1版） \vspace{8cm}}
+\zihao{3}（1.0.2版） \vspace{8cm}}
 
 \author{
 \textbf{邹文利} \\ \vspace{5mm}
@@ -278,10 +278,10 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \verb|NDeg|：自旋-轨道态的简并度。默认：1。
 
 \bigskip{}
-\verb|Temp|：温度（单位：K）。默认：298.15。
+\verb|Temp|：温度（单位：K）。默认：298.15。若\verb|Temp| < 0，表示除了默认温度以外，在\texttt{\$Thermo}输入组之后还提供多个额外的温度值。
 
 \bigskip{}
-\verb|Press|：压强（单位：大气压atm）。默认：1.0。
+\verb|Press|：压强（单位：大气压atm）。默认：1.0。若\verb|Press| < 0，表示除了默认压强以外，在\texttt{\$Thermo}输入组之后还提供多个额外的压强值。
 
 \bigskip{}
 \verb|Scale|：频率换算因子。默认：1.0。\texttt{\$ExpFrq}输入组中定义的实验频率不做换算。
@@ -295,6 +295,26 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \item[ ]\verb|  = "XXXX"|：直接指定点群名称，特别适用于程序不支持的高点群，例如，\verb|"D10h"|。不要忘记加上引号。
 \end{description}
 
+输入组之后是额外提供的温度（若\verb|Temp| < 0）或压强（若\verb|Press| < 0）值，每行一个数值，连续多行，直到遇到空行或输入结束为止。例如，
+\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\ttfamily
+\begin{lstlisting}
+ $Thermo Temp=-1 $End
+ 100
+ 200
+ 400
+\end{lstlisting}\end{colorboxed}
+这个输入例子表示除了标准温度298.15 K之外，还分别进行100，200，和400 K温度下的热化学计算。
+若同时提供温度和压强值（\verb|Temp| < 0，且\verb|Press| < 0），则每行两个数值，温度在前压强在后。例如，
+\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\ttfamily
+\begin{lstlisting}
+ $Thermo Temp=-1 Press=-1 $End
+ 100  0.5
+ 200  -1
+ -1   2.0
+\end{lstlisting}\end{colorboxed}
+额外温度/压强中的负值表示使用默认的温度（298.15 K）或压强（1.0 atm）。
 
 \section{原子热化学计算} \label{sec:inp-atom}
 

@@ -5,10 +5,14 @@ The total energy was calculated at the HF/STO-3G level
    qcprog="atomcalc"
  $end
 
- $Thermo
-   Eel=-126.604525089
- $end
-
  $IsoMas $End
  19.99244
+
+ $Thermo
+   Eel=-126.604525089 temp=-1 press=-1
+ $end
+  10.0  0.0
+ 100.0  0.5
+ 200.0  1.0
+ 300.0  2.0
 

@@ -10,9 +10,10 @@
 ! Freq    : (array) vib. frequencies (a.u.) in Freq(1:NVib,IFrq),
 !            where IFrq depends on IExpt
 ! Sc1,Sc2 : scratch. Size = NAtm3*NAtm3
+! ctmp    : scratch for characters.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine Thermochem(iinp,iout,Intact,NAtom,NAtm3,NVib,IFAtom,IExpt,PGNAME,AMass,XYZ,Freq,Sc1,Sc2)
+subroutine Thermochem(iinp,iout,Intact,NAtom,NAtm3,NVib,IFAtom,IExpt,PGNAME,AMass,XYZ,Freq,Sc1,Sc2,ctmp)
 implicit real(kind=8) (a-h,o-z)
 parameter(tolr=0.01d0)
 parameter( pi       = acos(-1.0d0),                                  &
@@ -34,10 +35,11 @@ parameter( pi       = acos(-1.0d0),                                  &
            au2wn    = sqrt(avogadro*H2Jou/1.0d1)/(2*pi*clight*b2met) )   ! au (freq) to wavenumber (=5140.4871)
 
 real(kind=8) :: AMass(NAtom),XYZ(3,NAtom),Freq(NAtm3,*),Sc1(3,*),Sc2(*)
+character*200 :: ctmp
 character*4 :: PGNAME(2),PG
 character*1 :: L2U
 real(kind=8) :: energy(3),entropy(4)
-logical :: Intact,IFAtom,IFLin
+logical :: Intact,IFAtom,IFLin,IFRdT,IfRdP
 
 ! Eel     : Total electronic energy from Q.C. calculation (a.u.)
 ! temp    : temperature (K)
@@ -55,6 +57,8 @@ NDeg=1
 temp=298.15d0
 press=1.d0
 scale=1.d0
+IFRdT=.false.
+IfRdP=.false.
 PG="2    "
 
 ! to rot temperatures
@@ -69,18 +73,23 @@ cf4 = cf3/au2wn
 rewind(iinp)
 read(iinp,Thermo,err=2000,end=100)
 
-100   temp=abs(temp)
-press=abs(press)
+100   continue
+if(temp < 0.d0)then
+  IFRdT=.true.
+  temp = 298.15d0
+end if
+if(press < 0.d0)then
+  IfRdP=.true.
+  press=1.d0
+end if
 ! mass of molecule
 VMas = ASum(AMass,NAtom)
 
 if(IFAtom) then
 
-  write(iout,"(/,                              &
-  ' Temperature          :',f13.6,' Kelvin',/, &
-  ' Pressure             :',f13.6,' Atm',/,    &
-  ' Atomic mass          :',f13.6,' AMU',/,    &
-  ' Elec. total energy   :',f13.6,' Hartree' )")temp,press,VMas,Eel
+  write(iout,"(/, &
+  ' Atomic mass               :',4x,f13.6,4x,'AMU',/,    &
+  ' Elec. total energy        :',4x,f13.6,4x,'Hartree' )")VMas,Eel
 
 else
   IFrq = 3
@@ -94,8 +103,8 @@ else
   if(IPG < 1 .or. IPG > 2) IPG = 2
   PG = PGNAME(IPG)
   goto 310
-300     IPG = 0    ! PG is symmetry symbol
-310     continue
+  300  IPG = 0    ! PG is symmetry symbol
+  310  continue
 
   if(PG == "****")PG = "C1  "
   PG(1:1)=L2U(PG(1:1))
@@ -107,13 +116,11 @@ else
   call NRotSym(iout,PG,NSigma,IFLin)
 
   write(iout,"(/, &
-  ' Temperature               :',4x,f13.6,4x,'Kelvin',/,   &
-  ' Pressure                  :',4x,f13.6,4x,'Atm',/,      &
-  ' Molecular mass            :',4x,f13.6,4x,'AMU',/,      &
-  ' Elec. total energy        :',4x,f13.6,4x,'Hartree',/,  &
+  ' Molecular mass            :',4x,f13.6,4x,'AMU',/,    &
+  ' Elec. total energy        :',4x,f13.6,4x,'Hartree',/,&
   ' Scale factor of Frequency :',4x,f13.6,/,             &
   ' Rot. symmetry number      :',4x,i6,/,                &
-  ' The ',a4,' point group is used to calculate rotational entropy.' )") temp,press,VMas,Eel,scale,NSigma,PG
+  ' The ',a4,' point group is used to calculate rotational entropy.' )") VMas,Eel,scale,NSigma,PG
 
 ! calculate principal axes and moments of inertia --> Sc1(:,1:4)
   call RotCons(Intact,NAtom,AMass,XYZ,Sc1,Sc2)
@@ -144,80 +151,109 @@ else
 
 end if
 
-! translation
-energy(1)=1.5d0*Rval*temp
-entropy(1)=boltzman*temp
-entropy(1)=(entropy(1)/(Atm2Pa*max(press,1.d-5))) * (2.d0*Pi*1.0d-3*VMas*entropy(1)/(avogadro*planck*planck))**1.5d0
-entropy(1)=Rval*(log(entropy(1))+5.d0/2.d0)
+! loop of Temperature & Pressure
+IRd = 0
+do while(.true.)
 
-! rotation
-if(IFAtom)then
-  energy(2)=0.d0
-  entropy(2)=0.d0
-else if(IFLin)then
-  energy(2)=Rval*temp
-  entropy(2)=( temp/max(Sc1(3,1),1.0d-6) )/dble(NSigma)
-  entropy(2)=Rval*(1.0d0 + log(entropy(2)) )
-else
-  energy(2)=Rval*temp*1.5d0
-  entropy(2)=Pi*temp*temp*temp/AMultip(Sc1,3,.True.,tolr/cf1)
-  entropy(2)=Rval*(1.5d0 + log(sqrt(entropy(2))/dble(NSigma)) )
-end if
+  if(IRd > 0) then
+    if(.NOT. IFRdT .and. .NOT. IFRdP)then
+      exit
+    else
+      read(iinp,"(a200)",end=1000,err=1000)ctmp
+      if(len_trim(ctmp) == 0) goto 1000
+      if(IFRdT .and. IFRdP)then
+        read(ctmp,*,end=1000,err=1000) temp,press
+      else if(IFRdT)then
+      	read(ctmp,*,end=1000,err=1000) temp
+      else if(IFRdP)then
+        read(ctmp,*,end=1000,err=1000) press
+      end if
+    end if
+    if(temp < 0.d0) temp = 298.15d0
+    if(press < 0.d0) press=1.d0
+  end if
+  IRd = IRd + 1
 
-! vibration
-energy(3)=0.d0
-entropy(3)=0.d0
-do i=1,NVib
-  ! at low temperature, no contributions from vibration
-  if(Temp <= 10.d0) exit
+  write(iout,"(//,' #',i4,4x,'Temperature = ',f15.5,' Kelvin',9x,'Pressure = ',f15.5,' Atm',/, &
+    1x,84('=') )") IRd,temp,press
 
-  scale0=scale
-  ! expt. freq should not be scaled
-  if(Freq(i,6) > 0.0d0) scale0=1.0d0
-  VT = Freq(i,IFrq)*scale0/cf4
-  VTT= VT/temp
-  ! neglect small freq. because it leads to big errors
-  if(VT <= 1.d0) cycle
+  ! translation
+  energy(1)=1.5d0*Rval*temp
+  entropy(1)=boltzman*temp
+  entropy(1)=(entropy(1)/(Atm2Pa*max(press,1.d-5))) * (2.d0*Pi*1.0d-3*VMas*entropy(1)/(avogadro*planck*planck))**1.5d0
+  entropy(1)=Rval*(log(entropy(1))+5.d0/2.d0)
 
-  energy(3)=energy(3) + Rval * VT / (exp(VTT) - 1.d0)
-  entropy(3)=entropy(3) + Rval * ( VTT/(exp(VTT) - 1.d0) - log(1.d0 - exp(-VTT)) )
+  ! rotation
+  if(IFAtom)then
+    energy(2)=0.d0
+    entropy(2)=0.d0
+  else if(IFLin)then
+    energy(2)=Rval*temp
+    entropy(2)=( temp/max(Sc1(3,1),1.0d-6) )/dble(NSigma)
+    entropy(2)=Rval*(1.0d0 + log(entropy(2)) )
+  else
+    energy(2)=Rval*temp*1.5d0
+    entropy(2)=Pi*temp*temp*temp/AMultip(Sc1,3,.True.,tolr/cf1)
+    entropy(2)=Rval*(1.5d0 + log(sqrt(entropy(2))/dble(NSigma)) )
+  end if
+
+  ! vibration
+  energy(3)=0.d0
+  entropy(3)=0.d0
+  do i=1,NVib
+    ! at low temperature, no contributions from vibration
+    if(Temp <= 10.d0) exit
+
+    scale0=scale
+    ! expt. freq should not be scaled
+    if(Freq(i,6) > 0.0d0) scale0=1.0d0
+    VT = Freq(i,IFrq)*scale0/cf4
+    VTT= VT/temp
+    ! neglect small freq. because it leads to big errors
+    if(VT <= 1.d0) cycle
+
+    energy(3)=energy(3) + Rval * VT / (exp(VTT) - 1.d0)
+    entropy(3)=entropy(3) + Rval * ( VTT/(exp(VTT) - 1.d0) - log(1.d0 - exp(-VTT)) )
+  end do
+
+  ! electronic contribution
+  !energy(4) = Eel
+  entropy(4)=Rval*log(dble(NDeg))
+
+  ! ZPE
+  zpe=0.d0
+  do i=1,NVib
+    ! neglect imag. freq.
+    if(Freq(i,IFrq) <= 0.d0) cycle
+
+    scale0=scale
+    ! expt. freq should not be scaled
+    if(Freq(i,6) > 0.0d0) scale0=1.0d0
+    zpe = zpe + Freq(i,IFrq)*scale0
+  end do
+  zpe=zpe*0.5d0*Rval/cf4
+
+  ! print results
+  eu=zpe+ASum(energy,3)
+
+  eh=eu+Rval*temp
+  eg=eh-temp*ASum(entropy,4)
+  write(iout,"(/,                                                 &
+  ' Thermal correction energies',30x,'Hartree',12x,'kcal/mol',/,  &
+  ' Zero-point Energy                          :',2f20.6,/,       &
+  ' Thermal correction to Energy               :',2f20.6,/,       &
+  ' Thermal correction to Enthalpy             :',2f20.6,/,       & 
+  ' Thermal correction to Gibbs Free Energy    :',2f20.6)") zpe,zpe*H2kcal,eu,eu*H2kcal,eh,eh*H2kcal,eg,eg*H2kcal
+  if(abs(Eel) > tolr)write(iout,"(/,                        &
+  ' Sum of electronic and zero-point Energies  :',f20.6,/,  &
+  ' Sum of electronic and thermal Energies     :',f20.6,/,  &
+  ' Sum of electronic and thermal Enthalpies   :',f20.6,/,  &
+  ' Sum of electronic and thermal Free Energies:',f20.6)")zpe+Eel,eu+Eel,eh+Eel,eg+Eel
+  write(iout,"(1x,84('=') )")
+
 end do
 
-! electronic contribution
-!energy(4) = Eel
-entropy(4)=Rval*log(dble(NDeg))
-
-! ZPE
-zpe=0.d0
-do i=1,NVib
-  ! neglect imag. freq.
-  if(Freq(i,IFrq) <= 0.d0) cycle
-
-  scale0=scale
-  ! expt. freq should not be scaled
-  if(Freq(i,6) > 0.0d0) scale0=1.0d0
-  zpe = zpe + Freq(i,IFrq)*scale0
-end do
-zpe=zpe*0.5d0*Rval/cf4
-
-! print results
-eu=zpe+ASum(energy,3)
-
-eh=eu+Rval*temp
-eg=eh-temp*ASum(entropy,4)
-write(iout,"(/,                                                 &
-' Thermal correction energies',30x,'Hartree',12x,'kcal/mol',/,  &
-' Zero-point Energy                          :',2f20.6,/,       &
-' Thermal correction to Energy               :',2f20.6,/,       &
-' Thermal correction to Enthalpy             :',2f20.6,/,       & 
-' Thermal correction to Gibbs Free Energy    :',2f20.6)") zpe,zpe*H2kcal,eu,eu*H2kcal,eh,eh*H2kcal,eg,eg*H2kcal
-if(abs(Eel) > tolr)write(iout,"(/,                        &
-' Sum of electronic and zero-point Energies  :',f20.6,/,  &
-' Sum of electronic and thermal Energies     :',f20.6,/,  &
-' Sum of electronic and thermal Enthalpies   :',f20.6,/,  &
-' Sum of electronic and thermal Free Energies:',f20.6)")zpe+Eel,eu+Eel,eh+Eel,eg+Eel
-
-return
+1000  return
 2000  call XError(Intact,"Please check your input of $Thermo!")
 end
 

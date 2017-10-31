@@ -16,8 +16,8 @@ character*200 :: ctmp, cname
 logical       :: Intact, ifopen
 real(kind=8),allocatable :: AMass(:), ZA(:), XYZ(:), FFx(:), APT(:), AL(:), Scr1(:), Scr2(:), Scr3(:), Scr4(:), Work(:)
 
-ver="1.0.1"
-dat="OCT 15, 2017"
+ver="1.0.2"
+dat="OCT 26, 2017"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O

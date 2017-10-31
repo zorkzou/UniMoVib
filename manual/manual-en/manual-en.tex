@@ -51,7 +51,7 @@
 
 \begin{document}
 
-\title{User's Guide of the Program \textsc{UniMoVib} \\ \vspace{10 mm} (Ver. 1.0.1)  \vspace{70 mm}}
+\title{User's Guide of the Program \textsc{UniMoVib} \\ \vspace{10 mm} (Ver. 1.0.2)  \vspace{70 mm}}
 
 \date{\today}
 
@@ -118,7 +118,7 @@ Two point groups will be printed by the program, \emph{i.e.} "\verb|Point Group 
 \pagebreak{}
 
 
-\section{Compiling abd Running} \label{part:setting}
+\section{Compiling and Running} \label{part:setting}
 
 \subsection{Compiling the program} \label{sec:install}
 \index{{Installation}@{Installation}}
@@ -164,8 +164,7 @@ This group specifies the type of calculation. Keywords:
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{QCProg}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}}
 \verb|QCProg="XXXX"|: \verb|XXXX| is the name of quantum chemistry program that
-is used to calculate the molecular Hessian matrix and vibrational frequencies. The
-following programs are supported:
+is used to calculate the molecular Hessian matrix and vibrational frequencies. The following programs are supported:
 \begin{itemize}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Gaussian}
 \item \verb|Gaussian| (default).
@@ -196,8 +195,7 @@ following programs are supported:
 the closely related \textsc{Fujitsu Mopac} 200x (now MO-G in \textsc{Scigress}) has not been tested.
 \index{{Quantum chemistry program}@{Quantum chemistry program}!AMSOL}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!AMPAC}
-\item \verb|AMSOL| (\verb|AMPAC| is synonym). \textsc{Ampac} 2.x is also supported, but the higher
-versions of \textsc{Ampac} have not been tested.
+\item \verb|AMSOL| (\verb|AMPAC| is synonym). \textsc{Ampac} 2.x is also supported, but the higher versions of \textsc{Ampac} have not been tested.
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Dalton}
 \item \verb|Dalton|.
 \index{{Quantum chemistry program}@{Quantum chemistry program}!FHI-AIMS}
@@ -299,9 +297,7 @@ defined separately by the keywords \verb|HESS|, \verb|DDIP|, and/or
 
 \begin{itemize}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Gaussian}
-\item \textsc{Gaussian}: *.fchk. By default, the atomic masses are not included in the fchk
-file, so the most abundant isotopic masses are assumed, but for \textsc{Gaussian} 09
-(and maybe higher versions in the future), one can also use \texttt{FREQ(SaveNormalModes)} instead
+\item \textsc{Gaussian}: *.fchk. By default, the atomic masses are not included in the fchk file, so the most abundant isotopic masses are assumed, but for \textsc{Gaussian} 09 (and maybe higher versions in the future), one can also use \texttt{FREQ(SaveNormalModes)} instead
 to save atomic masses automatically.
 \index{{Quantum chemistry program}@{Quantum chemistry program}!GAMESS}
 \item \textsc{Gamess}: *.dat (by \verb|FCHK|) + *.out (by \verb|GEOM|).
@@ -479,11 +475,11 @@ This group controls the thermochemistry calculation. Keywords:
 
 \bigskip{}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Temp}}
-\verb|Temp|: temperature (in K). Default: 298.15.
+\verb|Temp|: temperature (in K). Default: 298.15. If \verb|Temp| < 0, a series of additional temperatures will also be provided after this group.
 
 \bigskip{}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Press}}
-\verb|Press|: pressure (in atm). Default: 1.0.
+\verb|Press|: pressure (in atm). Default: 1.0. If \verb|Press| < 0, a series of additional pressures will also be provided after this group.
 
 \bigskip{}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Scale}}
@@ -506,6 +502,23 @@ not correct.
 \item[ ]\verb|  = "XXXX"|: specify the name of point group, which is useful for the high symmetry not supported by the program, for example, \verb|"D10h"|. Don't forget the quotes.
 \end{description}
 
+If \verb|Temp| < 0 or \verb|Press| < 0, a list of additional temperatures or pressures will be provided. One value per line. The program will
+read the values until a blank line or the end is encountered.
+For example,
+\begin{Verbatim}[frame=single]
+ $Thermo Temp=-1 $End
+ 100
+ 200
+ 400
+\end{Verbatim}
+In addition to the default temperature 298.15 K, thermochemistry calculations will also be performed at 100, 200, and 400 K in the above example. If both \verb|Temp| < 0 and \verb|Press| < 0, two values per line should be provided (a temperature, then a pressure). For example,
+\begin{Verbatim}[frame=single]
+ $Thermo Temp=-1 Press=-1 $End
+ 100  0.5
+ 200  -1
+ -1   2.0
+\end{Verbatim}
+Negative values in the additional data mean the default temperature (298.15 K) or pressure (1.0 atm).
 
 \subsection{Atomic thermochemistry calculation} \label{sec:inp-atom}
 \index{{Thermochemistry}@{Thermochemistry}!{Atomic thermochemistry}}
