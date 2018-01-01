@@ -4,7 +4,7 @@ A unified interface for molecular harmonic vibrational frequency calculations. I
 ## Latest Version
 Version 1.1.0 (Dec/31/2017).
 
-1. Raman intensities (Gaussian-fchk and UniMoVib data file only).
+1. Raman intensities (Gaussian-fchk and UniMoVib data files only).
 2. Interface to [LocalModes](https://github.com/zorkzou/OpenLocalModes) for the local mode analysis.
 3. The conversion factor from Bohr to Angstrom has been updated.
 
