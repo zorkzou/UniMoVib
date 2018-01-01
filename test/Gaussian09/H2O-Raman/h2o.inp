@@ -1,0 +1,13 @@
+%chk=h2o
+#p b3lyp/3-21g freq(raman)
+
+test
+
+0 1
+O
+H 1 r1
+H 1 r1 2 a1
+
+ r1=0.99665668
+ a1=103.91465383
+

@@ -115,22 +115,23 @@ end
 ! Read Q.C. data
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdData1(iout,idt0,idt1,idt2,Intact,IOP,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,Scr4)
+subroutine RdData1(iout,idt0,idt1,idt2,Intact,IOP,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Scr4)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact
 dimension :: IOP(*)
-real(kind=8) :: AMass(*), ZA(*), XYZ(*), FFx(*), APT(*), Scr1(*), Scr2(*), Scr3(*), Scr4(*)
+real(kind=8) :: AMass(*), ZA(*), XYZ(*), FFx(*), APT(*), DPol(*), Scr1(*), Scr2(*), Scr3(*), Scr4(*)
 character*100 :: tag,ctmp
 
 NAtm3=3*NAtm
+IRaman=0
 
 select case(IOP(1))
 
   case(-1) ! atom
     return
 
-  case(-2) ! UniMoVib (ALM)
-    call RdALMode(idt0,iout,Intact,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,Scr1)
+  case(-2) ! UniMoVib (ALM); the size of Scr4 should be 9*NAtm3 at least
+    call RdALMode(idt0,iout,Intact,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr4)
 
   case(-3) ! xyz
     call RdXYZ(idt0,iout,Intact,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
@@ -138,7 +139,7 @@ select case(IOP(1))
     call MasLib(0,NAtm,AMass,ZA)
 
   case(1)  ! Gaussian
-    call RdGauss(idt0,iout,tag,ctmp,Intact,IOP(4),NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
+    call RdGauss(idt0,iout,tag,ctmp,Intact,IOP(4),IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr1)
 !   the most abundant isotopic masses are assumed
     if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
@@ -1015,10 +1016,10 @@ end
 ! Read data from UniMoVib (ALM) data file
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdALMode(ifchk,iout,Intact,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,Scr)
+subroutine RdALMode(ifchk,iout,Intact,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr)
 implicit real(kind=8) (a-h,o-z)
-parameter(ang2au=1.d0/0.529177d0)
-real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(*),Scr(*)
+parameter(ang2au=1.d0/0.52917720859d0)
+real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(*),DPol(6,*),Scr(*)
 character*100 :: ctmp
 logical :: Intact
 
@@ -1026,6 +1027,7 @@ NAtm3 = NAtm * 3
 NAtm9 = NAtm * 9
 NSS = NAtm3 * NAtm3
 NTT = NAtm3 * (NAtm3+1) / 2
+IRaman = 0
 
 rewind(ifchk)
 
@@ -1065,11 +1067,13 @@ if(index(ctmp,"NOAPT") == 0) read(ifchk,*,err=1060,end=1060)(APT(i),i=1,NAtm9)
 read(ifchk,"(a100)",err=1070,end=1070)ctmp
 call charl2u(ctmp)
 if(index(ctmp,"NODPR") == 0) then
-!  if(index(ctmp,"DPRSQ") == 0) then
-!    read(ifchk,*,err=1070,end=1070)
-!  else
-!    read(ifchk,*,err=1070,end=1070)
-!  end if
+  IRaman = 1
+  if(index(ctmp,"DPRSQ") == 0 .and. index(ctmp,"DPR") /= 0) then
+    read(ifchk,*,err=1070,end=1070)((DPol(j,i),j=1,6),i=1,NAtm3)
+  else if(index(ctmp,"DPRSQ") /= 0) then
+    read(ifchk,*,err=1071,end=1071)(Scr(i),i=1,NAtm3*9)
+    call S9to6(NAtm3,Scr,DPol)
+  end if
 end if
 
 return
@@ -1081,6 +1085,7 @@ return
 1051  call XError(Intact,"Please check FFXLT data!")
 1060  call XError(Intact,"Please check APT data!")
 1070  call XError(Intact,"Please check DPR data!")
+1071  call XError(Intact,"Please check DPRSQ data!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1090,7 +1095,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdXYZ(ifchk,iout,Intact,NAtm,Elem,ZA,XYZ,FFx,S1,S2,S3,S4)
 implicit real(kind=8) (a-h,o-z)
-parameter(ang2au=1.d0/0.529177d0)
+parameter(ang2au=1.d0/0.52917720859d0)
 real(kind=8) :: ZA(*),XYZ(3,*),FFx(*),S1(*),S2(*),S3(*),S4(*)
 character*3 :: Elem
 logical :: Intact
@@ -1125,17 +1130,18 @@ end
 ! Read data from Gaussian fchk
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdGauss(ifchk,iout,tag,ctmp,Intact,IRdMas,NAtm,AMass,ZA,XYZ,FFx,APT,Scr)
+subroutine RdGauss(ifchk,iout,tag,ctmp,Intact,IRdMas,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact,ifapt
 
-real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(3,*),Scr(*)
+real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(3,*),DPol(6,*),Scr(*)
 character*100 :: ctmp
 character*49 :: tag
 
 NAtm3 = NAtm * 3
 NTT = NAtm3*(NAtm3+1)/2
 ifapt=.true.
+IRaman=1
 
 !! read nuclear charges; they lead to errors in the case of ECP
 !tag='Nuclear charges                            R   N='
@@ -1161,16 +1167,25 @@ if(index(ctmp,tag)==0)goto 201
 read(ifchk,"(5e16.8)")(Scr(i),i=1,NTT)
 call LT2Sqr(NAtm3,Scr,FFx)
 
-! read APT (a.u.)
+! read APT (a.u.), optional
 tag='Dipole Derivatives                         R   N='
 rewind(ifchk)
 301   read(ifchk,"(a100)",end=310)ctmp
 if(index(ctmp,tag)==0) goto 301
 read(ifchk,"(5e16.8)")((APT(j,i),j=1,3),i=1,NAtm3)
-goto 400
+goto 350
 310   ifapt=.false.
 write(iout,"(/,' *** Warning ***',/, &
 ' No dipole derivatives found, so the electronic properties will not be calculated.')")
+
+! read DPol (a.u.), optional
+350   tag='Polarizability Derivatives                 R   N='
+rewind(ifchk)
+351   read(ifchk,"(a100)",end=360)ctmp
+if(index(ctmp,tag)==0) goto 351
+read(ifchk,"(5e16.8)")((DPol(j,i),j=1,6),i=1,NAtm3)
+goto 400
+360   IRaman=0
 
 ! read atomic masses (1): masses were saved by freq(SaveNormalModes)
 ! G09 and higher versions only!
@@ -1199,7 +1214,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdGAMES(ifchk,iout,tmp,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
-parameter(an2br=0.529177d0,au2deb=2.541746d0)
+parameter(an2br=0.52917720859d0,au2deb=2.541746d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
 character*100 :: ctmp
 character*56 :: tmp
@@ -1490,7 +1505,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdMolp(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
-parameter(au2deb=2.541746d0,au2ang=0.529177d0)
+parameter(au2deb=2.541746d0,au2ang=0.52917720859d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
 character*100 :: ctmp
 character*18 :: hesstag
@@ -1679,7 +1694,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdGMUK(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
-parameter(au2deb=2.541746d0,au2ang=0.529177d0,ang2au=1.d0/au2ang)
+parameter(au2deb=2.541746d0,au2ang=0.52917720859d0,ang2au=1.d0/au2ang)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
 character*100 :: ctmp
 character*99 :: tag
@@ -1836,7 +1851,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdDeMon(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx)
 implicit real(kind=8) (a-h,o-z)
-parameter(au2ang=0.529177d0)
+parameter(au2ang=0.52917720859d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*)
 character*100 :: ctmp
 character*44 :: tag
@@ -1965,7 +1980,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdMopac(ifchk,tag,ctmp,Intact,NAtm,ZA,XYZ,FFx)
 implicit real(kind=8) (a-h,o-z)
-parameter(dy2au=1.d0/15.56893d0,ang2au=1.d0/0.529177d0)
+parameter(dy2au=1.d0/15.56893d0,ang2au=1.d0/0.52917720859d0)
 real(kind=8) :: ZA(*),XYZ(3,*),FFx(NAtm*3,*)
 character*100 :: ctmp
 character*44 :: tag
@@ -2047,7 +2062,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdAMPAC(ifchk,tag,ctmp,Intact,NAtm,ZA,XYZ,FFx)
 implicit real(kind=8) (a-h,o-z)
-parameter(dy2au=1.d0/15.56893d0,ang2au=1.d0/0.529177d0)
+parameter(dy2au=1.d0/15.56893d0,ang2au=1.d0/0.52917720859d0)
 real(kind=8) :: ZA(*),XYZ(3,*),FFx(NAtm*3,*)
 character*100 :: ctmp
 character*44 :: tag
@@ -2204,7 +2219,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdAIMS(ifchk,ihess,iddip,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
-parameter(ang2au=1.d0/0.529177d0,ev2au=1.d0/(ang2au*ang2au*27.2114d0))
+parameter(ang2au=1.d0/0.52917720859d0,ev2au=1.d0/(ang2au*ang2au*27.2114d0))
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),APT(*)
 character*100 :: ctmp
 logical :: Intact,ifopen
@@ -2250,7 +2265,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdCP2K(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx)
 implicit real(kind=8) (a-h,o-z)
-parameter(ang2au=1.d0/0.529177d0,amu2au=1.660538921d-27/9.10938291d-31)
+parameter(ang2au=1.d0/0.52917720859d0,amu2au=1.660538921d-27/9.10938291d-31)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*)
 character*100 :: ctmp
 character*50 :: tag
@@ -2573,7 +2588,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdHyper(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
-parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48714376d0)
+parameter(One=1.d0,ang2au=One/0.52917720859d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*69 :: tag
@@ -2647,7 +2662,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdJaguar(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
-parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48714376d0)
+parameter(One=1.d0,ang2au=One/0.52917720859d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*53 :: tag
@@ -2919,7 +2934,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdCry(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
-parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48714376d0)
+parameter(One=1.d0,ang2au=One/0.52917720859d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*60 :: tag
@@ -3278,7 +3293,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdACES(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
-parameter(One=1.d0,ang2au=One/0.529177d0,wn2au=One/5140.48714376d0)
+parameter(One=1.d0,ang2au=One/0.52917720859d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(3,NAtm,*),SC3(*),WORK(*)
 character*200 :: ctmp
 character*98 :: tag
@@ -3377,7 +3392,9 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
-! Save UniMoVib (ALM) data file (ialm). Format:
+! Save UniMoVib (ALM) data file (ialm) and/or localmode.dat (part I).
+!
+! Format of ALM file:
 !
 ! One text line
 ! NAtm
@@ -3386,47 +3403,129 @@ end
 ! XYZ (in a.u.)
 ! FFX (square matrix in a.u.)
 ! APT (in a.u.)
-! DPR (in a.u.)
+! DPR(6,NAtm3) (in a.u.)
 !
 ! If the frequencies are corrected by the experimental ones (saved in Freq(:,5)), the force constant matrix will be recalculated.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SavALM(ialm,NAtm,NAtm3,NVib,AMass,ZA,XYZ,FFX,APT,IExpt,AL,Freq,SC1,SC2,WORK,EIG)
+subroutine SavALM(ifalm,ifloc,ialm,iloc,IRaman,NAtm,NAtm3,NVib,AMass,ZA,XYZ,FFX,APT,DPol,IExpt,AL,Freq,SC1,SC2,WORK,EIG)
 implicit real(kind=8) (a-h,o-z)
-real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFX(*),APT(*),AL(*),Freq(NAtm3,*), SC1(*),SC2(*),WORK(*),EIG(*)
+logical :: ifalm,ifloc
+real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFX(*),APT(*),DPol(*),AL(*),Freq(NAtm3,*), SC1(*),SC2(*),WORK(*),EIG(*)
 
 NAtm9 = NAtm * 9
 NSS = NAtm3 * NAtm3
 
-write(ialm,"(' UniMoVib DATA FILE (THIS TITLE CAN BE MODIFIED)')")
+if(ifalm) then
+  rewind(ialm)
 
-write(ialm,"('NATM')")
-write(ialm,"(i5)")NAtm
+  write(ialm,"(' UniMoVib DATA FILE (THIS TITLE CAN BE MODIFIED)')")
 
-write(ialm,"('AMASS')")
-write(ialm,"(5d20.10)")(AMass(i),i=1,NAtm)
+  write(ialm,"('NATM')")
+  write(ialm,"(i5)")NAtm
 
-write(ialm,"('ZA')")
-write(ialm,"(5d20.10)")(ZA(i),i=1,NAtm)
+  write(ialm,"('AMASS')")
+  write(ialm,"(5d20.10)")(AMass(i),i=1,NAtm)
 
-write(ialm,"('XYZ')")
-write(ialm,"(5d20.10)")(XYZ(i),i=1,NAtm3)
+  write(ialm,"('ZA')")
+  write(ialm,"(5d20.10)")(ZA(i),i=1,NAtm)
 
-write(ialm,"('FFX')")
+  write(ialm,"('XYZ')")
+  write(ialm,"(5d20.10)")(XYZ(i),i=1,NAtm3)
+
+  write(ialm,"('FFX')")
+end if
+
+if(ifloc) then
+  rewind(iloc)
+
+  write(iloc,"(' LOCALMODE DATA FILE (THIS TITLE CAN BE MODIFIED)')")
+
+  write(iloc,"(' $CONTRL NAtm=',i5.5,' NVib=',i5.5,' $END')")NAtm,NVib
+
+  write(iloc,"(' $AMASS  $END')")
+  write(iloc,"(5d20.10)")(AMass(i),i=1,NAtm)
+
+  write(iloc,"(' $ZA  $END')")
+  write(iloc,"(5d20.10)")(ZA(i),i=1,NAtm)
+
+  write(iloc,"(' $XYZ  $END')")
+  write(iloc,"(5d20.10)")(XYZ(i),i=1,NAtm3)
+
+  write(iloc,"(' $FFX  $END')")
+end if
+
 if(IExpt == 0)then
-  write(ialm,"(5d20.10)")(FFX(i),i=1,NSS)
+  if(ifalm) write(ialm,"(5d20.10)")(FFX(i),i=1,NSS)
+  if(ifloc) write(iloc,"(5d20.10)")(FFX(i),i=1,NSS)
 else
   ! calculate experimentally corrected force constant matrix --> SC1
   call Frq2FFX(NAtm3,NVib,AMass,Freq(1,5),AL,SC1,SC2,WORK,EIG)
-  write(ialm,"(5d20.10)")(SC1(i),i=1,NSS)
+  if(ifalm) write(ialm,"(5d20.10)")(SC1(i),i=1,NSS)
+  if(ifloc) write(iloc,"(5d20.10)")(SC1(i),i=1,NSS)
 end if
 
-write(ialm,"('APT')")
-write(ialm,"(5d20.10)")(APT(i),i=1,NAtm9)
+if(ifalm) then
+  write(ialm,"('APT')")
+  write(ialm,"(5d20.10)")(APT(i),i=1,NAtm9)
 
-write(ialm,"('NODPR')")
+  if(IRaman == 0) then
+    write(ialm,"('NODPR')")
+  else
+    write(ialm,"('DPR')")
+    write(ialm,"(5d20.10)")(DPol(i),i=1,6*NAtm3)
+  end if
 
-write(ialm,"(/)")
+  write(ialm,"(/)")
+end if
+
+if(ifloc) then
+! vib + trans & rot
+  write(iloc,"(' $NMMODE  $END')")
+  write(iloc,"(5d20.10)")(AL(i),i=1,NSS)
+
+  write(iloc,"(' $APT  $END')")
+  write(iloc,"(5d20.10)")(APT(i),i=1,NAtm9)
+
+  if(IRaman == 0) then
+    write(iloc,"(' $DPR NODPR=.TRUE. $END')")
+  else
+    write(iloc,"(' $DPR NODPR=.FALSE. $END')")
+    write(iloc,"(5d20.10)")(DPol(i),i=1,6*NAtm3)
+  end if
+end if
+
+return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Save localmode.dat (part II).
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine SavLOC(iloc,irep,NAtm3,IExpt,Rslt,PGNAME,ctmp)
+implicit real(kind=8) (a-h,o-z)
+real(kind=8) :: Rslt(NAtm3,*)
+character*4 :: PGNAME(2),ctmp
+
+Ifrq = 3
+if(IExpt == 1) Ifrq = 5
+
+write(iloc,"(' $RSLT  $END')")
+do i=1, NAtm3
+! k, mr, freq, I.R. Int in a.u.; see subroutine PrtNFq for the conversion factors
+  X = Rslt(i,1)
+  if(IExpt == 1) X = sign(Rslt(i,Ifrq)*Rslt(i,Ifrq), Rslt(i,Ifrq)) * Rslt(i,2)
+  write(iloc,"(5d20.10)") X,Rslt(i,2),Rslt(i,Ifrq),Rslt(i,4)
+end do
+
+write(iloc,"(' $SYMM  $END')")
+write(iloc,"(2a4)")PGNAME(1),PGNAME(2)
+rewind(irep)
+do i=1,NAtm3
+  read(irep,"(a4)")ctmp
+  write(iloc,"(a4)")ctmp
+end do
 
 return
 end
@@ -3440,7 +3539,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine SavMDN(imdn,NAtm,NAtm3,NVib,ZA,XYZ,IExpt,AL,Freq)
 implicit real(kind=8) (a-h,o-z)
-parameter(au2wn=5140.48714376d0,au2ang=0.529177d0)
+parameter(au2wn=5140.48714376d0,au2ang=0.52917720859d0)
 real(kind=8) :: ZA(*),XYZ(3,*),AL(NAtm3,*),Freq(NAtm3,*)
 character*3 :: Elm
 

@@ -8,16 +8,17 @@
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 program UniMoVib
 implicit real(kind=8) (a-h,o-z)
-parameter (NOption=10, iudt=47, imdn=48, idt0=51, idt1=52, idt2=53, irep=54)
+parameter (NOption=10, Nrslt=8, iudt=47, imdn=48, idt0=51, idt1=52, idt2=53, irep=54, iloc=55)
 dimension     :: IOP(NOption)
 character*5   :: ver
 character*12  :: dat
 character*200 :: ctmp, cname
 logical       :: Intact, ifopen
-real(kind=8),allocatable :: AMass(:), ZA(:), XYZ(:), FFx(:), APT(:), AL(:), Scr1(:), Scr2(:), Scr3(:), Scr4(:), Work(:)
+real(kind=8),allocatable :: AMass(:), ZA(:), XYZ(:), FFx(:), APT(:), DPol(:), AL(:), Rslt(:), Scr1(:), Scr2(:), Scr3(:), &
+  Scr4(:), Work(:)
 
-ver="1.0.2"
-dat="OCT 26, 2017"
+ver="1.1.0"
+dat="DEC 31, 2017"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O
@@ -47,8 +48,9 @@ call head2(iout,ver,dat)
 !    IOP(5)   0~ (ISyTol)
 !    IOP(6)   0 (IFSAVE=.False.) or 1 (IFSAVE=.True.)
 !    IOP(7)   0 (IFMOLDEN=.False.), 1 (IFMOLDEN=.True.)
+!    IOP(8)   0 (IFLOCAL=.False.), 1 (IFLOCAL=.True.)
 !-----------------------------------------------------------------------
-call RdContrl(iinp,iout,iudt,imdn,Intact,NOption,IOP,ctmp,cname)
+call RdContrl(iinp,iout,iudt,imdn,iloc,Intact,NOption,IOP,ctmp,cname)
 
 !-----------------------------------------------------------------------
 !  4. Read $qcdata
@@ -66,11 +68,11 @@ call RdNAtm1(idt0,idt1,Intact,IOP,NAtm,ctmp)
 NAtm3=3*NAtm
 NSS=NAtm3*NAtm3
 NWK=2*max(NAtm3,2)*NAtm3
-allocate(AMass(NAtm), ZA(NAtm), XYZ(NAtm3), FFx(NSS), APT(NAtm3*3), AL(NSS))
-allocate(Scr1(NSS), Scr2(NSS), Scr3(NSS), Scr4(NSS), Work(NWK))
+allocate(AMass(NAtm), ZA(NAtm), XYZ(NAtm3), FFx(NSS), APT(NAtm3*3), DPol(NAtm3*6), AL(NSS))
+allocate(Rslt(NAtm3*Nrslt), Scr1(NSS), Scr2(NSS), Scr3(NSS), Scr4(NSS), Work(NWK))
 
 APT=0.d0
-call RdData1(iout,idt0,idt1,idt2,Intact,IOP,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,Work)
+call RdData1(iout,idt0,idt1,idt2,Intact,IOP,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Work)
 
 ! read atomic masses from input
 call RdIsot(iinp,iout,Intact,IOP(4),NAtm,ctmp,AMass)
@@ -82,12 +84,13 @@ if(IOP(1) /= -1) call ChkDat(iout,Intact,NAtm,AMass,ZA,XYZ)
 ! 7. Solve Secular equation in Cartesian coordinates
 !    Symmetry is also analyzed therein.
 !-----------------------------------------------------------------------
-call SolvSec(iinp,iout,irep,iudt,imdn,Intact,IOP,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,AL,Scr1,Scr2,Scr3,Scr4,Work,Eig)
+call SolvSec(iinp,iout,irep,iudt,imdn,iloc,Intact,IOP,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL,Rslt, &
+  Scr1,Scr2,Scr3,Scr4,Work,Eig)
 
 !-----------------------------------------------------------------------
 ! xx. the last step
 !-----------------------------------------------------------------------
-deallocate(AMass, ZA, XYZ, FFx, APT, AL, Scr1, Scr2, Scr3, Scr4, Work)
+deallocate(AMass, ZA, XYZ, FFx, APT, DPol, AL, Rslt, Scr1, Scr2, Scr3, Scr4, Work)
 
 call fdate(ctmp)
 write(*,"(//,' Job terminated correctly! ',a)")trim(ctmp)
@@ -96,7 +99,8 @@ if(Intact)write(iout,"(//,' Job terminated correctly, ',a)") trim(ctmp)
 close(iinp)
 close(iout)
 if(IOP(6) == 1) close(iudt)
-if(IOP(8) == 1) close(imdn)
+if(IOP(7) == 1) close(imdn)
+if(IOP(8) == 1) close(iloc)
 inquire(unit=idt0,opened=ifopen)
 if(ifopen) close(idt0)
 inquire(unit=idt1,opened=ifopen)

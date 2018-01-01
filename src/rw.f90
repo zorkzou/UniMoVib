@@ -145,12 +145,12 @@ end
 !
 ! (*) For debugging only.
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdContrl(iinp,iout,iudt,imdn,Intact,NOp,IOP,qcprog,cname)
+subroutine RdContrl(iinp,iout,iudt,imdn,iloc,Intact,NOp,IOP,qcprog,cname)
 implicit real(kind=8) (a-h,o-z)
 parameter(NProg=26)
 dimension :: IOP(NOp)
-logical :: Intact,ifconc,ifexp,ifsave,ifmolden
-namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden
+logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal
+namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal
 character*200 :: qcprog, cname
 character*9,allocatable  :: DATFMT(:)
 
@@ -163,6 +163,7 @@ ifconc= .false.
 ifexp = .false.
 ifsave= .false.
 ifmolden = .false.
+iflocal = .false.
 
 rewind(iinp)
 read(iinp,Contrl,end=100,err=10)
@@ -343,7 +344,6 @@ if(IOP(6) == 1)then
   iend=LEN_TRIM(cname)
 
   open(iudt,file=cname(istr:iend)//'.umv')
-  rewind(iudt)
   write(iout,"(' UniMoVib file:',3x,a)") cname(istr:iend)//'.umv'
   if(Intact) write(*,"(' UniMoVib file:',3x,a)") cname(istr:iend)//'.umv'
 end if
@@ -357,6 +357,14 @@ if(ifmolden)then
   open(imdn,file=cname(istr:iend)//'.molden')
   write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
   if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
+end if
+
+!>>>  iflocal --> IOP(8) = 0 (iflocal=.false.) or 1 (iflocal=.true.)
+if(iflocal)then
+  IOP(8) = 1
+  open(iloc,file='localmode.dat')
+  write(iout,"(' LOCALMODE file:',2x,'localmode.dat')")
+  if(Intact) write(*,"(' LOCALMODE file:',2x,'localmode.dat')")
 end if
 
 return
@@ -484,7 +492,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine ChkDat(iout,Intact,NAtm,AMass,ZA,XYZ)
 implicit real(kind=8) (a-h,o-z)
-parameter(tolmass=1.d-2,tolz=0.99d0,tolr=0.5d0,au2ang=0.529177d0)
+parameter(tolmass=1.d-2,tolz=0.99d0,tolr=0.5d0,au2ang=0.52917720859d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*)
 character*3 :: Elm
 logical :: Intact

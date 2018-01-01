@@ -1,0 +1,114 @@
+ =======================================================================================================================
+       _/     _/                _/     _/            _/     _/
+      _/     _/            _/  _/|  _/_/            _/     _/  _/  _/        UniMoVib:          A unified interface for
+     _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
+    _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
+   _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.1.0, DEC 30, 2017
+   _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
+ =======================================================================================================================
+
+
+ QC Program:      Gaussian
+ FCHK file:       h2o.fchk
+
+
+ Cartesian coordinates (Angstrom)
+ ------------------------------------------------------------------------------------------
+   No.   Atom    ZA                 X             Y             Z                Mass
+ ------------------------------------------------------------------------------------------
+     1    O       8            0.00000000    0.00000000    0.12283758           15.99491460
+     2    H       1            0.00000000    0.78491896   -0.49135031            1.00782504
+     3    H       1            0.00000000   -0.78491896   -0.49135031            1.00782504
+ ------------------------------------------------------------------------------------------
+
+
+ <<< SYMMETRY >>>
+ Molecular Point Group (Z)   :   C2v 
+ Molecular Point Group (Z+M) :   C2v 
+
+
+ ************************************
+ ***  Properties of Normal Modes  ***
+ ************************************
+
+ Results of vibrations:
+ Normal frequencies (cm**-1), reduced masses (AMU), force constants (mDyn/A), IR intensities (km/mol)
+ Raman scattering activities (A**4/AMU), depolarization ratios of Raman scattered light
+
+                                                   1                                 2                                 3
+          Irreps                                  A1                                A1                                B2
+     Frequencies                           1692.8367                         3415.0523                         3555.1433
+  Reduced masses                              1.0896                            1.0388                            1.0813
+ Force constants                              1.8397                            7.1381                            8.0519
+  IR intensities                             36.6564                           13.7074                            1.5879
+ Raman sc. activ                             13.9162                           90.6091                           42.9179
+ Depolar. ratios                              0.4754                            0.2074                            0.7500
+        Atom  ZA               X         Y         Z             X         Y         Z             X         Y         Z
+           1   8         0.00000  -0.00000   0.07386       0.00000  -0.00000   0.04547       0.00000  -0.07001  -0.00000
+           2   1         0.00000  -0.39211  -0.58611       0.00000   0.60728  -0.36081       0.00000   0.55552  -0.43468
+           3   1         0.00000   0.39211  -0.58611       0.00000  -0.60728  -0.36081       0.00000   0.55552   0.43468
+
+ Results of translations and rotations:
+
+                                                   1                                 2                                 3
+          Irreps                                  B1                                B2                                A1
+     Frequencies                              0.0009                           -0.0000                           -0.0108
+  Reduced masses                              6.0035                            6.0035                            6.0035
+ Force constants                              0.0000                           -0.0000                           -0.0000
+  IR intensities                              0.0000                            0.0000                            0.0000
+ Raman sc. activ                              0.0000                            0.0000                            0.0000
+ Depolar. ratios                              0.0000                            0.0000                            0.0000
+        Atom  ZA               X         Y         Z             X         Y         Z             X         Y         Z
+           1   8         0.57735   0.00000   0.00000       0.00000   0.57735   0.00000       0.00000   0.00000   0.57735
+           2   1         0.57735   0.00000   0.00000       0.00000   0.57735   0.00000       0.00000   0.00000   0.57735
+           3   1         0.57735   0.00000   0.00000       0.00000   0.57735   0.00000       0.00000   0.00000   0.57735
+
+                                                   4                                 5                                 6
+          Irreps                                  B1                                A2                                B2
+     Frequencies                             44.3339                           25.3066                          -25.6785
+  Reduced masses                              1.1259                            1.0078                            1.0465
+ Force constants                              0.0013                            0.0004                           -0.0004
+  IR intensities                            313.7445                            0.0000                          110.5109
+ Raman sc. activ                              9.3677                           16.7623                            2.1861
+ Depolar. ratios                              0.7500                            0.7500                            0.7500
+        Atom  ZA               X         Y         Z             X         Y         Z             X         Y         Z
+           1   8         0.08876   0.00000   0.00000       0.00000   0.00000  -0.00000       0.00000  -0.05078   0.00000
+           2   1        -0.70432  -0.00000  -0.00000      -0.70711   0.00000   0.00000       0.00000   0.40299   0.57992
+           3   1        -0.70432  -0.00000  -0.00000       0.70711   0.00000   0.00000       0.00000   0.40299  -0.57992
+
+
+ *********************************************
+ ***   Thermal Contributions to Energies   ***
+ *********************************************
+
+ Molecular mass            :        18.010565    AMU
+ Elec. total energy        :         0.000000    Hartree
+ Scale factor of Frequency :         1.000000
+ Rot. symmetry number      :         2
+ The C2v  point group is used to calculate rotational entropy.
+
+ Principal axes and moments of inertia in atomic units:
+                                     1                   2                   3
+     Eigenvalues --                  2.411404            4.434682            6.846086
+           X                         0.000000            0.000000            1.000000
+           Y                         1.000000            0.000000            0.000000
+           Z                         0.000000            1.000000            0.000000
+
+ Rotational temperatures            35.918417           19.531007           12.651581    Kelvin
+ Rot. constants A, B, C             24.964580           13.574746            8.793299    cm**-1
+                                   748.419273          406.960649          263.616484    GHz
+
+
+ #   1    Temperature =       298.15000 Kelvin         Pressure =         1.00000 Atm
+ ====================================================================================
+
+ Thermal correction energies                              Hartree            kcal/mol
+ Zero-point Energy                          :            0.019736           12.384426
+ Thermal correction to Energy               :            0.022571           14.163256
+ Thermal correction to Enthalpy             :            0.023515           14.755741
+ Thermal correction to Gibbs Free Energy    :            0.001989            1.248101
+ ====================================================================================
+
+
+ Job terminated correctly! Sun Dec 31 00:30:14 2017

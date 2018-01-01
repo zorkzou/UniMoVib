@@ -3,10 +3,11 @@
 ! Solve Secular equation in Cartesian coordinates
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SolvSec(iinp,iout,irep,iudt,imdn,Intact,IOP,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,AL,Scr1,Scr2,Scr3,Scr4,Work)
+subroutine SolvSec(iinp,iout,irep,iudt,imdn,iloc,Intact,IOP,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL,Rslt, &
+  Scr1,Scr2,Scr3,Scr4,Work)
 implicit real(kind=8) (a-h,o-z)
 dimension :: IOP(*)
-real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(*),AL(*),Scr1(*),Scr2(*),Scr3(*),Scr4(*),Work(*)
+real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),Scr1(*),Scr2(*),Scr3(*),Scr4(*),Work(*)
 character*4 :: PGNAME(2)
 character*100 :: ctmp
 logical :: Intact,IFAtom
@@ -36,27 +37,31 @@ call GSorth(Intact,.True.,NAtm3,NTR,AL,Scr3)
 ! construct secular equation in pure. vib. subspace, do diagonalization, and renormalize the mass-unweighted eigenvectors
 call VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
 
-! calculate freq. and IR int. of normal modes. The results are saved in Scr1.
-call NormFq(iout,NAtm,NAtm3,NVib,IOP(2),AMass,ZA,FFx,APT,AL,Scr1,Scr2,Scr3)
+! calculate freq. and IR int. of normal modes. The results are saved in Rslt.
+call NormFq(iout,IRaman,NAtm,NAtm3,NVib,IOP(2),AMass,ZA,FFx,APT,DPol,AL,Rslt,Scr2,Scr3)
 
 ! symmetry analysis; irreps of normal modes will be saved in file irep
 call symdrv(iout,irep,NAtm,IOP(5),.true.,XYZ,ZA,AMass,AL,PGNAME)
 
-! print normal modes results saved in Scr1
-call PrtNFq(iout,irep,NAtm,NAtm3,NVib,(IOP(1)==-3),IOP(2),ZA,AL,Scr1,Scr2)
+! print normal modes results saved in Rslt
+call PrtNFq(iout,irep,IRaman,NAtm,NAtm3,NVib,(IOP(1)==-3),IOP(2),ZA,AL,Rslt,Scr2)
 
 ! experimental frequencies
-if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Scr1,Scr2,Scr3,Scr4,ctmp)
+if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Rslt,Scr2,Scr3,Scr4,ctmp)
 
-! save plain UniMoVib (ALM) data file
-if(IOP(6) == 1) call SavALM(iudt,NAtm,NAtm3,NVib,AMass,ZA,XYZ,FFx,APT,IOP(3),AL,Scr1,Scr2,Scr3,WORK,Scr4)
+! save plain UniMoVib (ALM) data file and/or localmode.dat (part I)
+if(IOP(6) == 1 .or. IOP(8) == 1) call SavALM((IOP(6) == 1),(IOP(8) == 1),iudt,iloc,IRaman,NAtm,NAtm3,NVib,AMass,ZA,XYZ, &
+  FFx,APT,DPol,IOP(3),AL,Rslt,Scr2,Scr3,WORK,Scr4)
 
 ! save a molden file
-if(IOP(7) == 1) call SavMDN(imdn,NAtm,NAtm3,NVib,ZA,XYZ,IOP(3),AL,Scr1)
+if(IOP(7) == 1) call SavMDN(imdn,NAtm,NAtm3,NVib,ZA,XYZ,IOP(3),AL,Rslt)
+
+! save localmode.dat (part II)
+if(IOP(8) == 1) call SavLOC(iloc,irep,NAtm3,IOP(3),Rslt,PGNAME,ctmp)
 
 1000  continue
-! Thermochemistry calculation. Frequencies are saved in Scr1(1:NVib,3/5) in a.u.
-call Thermochem(iinp,iout,Intact,NAtm,NAtm3,NVib,IFAtom,IOP(3),PGNAME,AMass,XYZ,Scr1,Scr2,Scr3,ctmp)
+! Thermochemistry calculation. Frequencies are saved in Rslt(1:NVib,3/5) in a.u.
+call Thermochem(iinp,iout,Intact,NAtm,NAtm3,NVib,IFAtom,IOP(3),PGNAME,AMass,XYZ,Rslt,Scr2,Scr3,ctmp)
 
 return
 end
@@ -173,19 +178,23 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
-! calculate normal frequencies and IR intensities:
+! calculate normal frequencies, IR intensities, and Raman activities:
 !
 ! Reslt(:,1): k;  Reslt(:,2): mr;  Reslt(:,3): theor. freq;  Reslt(:,4): I.R. Int
 !
-! Reslt(:,5) and Reslt(:,6): see RdExFq
+! Reslt(:,5): expt. corrected freq if Reslt(:,6) = 1.0; see RdExFq.
+!
+! Reslt(:,7): Raman scattering activity; Reslt(:,8): Depolarization ratio
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine NormFq(iout,NAtm,NAtm3,NVib,IPrint,AMass,ZA,FFx,APT,AL,Reslt,Scr1,Scr2)
+subroutine NormFq(iout,IRaman,NAtm,NAtm3,NVib,IPrint,AMass,ZA,FFx,APT,DPol,AL,Reslt,Scr1,Scr2)
 implicit real(kind=8) (a-h,o-z)
-real(kind=8) :: AMass(*),ZA(*),FFX(NAtm3,NAtm3),APT(3,*),AL(NAtm3,*),Reslt(NAtm3,*),Scr1(NAtm3,NAtm3),Scr2(NAtm3,NAtm3)
+real(kind=8) :: AMass(*),ZA(*),FFX(NAtm3,NAtm3),APT(3,*),DPol(6,*),AL(NAtm3,*),Reslt(NAtm3,*),Scr1(NAtm3,NAtm3),Scr2(NAtm3,NAtm3)
+parameter(Tol=1.0d-5)
 
 NMod=NVib
 if(IPrint == 1)NMod=NAtm3
+
 ! k --> Reslt(:,1)
 do i=1,NMod
   call MMpyMF(1,NAtm3,NAtm3,AL(1,i),FFx,Scr1)
@@ -217,6 +226,37 @@ do i=1,NMod
 end do
 
 Reslt(:,6)=-1.0d0
+
+! Raman --> Reslt(:,7:8)
+if(IRaman == 1) then
+  call Transp(6,NAtm3,DPol,Scr1)
+  do i=1,NMod
+    X = 1.0d0/sqrt(Reslt(i,2))
+    do j=1,6
+      Scr2(j,1)=dotx(NAtm3,Scr1(1,j),AL(1,i))
+    end do
+    call AScale(6,X,Scr2(1,1),Scr2(1,1))
+!   [ 1  2  4]
+!   [ 2  3  5]
+!   [ 4  5  6]
+!   alpha^2 --> Scr2(1,2)
+    Scr2(1,2) = (Scr2(1,1) + Scr2(3,1) + Scr2(6,1)) / 3.0d0
+    Scr2(1,2) = Scr2(1,2) * Scr2(1,2)
+!   beta^2 --> Scr2(4,2)
+    Scr2(2,2) = (Scr2(1,1) - Scr2(3,1))**2 + (Scr2(3,1) - Scr2(6,1))**2 + (Scr2(6,1) - Scr2(1,1))**2
+    Scr2(3,2) = Scr2(2,1)*Scr2(2,1) + Scr2(4,1)*Scr2(4,1) + Scr2(5,1)*Scr2(5,1)
+    Scr2(4,2) = Scr2(2,2) * 0.5d0 + Scr2(3,2) * 3.0d0
+!   Raman scattering activity in a.u.
+    Reslt(i,7) = 45.0d0 * Scr2(1,2) + 7.0d0 * Scr2(4,2)
+!   depolarization ratio
+    Reslt(i,8) = 45.0d0 * Scr2(1,2) + 4.0d0 * Scr2(4,2)
+    if (Reslt(i,8) > Tol) then
+      Reslt(i,8) = 3.0d0 * Scr2(4,2) / Reslt(i,8)
+    else
+      Reslt(i,8) = 0.0d0
+    end if
+  end do
+end if
 
 return
 end
@@ -346,9 +386,9 @@ end
 ! print results of normal modes
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine PrtNFq(iout,irep,NAtm,NAtm3,NVib,IfSim,IPrint,ZA,AL,Reslt,IRNAME)
+subroutine PrtNFq(iout,irep,IRaman,NAtm,NAtm3,NVib,IfSim,IPrint,ZA,AL,Reslt,IRNAME)
 implicit real(kind=8) (a-h,o-z)
-parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0)
+parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0,au2ang4=0.52917720859d0**4)
 real(kind=8) :: ZA(*),AL(3,NAtm,*),Reslt(NAtm3,*)
 character*4 :: IRNAME(NAtm3)
 logical :: IfSim
@@ -365,7 +405,8 @@ if(IfSim) write(iout,"(/, 1x,75('!'),/,  &
    ' !!  NOTE: simulated Hessian is used, so the results are not meaningful.  !!',/, 1x,75('!'))")
 
 write(iout,"(/, ' Results of vibrations:',/, &
-' Normal frequencies (cm**-1), reduced masses (AMU),',/, ' force constants (mDyn/A), IR intensities (km/mol)')")
+' Normal frequencies (cm**-1), reduced masses (AMU), force constants (mDyn/A), IR intensities (km/mol)')")
+if(IRaman == 1) write(iout,"(' Raman scattering activities (A**4/AMU), depolarization ratios of Raman scattered light')")
 
 if(IPrint == 1)then
   NLine=(NVib-1)/3+1
@@ -379,6 +420,10 @@ if(IPrint == 1)then
     write(iout,"('  Reduced masses',2x,3f34.4)")(Reslt(j,2),j=iv1,iv2)
     write(iout,"(' Force constants',2x,3f34.4)")(Reslt(j,1)*au2dy,j=iv1,iv2)
     write(iout,"('  IR intensities',2x,3f34.4)")(Reslt(j,4)*cf*cf,j=iv1,iv2)
+    if(IRaman == 1) then
+      write(iout,"(' Raman sc. activ',2x,3f34.4)")(Reslt(j,7)*au2ang4,j=iv1,iv2)
+      write(iout,"(' Depolar. ratios',2x,3f34.4)")(Reslt(j,8),j=iv1,iv2)
+    end if
     if(ncol == 1)then
       write(iout,"('        Atom  ZA',2x,  13x,'X         Y         Z') ")
     else if(ncol == 2)then
@@ -404,6 +449,10 @@ if(IPrint == 1)then
     write(iout,"('  Reduced masses',2x,3f34.4)")(Reslt(j,2),j=iv1,iv2)
     write(iout,"(' Force constants',2x,3f34.4)")(Reslt(j,1)*au2dy,j=iv1,iv2)
     write(iout,"('  IR intensities',2x,3f34.4)")(Reslt(j,4)*cf*cf,j=iv1,iv2)
+    if(IRaman == 1) then
+      write(iout,"(' Raman sc. activ',2x,3f34.4)")(Reslt(j,7)*au2ang4,j=iv1,iv2)
+      write(iout,"(' Depolar. ratios',2x,3f34.4)")(Reslt(j,8),j=iv1,iv2)
+    end if
     if(ncol == 2)then
         write(iout,"('        Atom  ZA',2x,2(13x,'X         Y         Z'))")
     else
@@ -426,16 +475,14 @@ else
 !    write(iout,"('  Reduced masses',4x,10f10.4)")(Reslt(j,2),j=iv1,iv2)
     write(iout,"(' Force constants',4x,10f10.4)")(Reslt(j,1)*au2dy,j=iv1,iv2)
     write(iout,"('  IR intensities',4x,10f10.4)")(Reslt(j,4)*cf*cf,j=iv1,iv2)
+    if(IRaman == 1) then
+      write(iout,"(' Raman sc. activ',4x,10f10.4)")(Reslt(j,7)*au2ang4,j=iv1,iv2)
+      write(iout,"(' Depolar. ratios',4x,10f10.4)")(Reslt(j,8),j=iv1,iv2)
+    end if
   end do
 end if
-
-if(IPrint == 0) return
 
 return
 end
 
 !--- END
-
-
-
-

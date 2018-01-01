@@ -1,0 +1,9 @@
+a test job
+
+ $contrl
+   qcprog="gaussian"
+ $end
+
+ $qcdata
+   fchk="h2o.fchk"
+ $end
