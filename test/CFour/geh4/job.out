@@ -4,7 +4,7 @@
      _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
     _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
    _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
-  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.0, MAY 02, 2017
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.1.1, Jan 14, 2018
    _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
  =======================================================================================================================
 
@@ -19,10 +19,10 @@
    No.   Atom    ZA                 X             Y             Z                Mass
  ------------------------------------------------------------------------------------------
      1    Ge     32            0.00000000    0.00000000    0.00000000           73.92117740
-     2    H       1            0.00000000   -1.25868384    0.89002388            1.00782503
-     3    H       1            0.00000000    1.25868384    0.89002388            1.00782503
-     4    H       1            1.25868384    0.00000000   -0.89002388            1.00782503
-     5    H       1           -1.25868384    0.00000000   -0.89002388            1.00782503
+     2    H       1            0.00000000   -1.25868434    0.89002423            1.00782503
+     3    H       1            0.00000000    1.25868434    0.89002423            1.00782503
+     4    H       1            1.25868434    0.00000000   -0.89002423            1.00782503
+     5    H       1           -1.25868434    0.00000000   -0.89002423            1.00782503
  ------------------------------------------------------------------------------------------
 
 
@@ -36,8 +36,7 @@
  ************************************
 
  Results of vibrations:
- Normal frequencies (cm**-1), reduced masses (AMU),
- force constants (mDyn/A), IR intensities (km/mol)
+ Normal frequencies (cm**-1), reduced masses (AMU), force constants (mDyn/A), IR intensities (km/mol)
 
                                                    1                                 2                                 3
           Irreps                                  T2                                T2                                T2
@@ -111,8 +110,6 @@
  ***   Thermal Contributions to Energies   ***
  *********************************************
 
- Temperature               :       298.150000    Kelvin
- Pressure                  :         1.000000    Atm
  Molecular mass            :        77.952478    AMU
  Elec. total energy        :         0.000000    Hartree
  Scale factor of Frequency :         1.000000
@@ -130,11 +127,16 @@
  Rot. constants A, B, C              2.639476            2.639476            2.639476    cm**-1
                                     79.129497           79.129497           79.129497    GHz
 
+
+ #   1    Temperature =       298.15000 Kelvin         Pressure =         1.00000 Atm
+ ====================================================================================
+
  Thermal correction energies                              Hartree            kcal/mol
- Zero-point Energy                          :            0.029635           18.595979
- Thermal correction to Energy               :            0.032773           20.565127
- Thermal correction to Enthalpy             :            0.033717           21.157613
+ Zero-point Energy                          :            0.029635           18.595982
+ Thermal correction to Energy               :            0.032773           20.565130
+ Thermal correction to Enthalpy             :            0.033717           21.157615
  Thermal correction to Gibbs Free Energy    :            0.009030            5.666455
+ ====================================================================================
 
 
- Job terminated correctly! Tue May 02 17:52:34 2017
+ UniMoVib job terminated correctly! Sun Jan 14 13:19:15 2018

@@ -17,8 +17,8 @@ logical       :: Intact, ifopen
 real(kind=8),allocatable :: AMass(:), ZA(:), XYZ(:), FFx(:), APT(:), DPol(:), AL(:), Rslt(:), Scr1(:), Scr2(:), Scr3(:), &
   Scr4(:), Work(:)
 
-ver="1.1.0"
-dat="DEC 31, 2017"
+ver="1.1.1"
+dat="Jan 14, 2018"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O
@@ -72,7 +72,7 @@ allocate(AMass(NAtm), ZA(NAtm), XYZ(NAtm3), FFx(NSS), APT(NAtm3*3), DPol(NAtm3*6
 allocate(Rslt(NAtm3*Nrslt), Scr1(NSS), Scr2(NSS), Scr3(NSS), Scr4(NSS), Work(NWK))
 
 APT=0.d0
-call RdData1(iout,idt0,idt1,idt2,Intact,IOP,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Work)
+call RdData1(iout,idt0,idt1,idt2,Intact,IOP,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Work)
 
 ! read atomic masses from input
 call RdIsot(iinp,iout,Intact,IOP(4),NAtm,ctmp,AMass)
@@ -84,7 +84,7 @@ if(IOP(1) /= -1) call ChkDat(iout,Intact,NAtm,AMass,ZA,XYZ)
 ! 7. Solve Secular equation in Cartesian coordinates
 !    Symmetry is also analyzed therein.
 !-----------------------------------------------------------------------
-call SolvSec(iinp,iout,irep,iudt,imdn,iloc,Intact,IOP,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL,Rslt, &
+call SolvSec(iinp,iout,irep,iudt,imdn,iloc,Intact,IOP,Infred,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL,Rslt, &
   Scr1,Scr2,Scr3,Scr4,Work,Eig)
 
 !-----------------------------------------------------------------------
@@ -93,8 +93,8 @@ call SolvSec(iinp,iout,irep,iudt,imdn,iloc,Intact,IOP,IRaman,NAtm,NVib,ctmp,AMas
 deallocate(AMass, ZA, XYZ, FFx, APT, DPol, AL, Rslt, Scr1, Scr2, Scr3, Scr4, Work)
 
 call fdate(ctmp)
-write(*,"(//,' Job terminated correctly! ',a)")trim(ctmp)
-if(Intact)write(iout,"(//,' Job terminated correctly, ',a)") trim(ctmp)
+write(*,"(//,' UniMoVib job terminated correctly! ',a)")trim(ctmp)
+if(Intact)write(iout,"(//,' UniMoVib job terminated correctly, ',a)") trim(ctmp)
 
 close(iinp)
 close(iout)

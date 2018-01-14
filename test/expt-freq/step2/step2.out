@@ -4,7 +4,7 @@
      _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
     _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
    _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
-  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.1, OCT 15, 2017
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.1.1, Jan 14, 2018
    _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
  =======================================================================================================================
 
@@ -17,9 +17,9 @@
  ------------------------------------------------------------------------------------------
    No.   Atom    ZA                 X             Y             Z                Mass
  ------------------------------------------------------------------------------------------
-     1    H       1            0.00000000   -0.75387901    0.52702010            1.00782503
-     2    H       1            0.00000000    0.75387901    0.52702010            2.01410000
-     3    O       8            0.00000000    0.00000000   -0.06641412           15.99491463
+     1    H       1            0.00000000   -0.75387931    0.52702031            1.00782503
+     2    H       1            0.00000000    0.75387931    0.52702031            2.01410000
+     3    O       8            0.00000000    0.00000000   -0.06641414           15.99491463
  ------------------------------------------------------------------------------------------
 
 
@@ -33,8 +33,7 @@
  ************************************
 
  Results of vibrations:
- Normal frequencies (cm**-1), reduced masses (AMU),
- force constants (mDyn/A), IR intensities (km/mol)
+ Normal frequencies (cm**-1), reduced masses (AMU), force constants (mDyn/A), IR intensities (km/mol)
 
                                                    1                                 2                                 3
           Irreps                                  A'                                A'                                A'
@@ -76,8 +75,6 @@
  ***   Thermal Contributions to Energies   ***
  *********************************************
 
- Temperature               :       298.150000    Kelvin
- Pressure                  :         1.000000    Atm
  Molecular mass            :        19.016840    AMU
  Elec. total energy        :         0.000000    Hartree
  Scale factor of Frequency :         1.000000
@@ -95,11 +92,16 @@
  Rot. constants A, B, C             22.681871            9.166324            6.528137    cm**-1
                                    679.985393          274.799474          195.708620    GHz
 
+
+ #   1    Temperature =       298.15000 Kelvin         Pressure =         1.00000 Atm
+ ====================================================================================
+
  Thermal correction energies                              Hartree            kcal/mol
  Zero-point Energy                          :            0.017766           11.148586
  Thermal correction to Energy               :            0.020606           12.930762
  Thermal correction to Enthalpy             :            0.021551           13.523248
  Thermal correction to Gibbs Free Energy    :           -0.001084           -0.680241
+ ====================================================================================
 
 
- Job terminated correctly, Sun Oct 15 21:46:03 2017
+ UniMoVib job terminated correctly, Sun Jan 14 13:23:13 2018

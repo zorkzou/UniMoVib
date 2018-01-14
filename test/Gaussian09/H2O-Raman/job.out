@@ -4,7 +4,7 @@
      _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
     _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
    _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
-  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.1.0, DEC 30, 2017
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.1.1, Jan 14, 2018
    _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
  =======================================================================================================================
 
@@ -33,7 +33,7 @@
  ************************************
 
  Results of vibrations:
- Normal frequencies (cm**-1), reduced masses (AMU), force constants (mDyn/A), IR intensities (km/mol)
+ Normal frequencies (cm**-1), reduced masses (AMU), force constants (mDyn/A), IR intensities (km/mol),
  Raman scattering activities (A**4/AMU), depolarization ratios of Raman scattered light
 
                                                    1                                 2                                 3
@@ -111,4 +111,4 @@
  ====================================================================================
 
 
- Job terminated correctly! Sun Dec 31 00:30:14 2017
+ UniMoVib job terminated correctly! Sun Jan 14 13:25:45 2018

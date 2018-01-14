@@ -115,7 +115,7 @@ end
 ! Read Q.C. data
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdData1(iout,idt0,idt1,idt2,Intact,IOP,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Scr4)
+subroutine RdData1(iout,idt0,idt1,idt2,Intact,IOP,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Scr4)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact
 dimension :: IOP(*)
@@ -123,6 +123,7 @@ real(kind=8) :: AMass(*), ZA(*), XYZ(*), FFx(*), APT(*), DPol(*), Scr1(*), Scr2(
 character*100 :: tag,ctmp
 
 NAtm3=3*NAtm
+Infred=0
 IRaman=0
 
 select case(IOP(1))
@@ -131,7 +132,7 @@ select case(IOP(1))
     return
 
   case(-2) ! UniMoVib (ALM); the size of Scr4 should be 9*NAtm3 at least
-    call RdALMode(idt0,iout,Intact,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr4)
+    call RdALMode(idt0,iout,Intact,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr4)
 
   case(-3) ! xyz
     call RdXYZ(idt0,iout,Intact,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
@@ -139,22 +140,22 @@ select case(IOP(1))
     call MasLib(0,NAtm,AMass,ZA)
 
   case(1)  ! Gaussian
-    call RdGauss(idt0,iout,tag,ctmp,Intact,IOP(4),IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr1)
+    call RdGauss(idt0,iout,tag,ctmp,Intact,IOP(4),Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr1)
 !   the most abundant isotopic masses are assumed
     if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
   case(2,3)  ! Gamess,Firefly
-    call RdGAMES(idt0,idt1,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+    call RdGAMES(idt0,idt1,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 
   case(4)  ! ORCA
-    call RdORCA(idt0,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+    call RdORCA(idt0,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 
   case(5)  ! CFour
     call ChkAFRQ(idt0,tag,ctmp,Intact)
-    call RdCFour(idt0,idt1,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
+    call RdCFour(idt0,idt1,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
 
   case(6)  ! Molpro
-    call RdMolp(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+    call RdMolp(idt0,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 
   case(7)  ! QChem
     call RdQChem(idt0,tag,ctmp,Intact,IOP(4),NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
@@ -162,19 +163,19 @@ select case(IOP(1))
     if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
   case(8)  ! NWChem
-    call RdNWChem(idt0,idt1,idt2,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
+    call RdNWChem(idt0,idt1,idt2,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
 
   case(9)  ! GAMESS-UK
-    call RdGMUK(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+    call RdGMUK(idt0,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 
   case(10) ! Turbomole
-    call RdTurbm(idt0,idt1,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+    call RdTurbm(idt0,idt1,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 
   case(11) ! deMon
     call RdDeMon(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx)
 
   case(12) ! PQS
-    call RdPQS(idt0,idt1,idt2,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
+    call RdPQS(idt0,idt1,idt2,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
 
   case(13) ! MOPAC
     call RdMopac(idt0,tag,ctmp,Intact,NAtm,ZA,XYZ,FFx)
@@ -191,17 +192,17 @@ select case(IOP(1))
     call MasLib(1,NAtm,AMass,ZA)
 
   case(15) ! Dalton
-    call RdDalton(idt0,tag,tag(51:),ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+    call RdDalton(idt0,tag,tag(51:),ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 
   case(16) ! FHI-AIMS
-    call RdAIMS(idt0,idt1,idt2,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+    call RdAIMS(idt0,idt1,idt2,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 
   case(17) ! CP2K
     call RdCP2K(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx)
 
   case(18) ! ADF
     NWK=2*max(NAtm3,2)*NAtm3
-    call RdADF(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,NWK,Scr4)
+    call RdADF(idt0,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,NWK,Scr4)
 
   case(19) ! Hyperchem
     call RdHyper(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
@@ -216,7 +217,7 @@ select case(IOP(1))
     call RdCry(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
 
   case(23) ! Spartan
-    call RdSptn(idt0,tag,ctmp,Intact,NAtm,ZA,XYZ,FFx,APT,Scr1)
+    call RdSptn(idt0,tag,ctmp,Intact,Infred,NAtm,ZA,XYZ,FFx,APT,Scr1)
 !   the most abundant isotopic masses are assumed
     call MasLib(0,NAtm,AMass,ZA)
 
@@ -1016,7 +1017,7 @@ end
 ! Read data from UniMoVib (ALM) data file
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdALMode(ifchk,iout,Intact,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr)
+subroutine RdALMode(ifchk,iout,Intact,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr)
 implicit real(kind=8) (a-h,o-z)
 parameter(ang2au=1.d0/0.52917720859d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(*),DPol(6,*),Scr(*)
@@ -1027,6 +1028,7 @@ NAtm3 = NAtm * 3
 NAtm9 = NAtm * 9
 NSS = NAtm3 * NAtm3
 NTT = NAtm3 * (NAtm3+1) / 2
+Infred = 0
 IRaman = 0
 
 rewind(ifchk)
@@ -1061,7 +1063,10 @@ end if
 ! read APT in a.u.
 read(ifchk,"(a100)",err=1060,end=1060)ctmp
 call charl2u(ctmp)
-if(index(ctmp,"NOAPT") == 0) read(ifchk,*,err=1060,end=1060)(APT(i),i=1,NAtm9)
+if(index(ctmp,"NOAPT") == 0) then
+  Infred = 1
+  read(ifchk,*,err=1060,end=1060)(APT(i),i=1,NAtm9)
+end if
 
 ! read DPR in a.u.
 read(ifchk,"(a100)",err=1070,end=1070)ctmp
@@ -1130,9 +1135,9 @@ end
 ! Read data from Gaussian fchk
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdGauss(ifchk,iout,tag,ctmp,Intact,IRdMas,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr)
+subroutine RdGauss(ifchk,iout,tag,ctmp,Intact,IRdMas,Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr)
 implicit real(kind=8) (a-h,o-z)
-logical :: Intact,ifapt
+logical :: Intact
 
 real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(3,*),DPol(6,*),Scr(*)
 character*100 :: ctmp
@@ -1140,8 +1145,8 @@ character*49 :: tag
 
 NAtm3 = NAtm * 3
 NTT = NAtm3*(NAtm3+1)/2
-ifapt=.true.
-IRaman=1
+Infred=0
+IRaman=0
 
 !! read nuclear charges; they lead to errors in the case of ECP
 !tag='Nuclear charges                            R   N='
@@ -1170,22 +1175,18 @@ call LT2Sqr(NAtm3,Scr,FFx)
 ! read APT (a.u.), optional
 tag='Dipole Derivatives                         R   N='
 rewind(ifchk)
-301   read(ifchk,"(a100)",end=310)ctmp
+301   read(ifchk,"(a100)",end=350)ctmp
 if(index(ctmp,tag)==0) goto 301
 read(ifchk,"(5e16.8)")((APT(j,i),j=1,3),i=1,NAtm3)
-goto 350
-310   ifapt=.false.
-write(iout,"(/,' *** Warning ***',/, &
-' No dipole derivatives found, so the electronic properties will not be calculated.')")
+Infred= 1
 
 ! read DPol (a.u.), optional
 350   tag='Polarizability Derivatives                 R   N='
 rewind(ifchk)
-351   read(ifchk,"(a100)",end=360)ctmp
+351   read(ifchk,"(a100)",end=400)ctmp
 if(index(ctmp,tag)==0) goto 351
 read(ifchk,"(5e16.8)")((DPol(j,i),j=1,6),i=1,NAtm3)
-goto 400
-360   IRaman=0
+IRaman= 1
 
 ! read atomic masses (1): masses were saved by freq(SaveNormalModes)
 ! G09 and higher versions only!
@@ -1212,7 +1213,7 @@ end
 ! Read data from *.dat + *.out of Gamess or PUNCH + *.out of Firefly
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdGAMES(ifchk,iout,tmp,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdGAMES(ifchk,iout,tmp,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
 parameter(an2br=0.52917720859d0,au2deb=2.541746d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
@@ -1221,6 +1222,7 @@ character*56 :: tmp
 logical :: Intact
 
 NAtm3 = NAtm * 3
+Infred= 0
 
 ! read nuclear charges and Cartesian coordinates in standard orientation (a.u.)
 rewind(iout)
@@ -1245,16 +1247,17 @@ end do
 
 ! read APT (a.u.)
 ! rewind(ifchk)
-301   read(ifchk,"(a7)",end=310)ctmp
+301   read(ifchk,"(a7)",end=401)ctmp
 if(index(ctmp,' $DIPDR')==0)goto 301
 read(ifchk,"(1x,3e15.8)")((APT(j,i),j=1,3),i=1,NAtm3)
 ! Deb/Ang --> a.u.
 factor=an2br/au2deb
 call AScale(NAtm3*3,factor,APT,APT)
+Infred= 1
 
 ! read atomic masses
-! rewind(ifchk)
-401   read(ifchk,"(a13)",end=410)ctmp
+401   rewind(ifchk)
+read(ifchk,"(a13)",end=410)ctmp
 if(index(ctmp,'ATOMIC MASSES')==0)goto 401
 read(ifchk,*,err=410,end=410)(AMass(i),i=1,NAtm)
 
@@ -1262,7 +1265,6 @@ return
 110   call XError(Intact,"No Cartesian coordinates found!")
 120   call XError(Intact,"Cartesian coordinates are wrong!")
 210   call XError(Intact,"No Cartesian force constants found!")
-310   call XError(Intact,"No dipole derivatives found!")
 410   call XError(Intact,"No atomic masses found!")
 end
 
@@ -1271,13 +1273,14 @@ end
 ! Read data from ORCA *.hess
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdORCA(ifchk,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdORCA(ifchk,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
 character*100 :: ctmp
 logical :: Intact
 
 NAtm3 = NAtm * 3
+Infred= 0
 
 ! read nuclear charges, atomic masses, and Cartesian coordinates in standard orientation (a.u.)
 rewind(ifchk)
@@ -1306,15 +1309,16 @@ end do
 
 ! read APT (a.u.)
 rewind(ifchk)
-201   read(ifchk,"(a19)",end=210)ctmp
+201   read(ifchk,"(a19)",end=900)ctmp
 if(index(ctmp,"$dipole_derivatives")==0)goto 201
 read(ifchk,*)
 read(ifchk,"(3f13.6)")((APT(j,i),j=1,3),i=1,NAtm3)
+Infred= 1
 
+900  continue
 return
-010   call XError(Intact,"No $atoms found!")
-110   call XError(Intact,"No $hessian found!")
-210   call XError(Intact,"No $dipole_derivatives found!")
+010  call XError(Intact,"No $atoms found!")
+110  call XError(Intact,"No $hessian found!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1343,7 +1347,7 @@ end
 ! Read data from CFour *.out
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdCFour(ifchk,igeom,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT,Scr)
+subroutine RdCFour(ifchk,igeom,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*),Scr(*)
 character*100 :: ctmp
@@ -1352,6 +1356,7 @@ logical :: Intact,ifc1
 
 NAtm3 = NAtm * 3
 ifc1 = .False.
+Infred= 0
 
 ! read nuclear charges and Cartesian coordinates (a.u.)
 rewind(igeom)
@@ -1440,7 +1445,7 @@ end do
 ! read APT (a.u.)
 tag='                     Total dipole moment derivatives'
 ! rewind(ifchk)
-501   read(ifchk,"(a100)",end=510)ctmp
+501   read(ifchk,"(a100)",end=900)ctmp
 if(index(ctmp,tag)==0)goto 501
 
 if(ifc1)then
@@ -1448,7 +1453,7 @@ if(ifc1)then
 else
   tag='                       Ex          Ey          Ez'
 end if
-502   read(ifchk,"(a100)",end=511)ctmp
+502   read(ifchk,"(a100)",end=900)ctmp
 if(index(ctmp,tag)==0)goto 502
 do i=1,NAtm3
   if(mod(i,3) == 1)read(ifchk,*)
@@ -1458,6 +1463,9 @@ do i=1,NAtm3
     read(ifchk,"(15x,3f12.6)")(APT(j,i),j=1,3)
   end if
 end do
+Infred= 1
+
+900  continue
 
 return
 010   call XError(Intact,"No Cartesian coordinates found!")
@@ -1468,8 +1476,6 @@ return
 411   call XError(Intact,"No Cartesian force constants found (2)!")
 412   call XError(Intact,"No Cartesian force constants found (3)!")
 420   call XError(Intact,"Please check Force Constant matrix!")
-510   call XError(Intact,"No dipole derivatives found (1)!")
-511   call XError(Intact,"No dipole derivatives found (2)!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1503,7 +1509,7 @@ end
 ! Read data from Molpro *.out
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdMolp(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdMolp(ifchk,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
 parameter(au2deb=2.541746d0,au2ang=0.52917720859d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
@@ -1513,6 +1519,7 @@ character*61 :: tag
 logical :: Intact
 
 NAtm3 = NAtm * 3
+Infred= 0
 hesstag=' PROGRAM * HESSIAN'
 
 ! read nuclear charges and Cartesian coordinates (a.u.)
@@ -1558,7 +1565,7 @@ tag=' Dipole Moment Derivatives [debye/ang]'
 rewind(ifchk)
 201   read(ifchk,"(a100)")ctmp
 if(index(ctmp,hesstag)==0)goto 201
-202   read(ifchk,"(a100)",end=210)ctmp
+202   read(ifchk,"(a100)",end=300)ctmp
 if(index(ctmp,tag)==0)goto 202
 NBlock=(NAtm3-1)/8+1
 do i=1,NBlock
@@ -1566,12 +1573,14 @@ do i=1,NBlock
   iv2=min(i*8,NAtm3)
   read(ifchk,*)
   do j=1,3
-    read(ifchk,"(10x,8f14.7)",end=220)(APT(j,k),k=iv1,iv2)
+    read(ifchk,"(10x,8f14.7)",end=300)(APT(j,k),k=iv1,iv2)
   end do
 end do
 ! debye/ang --> a.u.
 call AScale(NAtm3*3,au2ang/au2deb,APT,APT)
+Infred= 1
 
+300  continue
 ! read atomic masses
 tag=' Atomic Masses'
 rewind(ifchk)
@@ -1645,7 +1654,7 @@ end
 ! Read data of NWChem
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdNWChem(ifchk,ihess,iddip,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT,Scr)
+subroutine RdNWChem(ifchk,ihess,iddip,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),APT(*),Scr(*)
 character*100 :: ctmp
@@ -1653,6 +1662,7 @@ character*69 :: tag
 logical :: Intact,ifopen
 
 NAtm3 = NAtm * 3
+Infred= 0
 
 ! read nuclear charges, Cartesian coordinates (a.u.), and atomic masses
 tag='     atom    #        X              Y              Z            mass'
@@ -1676,8 +1686,7 @@ inquire(unit=iddip,opened=ifopen)
 if(ifopen)then
   rewind(iddip)
   read(iddip,*,err=210)(APT(i),i=1,NAtm3*3)
-else
-  call AClear(NAtm3*3,APT)
+  Infred= 1
 end if
 
 return
@@ -1692,7 +1701,7 @@ end
 ! Read data from GAMESS-UK *.out
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdGMUK(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdGMUK(ifchk,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
 parameter(au2deb=2.541746d0,au2ang=0.52917720859d0,ang2au=1.d0/au2ang)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
@@ -1701,6 +1710,7 @@ character*99 :: tag
 logical :: Intact
 
 NAtm3 = NAtm * 3
+Infred= 0
 
 ! read nuclear charges, Cartesian coordinates (a.u.), and  atomic masses
 tag='     atom              x                   y                   z             nucleus  atomic weight'
@@ -1741,7 +1751,7 @@ end do
 ! read APT (a.u.)
 tag='                    *     (debye/angstrom)     *'
 ! rewind(ifchk)
-201   read(ifchk,"(a100)",end=210)ctmp
+201   read(ifchk,"(a100)",end=300)ctmp
 if(index(ctmp,tag)==0)goto 201
 do j=1,3
   read(ifchk,*)
@@ -1752,18 +1762,19 @@ do i=1,NAtm3
     read(ifchk,*)
     read(ifchk,*)
   end if
-  read(ifchk,"(23x,3f16.8)",end=220)(APT(j,i),j=1,3)
+  read(ifchk,"(23x,3f16.8)",end=300)(APT(j,i),j=1,3)
 end do
 ! debye/ang --> a.u.
 call AScale(NAtm3*3,au2ang/au2deb,APT,APT)
+Infred= 1
+
+300  continue
 
 return
 010   call XError(Intact,"No Cartesian coordinates found!")
 020   call XError(Intact,"Please check Cartesian coordinates!")
 110   call XError(Intact,"No Cartesian force constants found!")
 120   call XError(Intact,"Please check Force Constant matrix!")
-210   call XError(Intact,"No dipole derivatives found!")
-220   call XError(Intact,"Please check Dipole Moment Derivatives!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1771,7 +1782,7 @@ end
 ! Read data from Turbomole's aoforce.out and dipgrad
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdTurbm(ifchk,iddip,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdTurbm(ifchk,iddip,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(*)
 character*100 :: ctmp
@@ -1779,6 +1790,7 @@ character*72 :: tag
 logical :: Intact,ifopen
 
 NAtm3 = NAtm * 3
+Infred= 0
 
 ! read nuclear charges and Cartesian coordinates (a.u.)
 tag='                    atomic coordinates            atom    charge  isotop'
@@ -1828,6 +1840,7 @@ if(ifopen)then
   rewind(iddip)
   read(iddip,*)
   read(iddip,*,err=310)(APT(i),i=1,NAtm3*3)
+  Infred= 1
 else
   call AClear(NAtm3*3,APT)
 end if
@@ -1925,7 +1938,7 @@ end
 ! Read data of PQS
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdPQS(ifchk,ihess,iddip,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT,Scr)
+subroutine RdPQS(ifchk,ihess,iddip,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),APT(*),Scr(*)
 character*100 :: ctmp
@@ -1933,6 +1946,7 @@ character*20 :: tag
 logical :: Intact,ifopen
 
 NAtm3 = NAtm * 3
+Infred= 0
 
 ! read nuclear charges, Cartesian coordinates (a.u.), and atomic masses
 tag='$coordinates'
@@ -1962,6 +1976,7 @@ if(ifopen)then
   201  read(iddip,"(a100)",end=210)ctmp
   if(index(ctmp,tag)==0)goto 201
   read(iddip,*,err=210)(APT(i),i=1,NAtm3*3)
+  Infred= 1
 else
   call AClear(NAtm3*3,APT)
 end if
@@ -2124,7 +2139,7 @@ end
 ! 2015.12.23: analytic Hessian and APT of Dalton2015 are supported.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdDalton(ifchk,tag,ta2,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdDalton(ifchk,tag,ta2,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
 character*100 :: ctmp
@@ -2134,6 +2149,7 @@ logical :: Intact,IfAna,ifgeom
 NAtm3 = NAtm * 3
 IfAna = .false.
 ifgeom= .false.
+Infred= 0
 
 rewind(ifchk)
 
@@ -2190,6 +2206,7 @@ if(IfAna)then
     read(ifchk,"(a100)",end=1110)ctmp
     read(ctmp(15:),*,err=1110)(APT(j,i),j=1,3)
   end do
+  Infred= 1
 end if
 
 ! read IZ and mass
@@ -2217,7 +2234,7 @@ end
 ! Read data from FHI-AIMS output
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdAIMS(ifchk,ihess,iddip,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdAIMS(ifchk,ihess,iddip,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 implicit real(kind=8) (a-h,o-z)
 parameter(ang2au=1.d0/0.52917720859d0,ev2au=1.d0/(ang2au*ang2au*27.2114d0))
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),APT(*)
@@ -2225,6 +2242,7 @@ character*100 :: ctmp
 logical :: Intact,ifopen
 
 NAtm3 = NAtm * 3
+Infred= 0
 
 rewind(ifchk)
 ! read IZ, mass, and Cartesian coordinates in Angstrom
@@ -2246,6 +2264,7 @@ rewind(iddip)
 inquire(unit=iddip,opened=ifopen)
 if(ifopen)then
   read(iddip,*,err=310)(APT(i),i=1,NAtm3*3)
+  Infred= 1
 else
   call AClear(NAtm3*3,APT)
 end if
@@ -2323,7 +2342,7 @@ end
 ! Read data from ADF tape21 or tape13.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdADF(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,APT,DAT1,IDAT,SCR,NWork,SCRFFX)
+subroutine RdADF(ifchk,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,DAT1,IDAT,SCR,NWork,SCRFFX)
 implicit real(kind=8) (a-h,o-z)
 ! we assume #atomtypes < NAtm3, which should be safe
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),APT(*),DAT1(NAtm*3,*),SCR(*),SCRFFX(NWork)
@@ -2333,6 +2352,7 @@ character*28 :: tag(2)
 logical :: Intact,anafc
 
 NAtm3 = NAtm * 3
+Infred= 0
 
 ! #atomtypes (including dummy atoms)
 i=0
@@ -2508,6 +2528,7 @@ if(anafc) then
         read(ifchk,*,end=710,err=710)NVal
         if(NAtm3*3 /= NVal) call XError(Intact,"NAtm3*3 /= NVal in Hessian % Ana. Dipole Der.!")
         read(ifchk,*,end=710,err=710)(APT(i),i=1,NVal)
+        Infred= 1
         goto 750
       end if
     end if
@@ -2537,6 +2558,7 @@ else
   end do
 ! actually the APT^T was read above
   700  call Transp(NAtm3,3,SCR,APT)
+  Infred= 1
 end if
 750   continue
 
@@ -3040,7 +3062,7 @@ end
 ! Read data from Spartan *.smol
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdSptn(ifchk,tag,ctmp,Intact,NAtm,ZA,XYZ,FFx,APT,SCR)
+subroutine RdSptn(ifchk,tag,ctmp,Intact,Infred,NAtm,ZA,XYZ,FFx,APT,SCR)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: ZA(*),XYZ(3,*),FFx(*),APT(*),SCR(*)
 character*100 :: ctmp
@@ -3049,6 +3071,7 @@ logical :: Intact
 
 NAtm3 = NAtm * 3
 NTT = NAtm3*(NAtm3+1)/2
+Infred= 0
 
 ! read FFx (a.u.)
 tag='HESSIAN'
@@ -3086,6 +3109,7 @@ do while(.true.)
   if(index(ctmp,tag(1:14)) /= 0) exit
 end do
 read(ifchk,*,end=300,err=300)(APT(i),i=1,3*NAtm3)
+Infred= 1
 
 300   continue
 
@@ -3408,7 +3432,7 @@ end
 ! If the frequencies are corrected by the experimental ones (saved in Freq(:,5)), the force constant matrix will be recalculated.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SavALM(ifalm,ifloc,ialm,iloc,IRaman,NAtm,NAtm3,NVib,AMass,ZA,XYZ,FFX,APT,DPol,IExpt,AL,Freq,SC1,SC2,WORK,EIG)
+subroutine SavALM(ifalm,ifloc,ialm,iloc,Infred,IRaman,NAtm,NAtm3,NVib,AMass,ZA,XYZ,FFX,APT,DPol,IExpt,AL,Freq,SC1,SC2,WORK,EIG)
 implicit real(kind=8) (a-h,o-z)
 logical :: ifalm,ifloc
 real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFX(*),APT(*),DPol(*),AL(*),Freq(NAtm3,*), SC1(*),SC2(*),WORK(*),EIG(*)
@@ -3466,8 +3490,13 @@ else
 end if
 
 if(ifalm) then
-  write(ialm,"('APT')")
-  write(ialm,"(5d20.10)")(APT(i),i=1,NAtm9)
+
+  if(Infred == 0) then
+    write(ialm,"('NOAPT')")
+  else
+    write(ialm,"('APT')")
+    write(ialm,"(5d20.10)")(APT(i),i=1,NAtm9)
+  end if
 
   if(IRaman == 0) then
     write(ialm,"('NODPR')")
@@ -3484,8 +3513,12 @@ if(ifloc) then
   write(iloc,"(' $NMMODE  $END')")
   write(iloc,"(5d20.10)")(AL(i),i=1,NSS)
 
-  write(iloc,"(' $APT  $END')")
-  write(iloc,"(5d20.10)")(APT(i),i=1,NAtm9)
+  if(Infred == 0) then
+    write(iloc,"(' $APT NOAPT=.TRUE. $END')")
+  else
+    write(iloc,"(' $APT NOAPT=.FALSE. $END')")
+    write(iloc,"(5d20.10)")(APT(i),i=1,NAtm9)
+  end if
 
   if(IRaman == 0) then
     write(iloc,"(' $DPR NODPR=.TRUE. $END')")

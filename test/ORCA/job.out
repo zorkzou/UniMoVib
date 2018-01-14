@@ -4,7 +4,7 @@
      _/     _/   _/_/_/       _/ |_/ _/   _/_/_/   _/     _/      _/           molecular harmonic vibrational frequency
     _/     _/  _/    _/  _/  _/  _/ _/  _/    _/  _/     _/  _/  _/_/_/        calculations.
    _/     _/  _/    _/  _/  _/     _/  _/    _/  _/    _/   _/  _/   _/
-  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.0.0, MAY 02, 2017
+  _/     _/  _/    _/  _/  _/     _/  _/    _/   _/  _/    _/  _/   _/       Ver. 1.1.1, Jan 14, 2018
    _/_/_/   _/    _/  _/  _/     _/   _/_/_/     _/_/     _/  _/_/_/         https://github.com/zorkzou/UniMoVib
  =======================================================================================================================
 
@@ -17,9 +17,9 @@
  ------------------------------------------------------------------------------------------
    No.   Atom    ZA                 X             Y             Z                Mass
  ------------------------------------------------------------------------------------------
-     1    O       8            0.00000000    0.00000000    0.06290380           15.99900000
-     2    H       1            0.00000000    0.78365557   -0.54376800            1.00800000
-     3    H       1            0.00000000   -0.78365557   -0.54376800            1.00800000
+     1    O       8            0.00000000    0.00000000    0.06290382           15.99900000
+     2    H       1            0.00000000    0.78365588   -0.54376821            1.00800000
+     3    H       1            0.00000000   -0.78365588   -0.54376821            1.00800000
  ------------------------------------------------------------------------------------------
 
 
@@ -33,8 +33,7 @@
  ************************************
 
  Results of vibrations:
- Normal frequencies (cm**-1), reduced masses (AMU),
- force constants (mDyn/A), IR intensities (km/mol)
+ Normal frequencies (cm**-1), reduced masses (AMU), force constants (mDyn/A), IR intensities (km/mol)
 
                                                    1                                 2                                 3
           Irreps                                  A1                                A1                                B2
@@ -76,8 +75,6 @@
  ***   Thermal Contributions to Energies   ***
  *********************************************
 
- Temperature               :       298.150000    Kelvin
- Pressure                  :         1.000000    Atm
  Molecular mass            :        18.015000    AMU
  Elec. total energy        :         0.000000    Hartree
  Scale factor of Frequency :         1.000000
@@ -93,13 +90,18 @@
 
  Rotational temperatures            36.807165           19.590616           12.785522    Kelvin
  Rot. constants A, B, C             25.582291           13.616176            8.886393    cm**-1
-                                   766.937800          408.202700          266.407362    GHz
+                                   766.937799          408.202700          266.407362    GHz
+
+
+ #   1    Temperature =       298.15000 Kelvin         Pressure =         1.00000 Atm
+ ====================================================================================
 
  Thermal correction energies                              Hartree            kcal/mol
- Zero-point Energy                          :            0.020138           12.637066
- Thermal correction to Energy               :            0.022973           14.415863
- Thermal correction to Enthalpy             :            0.023917           15.008348
+ Zero-point Energy                          :            0.020138           12.637068
+ Thermal correction to Energy               :            0.022973           14.415865
+ Thermal correction to Enthalpy             :            0.023917           15.008350
  Thermal correction to Gibbs Free Energy    :            0.002409            1.511792
+ ====================================================================================
 
 
- Job terminated correctly! Tue May 02 18:18:33 2017
+ UniMoVib job terminated correctly! Sun Jan 14 13:29:44 2018
