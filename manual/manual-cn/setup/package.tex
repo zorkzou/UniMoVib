@@ -11,6 +11,56 @@
 \usepackage{amsfonts,amssymb}
 %--------------------------------------------------------------------------------------
 \usepackage[skins,listings,breakable,theorems]{tcolorbox}
+
+\usepackage{fancybox}                 % 边框,有阴影,fancybox提供了五种式样\fbox,\shadowbox,\doublebox,\ovalbox,\Ovalbox。
+\usepackage{colortbl}                 % 单元格加背景
+\usepackage{fancyhdr}                 % 页眉和页脚的相关定义
+\usepackage[unicode, colorlinks, bookmarksnumbered=true,pdfstartview=FitH,linkcolor=blue,citecolor=red,urlcolor=magenta]{hyperref}   % 书签功能，选项去掉链接红色方框
+
+%\setmonofont{Consolas}               % Consolas字体，字母符号连用有问题
+
+\usepackage{chngcntr}                 % 公式、图的编号不显示章节号
+\counterwithout{equation}{chapter}
+\counterwithout{equation}{section}
+\counterwithout{figure}{chapter}
+\counterwithout{figure}{section}
+
+\usepackage{bigfoot}                  % use \verb in footnote
+
+\usepackage{listings,xcolor}
+\lstset{
+        extendedchars=false,          % non-English characters
+        lineskip=2pt,
+%%        backgroundcolor=\color{white},
+        basicstyle=\tt\footnotesize\color{black},   % 字体大小和颜色
+        commentstyle=\tt\color{green!40!black},
+        keywordstyle=\tt\color{blue},
+        stringstyle=\tt\color{magenta},
+        showspaces=false,             % underline spaces in the codes
+        showstringspaces=false,       % underline spaces only in a string
+        showtabs=false,               % underline tabs in the codes
+%%        identifierstyle=\tt\color{red!60!black},
+        numbers=left,
+        numberstyle=\tiny\color{black},
+        numberstyle=\scriptsize\color{red!75!black},
+        numbersep=14pt,               % how far the line-numbers are from the code
+        texcl=false,                  % comments in LaTeX if true
+%        emph={                        % keywords to be highlighted
+%               subroutine, return,
+%               end
+%        },
+        emphstyle=\sf\bfseries\color{red!50!black}\fcolorbox{orange!40!white}{.},
+%%        rulecolor=\color{green},
+%%        frame=single,
+%%        frame=shadowbox,
+        tabsize=2,                    % set default tab-size to 2 spaces
+}
+
+\newtcblisting{commandshell}{colback=black,colupper=white,colframe=yellow!75!black,
+%listing only,listing options={style=tcblatex,language=sh,numbers=none},
+listing only,listing options={style=tcblatex,numbers=none},
+every listing line={\textcolor{red}{\small\ttfamily\bfseries UserID \$> }}}
+
 %\newtcblisting{molprojob}{
 %breakable,colback=green!5!white,colframe=green!75!black,left=7mm,
 %enhanced,
@@ -20,27 +70,3 @@
 %overlay={\begin{tcbclipinterior}\fill[red!20!blue!20!white] (frame.south west)
 %    rectangle ([xshift=5mm]frame.north west);\end{tcbclipinterior}}
 %}
-
-\newtcblisting{commandshell}{colback=black,colupper=white,colframe=yellow!75!black,
-listing only,listing options={style=tcblatex,language=sh,numbers=none},
-every listing line={\textcolor{red}{\small\ttfamily\bfseries UserID \$> }}}
-
-\lstset{
-numbers=left,
-numberstyle=\scriptsize\color{red!75!black},
-extendedchars=false,
-showspaces=false
-}
-
-\usepackage{fancybox}                 % 边框,有阴影,fancybox提供了五种式样\fbox,\shadowbox,\doublebox,\ovalbox,\Ovalbox。
-\usepackage{colortbl}                 % 单元格加背景
-\usepackage{fancyhdr}                 % 页眉和页脚的相关定义
-\usepackage[unicode, colorlinks, bookmarksnumbered=true,pdfstartview=FitH,linkcolor=blue,citecolor=red,urlcolor=magenta]{hyperref}   % 书签功能，选项去掉链接红色方框
-
-\usepackage{chngcntr}                 % 公式、图的编号不显示章节号
-\counterwithout{equation}{chapter}
-\counterwithout{equation}{section}
-\counterwithout{figure}{chapter}
-\counterwithout{figure}{section}
-
-\usepackage{bigfoot}                  % use \verb in footnote

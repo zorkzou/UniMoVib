@@ -80,25 +80,30 @@ $S_{n}$           & n = 4, 6, 8 \\
 
 \section{编译程序} \label{sec:install}
 
-\noindent
-\verb|$ cd $UniMoVib/src| \\
-\verb|$ make |
-
+\begin{commandshell}
+cd $UniMoVib/src
+make
+\end{commandshell}
 需要在\verb|Makefile|中定义合适的Fortran90编译器。
 
 
 \section{运行程序} \label{sec:run}
 
-用鼠标双击二进制程序\verb|unimovib.exe|，并键入输入文件名（仅MS-Windows）， \\
+运行方法：\\
+用鼠标双击二进制程序\verb|unimovib.exe|，并键入输入文件名（仅MS-Windows），
 
 或者 \\
-在终端中键入 \\
-\verb|$ ./unimovib.exe | \\
-接下来，键入输入文件名（若不提供输入文件名，使用默认文件名\verb|job.inp|）， \\
+在终端中键入
+\begin{commandshell}
+./unimovib.exe
+\end{commandshell}
+\noindent 接下来，键入输入文件名（若不提供输入文件名，使用默认文件名\verb|job.inp|），
 
 或者 \\
-在终端中键入 \\
-\verb|$ ./unimovib.exe -b < input > output | \\
+在终端中键入
+\begin{commandshell}
+./unimovib.exe -b < input > output
+\end{commandshell}
 
 最后一种方式可以用来准备批处理脚本，做一系列计算。
 
@@ -504,7 +509,9 @@ DPR
 
 要接入到其它支持谐振频率计算的量子化学程序，需要在\emph{interface.f90}中提供两个接口子例程。
 \begin{enumerate}
-\item 读取或统计原子数（\verb|NAtm|）。虚原子不包含在内。该子例程 在\verb|subroutine RdNAtm1|中调用。例如：
+\item[1] 读取或统计原子数（\verb|NAtm|）。虚原子不包含在内。该子例程 在\verb|subroutine RdNAtm1|中调用。例如：
+\end{enumerate}
+\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
 \begin{lstlisting}[language={[90]Fortran}]
 !-----------------------------------------------------------------------
 ! Read NAtm from XXXX output
@@ -516,9 +523,11 @@ character*100 :: tag
 (...)
 return
 end
-\end{lstlisting}
-
-\item 读取原子单位的直角坐标（\verb|XYZ|），原子核电荷数（\verb|ZA|），原子单位的原子量或同位素质量（\verb|AMass|；可选），原子单位的直角坐标力常数矩阵（\verb|FFx|，必须是未做质量加权的对称方阵），以及原子单位的偶极矩梯度（也叫做原子极化张量APT，\verb|APT|；可选）。该子例程在\verb|subroutine RdData1|中调用。例如：
+\end{lstlisting}\end{colorboxed}
+\begin{enumerate}
+\item[2] 读取原子单位的直角坐标（\verb|XYZ|），原子核电荷数（\verb|ZA|），原子单位的原子量或同位素质量（\verb|AMass|；可选），原子单位的直角坐标力常数矩阵（\verb|FFx|，必须是未做质量加权的对称方阵），以及原子单位的偶极矩梯度（也叫做原子极化张量APT，\verb|APT|；可选）。该子例程在\verb|subroutine RdData1|中调用。例如：
+\end{enumerate}
+\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
 \begin{lstlisting}[language={[90]Fortran}]
 !-----------------------------------------------------------------------
 ! Read data from XXXX output
@@ -531,11 +540,11 @@ character*100 :: tag
 (...)
 return
 end
-\end{lstlisting}
+\end{lstlisting}\end{colorboxed}
+\begin{enumerate}
+\item[3] 此外，在\emph{rw.f90}的\verb|subroutine RdContrl|中加入量子化学程序名作为\verb|QCProg|的新选项。
 
-\item 此外，在\emph{rw.f90}的\verb|subroutine RdContrl|中加入量子化学程序名作为\verb|QCProg|的新选项。
-
-\item 最后，别忘了升级使用手册。
+\item[4] 最后，别忘了升级使用手册。
 \end{enumerate}
 
 \end{document}

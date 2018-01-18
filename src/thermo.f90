@@ -89,7 +89,7 @@ if(IFAtom) then
 
   write(iout,"(/, &
   ' Atomic mass               :',4x,f13.6,4x,'AMU',/,    &
-  ' Elec. total energy        :',4x,f13.6,4x,'Hartree' )")VMas,Eel
+  ' Electronic total energy   :',4x,f13.6,4x,'Hartree' )")VMas,Eel
 
 else
   IFrq = 3
@@ -117,9 +117,9 @@ else
 
   write(iout,"(/, &
   ' Molecular mass            :',4x,f13.6,4x,'AMU',/,    &
-  ' Elec. total energy        :',4x,f13.6,4x,'Hartree',/,&
+  ' Electronic total energy   :',4x,f13.6,4x,'Hartree',/,&
   ' Scale factor of Frequency :',4x,f13.6,/,             &
-  ' Rot. symmetry number      :',4x,i6,/,                &
+  ' Rotational symmetry number:',4x,i6,/,                &
   ' The ',a4,' point group is used to calculate rotational entropy.' )") VMas,Eel,scale,NSigma,PG
 
 ! calculate principal axes and moments of inertia --> Sc1(:,1:4)

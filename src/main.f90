@@ -18,7 +18,7 @@ real(kind=8),allocatable :: AMass(:), ZA(:), XYZ(:), FFx(:), APT(:), DPol(:), AL
   Scr4(:), Work(:)
 
 ver="1.1.1"
-dat="Jan 14, 2018"
+dat="Jan 18, 2018"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O
@@ -94,6 +94,7 @@ deallocate(AMass, ZA, XYZ, FFx, APT, DPol, AL, Rslt, Scr1, Scr2, Scr3, Scr4, Wor
 
 call fdate(ctmp)
 write(*,"(//,' UniMoVib job terminated correctly! ',a)")trim(ctmp)
+write(*,"(//)")
 if(Intact)write(iout,"(//,' UniMoVib job terminated correctly, ',a)") trim(ctmp)
 
 close(iinp)
