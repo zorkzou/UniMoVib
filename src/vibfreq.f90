@@ -3,11 +3,10 @@
 ! Solve Secular equation in Cartesian coordinates
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SolvSec(iinp,iout,irep,iudt,imdn,iloc,Intact,IOP,Infred,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL,Rslt, &
+subroutine SolvSec(iinp,iout,idt0,irep,iudt,imdn,iloc,Intact,IOP,Infred,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL,Rslt, &
   Scr1,Scr2,Scr3,Scr4,Work)
 implicit real(kind=8) (a-h,o-z)
-dimension :: IOP(*)
-real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),Scr1(*),Scr2(*),Scr3(*),Scr4(*),Work(*)
+dimension :: IOP(*),AMass(*),ZA(*),XYZ(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),Scr1(*),Scr2(*),Scr3(*),Scr4(*),Work(*)
 character*4 :: PGNAME(2)
 character*100 :: ctmp
 logical :: Intact,IFAtom
@@ -20,31 +19,36 @@ if(IFAtom) then
   goto 1000
 end if
 
-! center of mass ---> Scr2(1:3); XYZ in CMCS --> Scr1
+! center of mass ---> Scr2(1:3); XYZ in CMCS --> Scr1(1:NAtm3)
 call MassCent(NAtm,AMass,XYZ,Scr1,Scr2)
 
-! principal moment of inertia; Eigenvector --> Scr2
-call MIner(Intact,NAtm,AMass,Scr1,Scr2,Scr3,Scr4)
+! principal moment of inertia; Eigenvector --> Scr1(NAtm3+1:NAtm3+9)
+call MIner(Intact,NAtm,AMass,Scr1,Scr1(NAtm3+1),Scr2,Scr2(4))
 
 ! generate m.w. vectors of translations and rotations --> AL
-call TRVec(Intact,NAtm,NTR,Im,AMass,Scr1,AL,Scr2,Scr3)
+call TRVec(Intact,NAtm,NTR,Im,AMass,Scr1,AL,Scr1(NAtm3+1),Scr2)
 NVib=NAtm3-NTR
 ! Scr1 and Scr2 will be destroyed
 
-! generate m.w. vectors of vibrations by Gram-Schmidt orthogonalization
-call GSorth(Intact,.True.,NAtm3,NTR,AL,Scr3)
-
-! construct secular equation in pure. vib. subspace, do diagonalization, and renormalize the mass-unweighted eigenvectors
-call VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
+if (IOP(9) == 1) then
+! read vibrational normal modes
+  call RdNmMod(idt0,Intact,NAtm3,NTR,NVib,IOP,AMass,AL,Scr1)
+else
+  ! generate m.w. vectors of vibrations by Gram-Schmidt orthogonalization
+  call GSorth(Intact,.True.,NAtm3,NTR,AL,Scr3)
+  ! construct secular equation in pure. vib. subspace, do diagonalization, and renormalize the mass-unweighted eigenvectors
+  call VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
+end if
+call RmNoise(NAtm3*NAtm3,1.0d-8,AL)
 
 ! calculate freq. and IR int. of normal modes. The results are saved in Rslt.
-call NormFq(iout,Infred,IRaman,NAtm,NAtm3,NVib,IOP(2),AMass,ZA,FFx,APT,DPol,AL,Rslt,Scr2,Scr3)
+call NormFq(iout,Infred,IRaman,NAtm,NAtm3,NVib,IOP(2),AMass,ZA,FFx,APT,DPol,AL,Rslt,Scr1,Scr2)
 
 ! symmetry analysis; irreps of normal modes will be saved in file irep
 call symdrv(iout,irep,NAtm,IOP(5),.true.,XYZ,ZA,AMass,AL,PGNAME)
 
 ! print normal modes results saved in Rslt
-call PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,(IOP(1)==-3),IOP(2),ZA,AL,Rslt,Scr2)
+call PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,(IOP(1)==-3),IOP(2),IOP(10),ZA,AL,Rslt,Scr2)
 
 ! experimental frequencies
 if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Rslt,Scr2,Scr3,Scr4,ctmp)
@@ -61,7 +65,7 @@ if(IOP(8) == 1) call SavLOC(iloc,irep,NAtm3,IOP(3),Rslt,PGNAME,ctmp)
 
 1000  continue
 ! Thermochemistry calculation. Frequencies are saved in Rslt(1:NVib,3/5) in a.u.
-call Thermochem(iinp,iout,Intact,NAtm,NAtm3,NVib,IFAtom,IOP(3),PGNAME,AMass,XYZ,Rslt,Scr2,Scr3,ctmp)
+call Thermochem(iinp,iout,Intact,NAtm,NAtm3,NVib,IFAtom,IOP(3),PGNAME,AMass,XYZ,Rslt,Scr1,Scr2,ctmp)
 
 return
 end
@@ -389,7 +393,7 @@ end
 ! print results of normal modes
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,IfSim,IPrint,ZA,AL,Reslt,IRNAME)
+subroutine PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,IfSim,IPrint,IApprox,ZA,AL,Reslt,IRNAME)
 implicit real(kind=8) (a-h,o-z)
 parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0,au2ang4=0.52917720859d0**4)
 real(kind=8) :: ZA(*),AL(3,NAtm,*),Reslt(NAtm3,*)
@@ -404,13 +408,19 @@ end do
 
 write(iout,"(//, 1x,36('*'),/, 1x,'***  Properties of Normal Modes  ***',/, 1x,36('*'))")
 
-if(IfSim) write(iout,"(/, 1x,75('!'),/,  &
-   ' !!  NOTE: simulated Hessian is used, so the results are not meaningful.  !!',/, 1x,75('!'))")
+if(IApprox /= 0) then
+   write(iout,"(/, 1x,75('!'),/,  &
+     ' !! #Internal Coordinates = ',i6,40x,'!!',/,  &
+     ' !! NOTE: approximate Hessian is used, so the results are not meaningful. !!',/, 1x,75('!'))") IApprox
+else if(IfSim) then
+   write(iout,"(/, 1x,75('!'),/,  &
+     ' !!  NOTE: simulated Hessian is used, so the results are not meaningful.  !!',/, 1x,75('!'))")
+end if
 
-write(iout,"(/, ' Results of vibrations:',/,' Normal frequencies (cm**-1), reduced masses (AMU), force constants (mDyn/A)')",  &
+write(iout,"(/, ' Results of vibrations:',/,' Normal frequencies (cm^-1), reduced masses (AMU), force constants (mDyn/A)')",  &
   advance='NO')
 if(Infred == 1) write(iout,"(', IR intensities (km/mol)')",advance='NO')
-if(IRaman == 1) write(iout,"(',',/,' Raman scattering activities (A**4/AMU), depolarization ratios of Raman scattered light')", &
+if(IRaman == 1) write(iout,"(',',/,' Raman scattering activities (A^4/AMU), depolarization ratios of Raman scattered light')", &
   advance='NO')
 write(iout,*)
 

@@ -1,5 +1,68 @@
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
+! Read normal modes
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdNmMod(ifchk,Intact,NAtm3,NTR,NVib,IOP,AMass,AL,Scr)
+implicit real(kind=8) (a-h,o-z)
+dimension :: IOP(*)
+logical :: Intact
+real(kind=8) :: AMass(*), AL(NAtm3,*), Scr(NAtm3,*)
+character*100 :: tag,ctmp
+
+NSS = NAtm3*NAtm3
+
+select case(IOP(1))
+
+  case(1)  ! Gaussian
+!   mass-unweighting and renormalization: Trans & Rot only
+    do i=1,NTR
+      do j=1,NAtm3
+        jm=(j-1)/3+1
+        AL(j,i) = AL(j,i)/sqrt(AMass(jm))
+      end do
+      X = dotx(NAtm3,AL(1,i),AL(1,i))
+      X = 1.0d0/sqrt(X)
+      call AScale(NAtm3,X,AL(1,i),Scr(1,i))
+    end do
+!   read vib. normal modes
+    call RdNMGauss(ifchk,tag,ctmp,Intact,NAtm3,NVib,AL)
+    Call ACopy(NAtm3*NTR,Scr,AL(1,NVib+1))
+
+  case default
+    call XError(Intact,"N.Y.I. in RdNmMod!")
+
+end select
+
+return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read normal modes from Gaussian fchk
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdNMGauss(ifchk,tag,ctmp,Intact,NAtm3,NVib,AL)
+implicit real(kind=8) (a-h,o-z)
+logical :: Intact
+real(kind=8) :: AL(*)
+character*100 :: tag,ctmp
+
+tag='Vib-Modes                                  R   N='
+rewind(ifchk)
+001   read(ifchk,"(a100)",end=010)ctmp
+if(index(ctmp,tag(1:49))==0)goto 001
+read(ctmp(51:100),*) N
+if(N /= NAtm3*NVib) goto 011
+read(ifchk,*,err=011)(AL(i),i=1,N)
+
+return
+010   call XError(Intact,"No normal modes found!")
+011   call XError(Intact,"Please check normal modes!")
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
 ! Read NAtm
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,9 +178,9 @@ end
 ! Read Q.C. data
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdData1(iout,idt0,idt1,idt2,Intact,IOP,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Scr4)
+subroutine RdData1(iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Scr4)
 implicit real(kind=8) (a-h,o-z)
-logical :: Intact
+logical :: Intact, IfFXX
 dimension :: IOP(*)
 real(kind=8) :: AMass(*), ZA(*), XYZ(*), FFx(*), APT(*), DPol(*), Scr1(*), Scr2(*), Scr3(*), Scr4(*)
 character*100 :: tag,ctmp
@@ -125,6 +188,7 @@ character*100 :: tag,ctmp
 NAtm3=3*NAtm
 Infred=0
 IRaman=0
+IfFXX = IOP(10) == 0
 
 select case(IOP(1))
 
@@ -135,7 +199,7 @@ select case(IOP(1))
     call RdALMode(idt0,iout,Intact,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr4)
 
   case(-3) ! xyz
-    call RdXYZ(idt0,iout,Intact,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdXYZ(idt0,iout,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
 !   the most abundant isotopic masses are used
     call MasLib(0,NAtm,AMass,ZA)
 
@@ -205,16 +269,16 @@ select case(IOP(1))
     call RdADF(idt0,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,NWK,Scr4)
 
   case(19) ! Hyperchem
-    call RdHyper(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdHyper(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
 
   case(20) ! Jaguar
-    call RdJaguar(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdJaguar(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
 
   case(21) ! MOLDEN
-    call RdMOLDEN(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdMOLDEN(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
 
   case(22) ! Crystal
-    call RdCry(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdCry(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
 
   case(23) ! Spartan
     call RdSptn(idt0,tag,ctmp,Intact,Infred,NAtm,ZA,XYZ,FFx,APT,Scr1)
@@ -225,20 +289,91 @@ select case(IOP(1))
     call RdPSI(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx)
 
   case(25) ! DMOL3
-    call RdDMol(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdDMol(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
 
   case(26) ! ACES
-    call RdACES(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdACES(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
 
   case default
     call XError(Intact,"N.Y.I. in RdData1!")
 
 end select
 
+! read Ka & B matrix and construct an approximate Hessian matrix
+if(.NOT. IfFXX) call RdBMat(iout,ibmt,ctmp,Intact,NAtm3,IOP,FFx)
+
 ! symmetrize FFx
 call Symtrz(NAtm3,FFx,FFx)
 
 return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read Ka and B-matrix from the data file ibmt, and construct an approximate Hessian matrix:
+! Fx ~ B^T * Fq * B ~ B^T * Ka * B = D^T * D, where D = Ka^1/2 * B
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdBMat(iout,ibmt,ctmp,Intact,NAtm3,IOP,FFx)
+implicit real(kind=8) (a-h,o-z)
+parameter(au2ang=0.5291772083d0,au2dy=15.56893d0,au2da=au2dy*au2ang*au2ang)
+character*100 :: ctmp
+logical :: Intact
+dimension IOP(*)
+real(kind=8) :: FFx(*)
+real(kind=8),allocatable :: BM(:,:), BT(:,:)
+
+! the number of parameters
+NPar = 0
+rewind(ibmt)
+do while(.true.)
+  read(ibmt,"(a2)",end=100,err=1110) ctmp(1:2)
+  if(ctmp(2:2) == ":")NPar = NPar + 1
+  cycle
+
+  100 exit
+end do
+
+if(NPar < 1) call XError(Intact,"No Internal Coordinate found!")
+IOP(10) = NPar
+
+allocate(BM(NPar,NAtm3), BT(NAtm3,NPar), stat=ierr)
+  if(ierr /= 0) call XError(Intact,"Insufficient Memory in RdBMat!")
+
+rewind(ibmt)
+do ip=1,NPar
+  200  read(ibmt,"(a100)",err=1110) ctmp
+! a blank line, or a comment line
+  if(len_trim(ctmp) == 0 .or. ctmp(1:1) == "!" .or. ctmp(1:1) == "%") goto 200
+
+  if(ctmp(1:2) == "R:" .or. ctmp(1:2) == "r:") then
+    con = au2dy
+  else if(ctmp(1:2) == "A:" .or. ctmp(1:2) == "a:") then
+    con = au2da
+  else
+    goto 2110
+  end if
+  read(ctmp(3:100),*,err=2120) Fcon
+! Ka --> a.u.
+  Fcon = Fcon / con
+! B^T
+  read(ibmt,*,err=2130) (BT(i,ip),i=1,NAtm3)
+! D^T
+  call AScale(NAtm3,sqrt(Fcon),BT(1,ip),BT(1,ip))
+end do
+
+call Transp(NAtm3,NPar,BT,BM)
+
+call MMpyMF(NAtm3,NPar,NAtm3,BT,BM,FFx)
+
+deallocate(BM, BT)
+
+return
+1110  call XError(Intact,"Please check the data file of B-matrix!")
+2110  write(iout,"(1x,a)") trim(ctmp)
+      call XError(Intact,"Unknown data line!")
+2120  call XError(Intact,"Please check Ka!")
+2130  call XError(Intact,"Please check B-matrix!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1098,12 +1233,12 @@ end
 ! Read data from XYZ data file
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdXYZ(ifchk,iout,Intact,NAtm,Elem,ZA,XYZ,FFx,S1,S2,S3,S4)
+subroutine RdXYZ(ifchk,iout,Intact,IfFXX,NAtm,Elem,ZA,XYZ,FFx,S1,S2,S3,S4)
 implicit real(kind=8) (a-h,o-z)
 parameter(ang2au=1.d0/0.52917720859d0)
 real(kind=8) :: ZA(*),XYZ(3,*),FFx(*),S1(*),S2(*),S3(*),S4(*)
 character*3 :: Elem
-logical :: Intact
+logical :: Intact,IfFXX
 
 NAtm3 = NAtm * 3
 
@@ -1118,13 +1253,15 @@ end do
 ! Ang to a.u.
 call AScale(NAtm3,ang2au,XYZ,XYZ)
 
+if(IfFXX) then
 ! FFX is simulated by CZ * [E"(NRE) * E"(NRE)]^(1/2), which is positive definite.
 ! CZ = 0.5/Max(ZA)
-CZ = 0.5d0 / ArMax(NAtm,i,ZA)
-call DDerNRE(NAtm,ZA,XYZ,FFx,S1(1),S1(6))
-call MPACMF(FFx,FFx,S1,NAtm3,NAtm3,1)
-call SqrtMp(Intact,1,NAtm3,S1,FFx,FFx,S2,S3,S4)
-call AScale(NAtm3*NAtm3,CZ,FFx,FFx)
+  CZ = 0.5d0 / ArMax(NAtm,i,ZA)
+  call DDerNRE(NAtm,ZA,XYZ,FFx,S1(1),S1(6))
+  call MPACMF(FFx,FFx,S1,NAtm3,NAtm3,1)
+  call SqrtMp(Intact,1,NAtm3,S1,FFx,FFx,S2,S3,S4)
+  call AScale(NAtm3*NAtm3,CZ,FFx,FFx)
+end if
 
 return
 1010  call XError(Intact,"Please check XYZ file!")
@@ -2608,13 +2745,13 @@ end
 ! APT is not available at present.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdHyper(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
+subroutine RdHyper(ifchk,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
 parameter(One=1.d0,ang2au=One/0.52917720859d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*69 :: tag
-logical :: Intact
+logical :: Intact,IfFXX
 
 NAtm3 = NAtm * 3
 
@@ -2632,42 +2769,44 @@ end do
 ! Ang --> a.u.
 call AScale(NAtm3,ang2au,XYZ,XYZ)
 
+if(IfFXX) then
 ! read NAtm3 frequencies and normal modes --> SC1 and SC2
-tag='Frequencies of the Normal Modes and Transformation Matrix.'
-201   read(ifchk,"(a100)",end=210)ctmp
-if(index(ctmp,tag(1:58))==0)goto 201
+  tag='Frequencies of the Normal Modes and Transformation Matrix.'
+  201   read(ifchk,"(a100)",end=210)ctmp
+  if(index(ctmp,tag(1:58))==0)goto 201
 
-tag='    mu '
-NBlock=(NAtm3-1)/6+1
-do i=1,NBlock
-  do while(.true.)
-    read(ifchk,"(a100)",end=220,err=220)ctmp
-    if(index(ctmp,tag(1:7)) /= 0) exit
+  tag='    mu '
+  NBlock=(NAtm3-1)/6+1
+  do i=1,NBlock
+    do while(.true.)
+      read(ifchk,"(a100)",end=220,err=220)ctmp
+      if(index(ctmp,tag(1:7)) /= 0) exit
+    end do
+    iv1=(i-1)*6+1
+    iv2=min(i*6,NAtm3)
+    read(ctmp(9:),*,end=220,err=220)(SC1(j),j=iv1,iv2)
+    read(ifchk,*,end=220,err=220)
+    do j=1,NAtm3
+      read(ifchk,"(a100)",end=220,err=220)ctmp
+      read(ctmp(9:),*,end=220,err=220)(SC2(j,k),k=iv1,iv2)
+    end do
   end do
-  iv1=(i-1)*6+1
-  iv2=min(i*6,NAtm3)
-  read(ctmp(9:),*,end=220,err=220)(SC1(j),j=iv1,iv2)
-  read(ifchk,*,end=220,err=220)
-  do j=1,NAtm3
-    read(ifchk,"(a100)",end=220,err=220)ctmp
-    read(ctmp(9:),*,end=220,err=220)(SC2(j,k),k=iv1,iv2)
-  end do
-end do
 ! cm-1 --> a.u.
-call AScale(NAtm3,wn2au,SC1,SC1)
+  call AScale(NAtm3,wn2au,SC1,SC1)
 ! normal modes: mass-unweighting and renormalization
-do i=1,NAtm3
-  do j=1,NAtm3
-    ja=(j-1)/3+1
-    SC2(j,i)=SC2(j,i)/sqrt(AMass(ja))
+  do i=1,NAtm3
+    do j=1,NAtm3
+      ja=(j-1)/3+1
+      SC2(j,i)=SC2(j,i)/sqrt(AMass(ja))
+    end do
+    X = dotx(NAtm3,SC2(1,i),SC2(1,i))
+    X = One/sqrt(X)
+    call AScale(NAtm3,X,SC2(1,i),SC2(1,i))
   end do
-  X = dotx(NAtm3,SC2(1,i),SC2(1,i))
-  X = One/sqrt(X)
-  call AScale(NAtm3,X,SC2(1,i),SC2(1,i))
-end do
 
 ! calculate force constant matrix --> FFX
-call Frq2FFX(NAtm3,NAtm3,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+  call Frq2FFX(NAtm3,NAtm3,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+end if
 
 return
 110   call XError(Intact,"Please check Cartesian coordinates!")
@@ -2682,13 +2821,13 @@ end
 ! APT is not available at present.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdJaguar(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
+subroutine RdJaguar(ifchk,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
 parameter(One=1.d0,ang2au=One/0.52917720859d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*53 :: tag
-logical :: Intact
+logical :: Intact,IfFXX
 
 NAtm3 = NAtm * 3
 NCol = 6
@@ -2743,66 +2882,68 @@ end do
 ! the most abundant isotopic masses are assumed
 300   if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
+if(IfFXX) then
 ! generate rot. + trans. modes
 ! center of mass ---> WORK; XYZ in CMCS --> Sc1
-call MassCent(NAtm,AMass,XYZ,SC1,WORK)
+  call MassCent(NAtm,AMass,XYZ,SC1,WORK)
 ! principal moment of inertia; Eigenvector --> Sc3(1:9)
-call MIner(.False.,NAtm,AMass,Sc1,Sc3,Sc3(10),WORK)
+  call MIner(.False.,NAtm,AMass,Sc1,Sc3,Sc3(10),WORK)
 ! generate m.w. vectors of translations and rotations --> WORK
-call TRVec(.False.,NAtm,NTR,Imiss,AMass,Sc1,WORK,Sc3,Sc2)
-NVib = NAtm3 - NTR
+  call TRVec(.False.,NAtm,NTR,Imiss,AMass,Sc1,WORK,Sc3,Sc2)
+  NVib = NAtm3 - NTR
 ! save NTR rot. & trans. modes to SC2(:,Nvib+1:)
-call ACopy(NAtm3*NTR,WORK,SC2(1,NVib+1))
+  call ACopy(NAtm3*NTR,WORK,SC2(1,NVib+1))
 
 ! read NVib frequencies and normal modes --> SC1 and SC2
-call CClear(53,tag)
-tag='normal modes in cartesian coordinates:'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=310,err=310)ctmp
-  if(index(ctmp,tag(1:38)) /= 0) exit
-end do
-
-call CClear(53,tag)
-tag='frequencies'
-NBlock=(NVib-1)/NCol+1
-do i=1,NBlock
-  iv1=(i-1)*NCol+1
-  iv2=min(i*NCol,NVib)
+  call CClear(53,tag)
+  tag='normal modes in cartesian coordinates:'
+  rewind(ifchk)
   do while(.true.)
-    read(ifchk,"(a100)",end=320,err=320)ctmp
-    ibgn = index(ctmp,tag(1:11))
-    if(ibgn /= 0) then
-      read(ctmp(ibgn+11:),*,end=320,err=320)(SC1(j),j=iv1,iv2)
-    else if(index(ctmp,"X") /= 0) then
-      exit
-    end if
+    read(ifchk,"(a100)",end=310,err=310)ctmp
+    if(index(ctmp,tag(1:38)) /= 0) exit
   end do
-  read(ctmp(15:),*,end=320,err=320)(SC2(1,k),k=iv1,iv2)
-  do j=2,NAtm3
-    read(ifchk,"(a100)",end=320,err=320)ctmp
-    read(ctmp(15:),*,end=320,err=320)(SC2(j,k),k=iv1,iv2)
+
+  call CClear(53,tag)
+  tag='frequencies'
+  NBlock=(NVib-1)/NCol+1
+  do i=1,NBlock
+    iv1=(i-1)*NCol+1
+    iv2=min(i*NCol,NVib)
+    do while(.true.)
+      read(ifchk,"(a100)",end=320,err=320)ctmp
+      ibgn = index(ctmp,tag(1:11))
+      if(ibgn /= 0) then
+        read(ctmp(ibgn+11:),*,end=320,err=320)(SC1(j),j=iv1,iv2)
+      else if(index(ctmp,"X") /= 0) then
+        exit
+      end if
+    end do
+    read(ctmp(15:),*,end=320,err=320)(SC2(1,k),k=iv1,iv2)
+    do j=2,NAtm3
+      read(ifchk,"(a100)",end=320,err=320)ctmp
+      read(ctmp(15:),*,end=320,err=320)(SC2(j,k),k=iv1,iv2)
+    end do
   end do
-end do
 ! cm-1 --> a.u.
-call AScale(NVib,wn2au,SC1,SC1)
-call AClear(NAtm3-NVib,SC1(NVib+1))
+  call AScale(NVib,wn2au,SC1,SC1)
+  call AClear(NAtm3-NVib,SC1(NVib+1))
 
 ! normal modes: mass-unweighting (R.+T. only) and renormalization
-do i=1,NAtm3
-  if(i > NVib)then
-    do j=1,NAtm3
-      ja=(j-1)/3+1
-      SC2(j,i)=SC2(j,i)/sqrt(AMass(ja))
-    end do
-  end if
-  X = dotx(NAtm3,SC2(1,i),SC2(1,i))
-  X = One/sqrt(X)
-  call AScale(NAtm3,X,SC2(1,i),SC2(1,i))
-end do
+  do i=1,NAtm3
+    if(i > NVib)then
+      do j=1,NAtm3
+        ja=(j-1)/3+1
+        SC2(j,i)=SC2(j,i)/sqrt(AMass(ja))
+      end do
+    end if
+    X = dotx(NAtm3,SC2(1,i),SC2(1,i))
+    X = One/sqrt(X)
+    call AScale(NAtm3,X,SC2(1,i),SC2(1,i))
+  end do
 
 ! calculate force constant matrix --> FFX
-call Frq2FFX(NAtm3,NAtm3,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+  call Frq2FFX(NAtm3,NAtm3,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+end if
 
 return
 110   call XError(Intact,"Please check Cartesian coordinates!")
@@ -2824,7 +2965,7 @@ parameter(One=1.d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*15 :: tag
-logical :: Intact,full3n,DoUnWt
+logical :: Intact,IfFXX,full3n,DoUnWt
 
 NAtm3 = NAtm * 3
 
@@ -2850,92 +2991,94 @@ end do
 ! calculated FFX below will be wrong!
 call MasLib(0,NAtm,AMass,ZA)
 
+if(IfFXX) then
 ! read NVib or NAtm3 frequencies in cm-1 --> SC3(1:NAtm3)
-call CClear(15,tag)
-tag='[FREQ]'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=260,err=260)ctmp
-  call charl2u(ctmp)
-  if(index(ctmp,tag(1:6)) /= 0) exit
-end do
+  call CClear(15,tag)
+  tag='[FREQ]'
+  rewind(ifchk)
+  do while(.true.)
+    read(ifchk,"(a100)",end=260,err=260)ctmp
+    call charl2u(ctmp)
+    if(index(ctmp,tag(1:6)) /= 0) exit
+  end do
 
-NFrq=0
-do i=1,NAtm3
-  read(ifchk,"(a100)",end=360,err=360)ctmp
-  if(len_trim(ctmp) == 0) exit
-  if(index(ctmp,"[") /= 0) exit
-  if(index(ctmp,"]") /= 0) exit
-  NFrq=NFrq+1
-  read(ctmp,*,end=360,err=360)SC3(NFrq)
-end do
+  NFrq=0
+  do i=1,NAtm3
+    read(ifchk,"(a100)",end=360,err=360)ctmp
+    if(len_trim(ctmp) == 0) exit
+    if(index(ctmp,"[") /= 0) exit
+    if(index(ctmp,"]") /= 0) exit
+    NFrq=NFrq+1
+    read(ctmp,*,end=360,err=360)SC3(NFrq)
+  end do
 ! cm-1 --> a.u.
-call AScale(NFrq,wn2au,SC3,SC3)
-full3n = .true.
-if(NFrq < NAtm3) full3n = .false.
+  call AScale(NFrq,wn2au,SC3,SC3)
+  full3n = .true.
+  if(NFrq < NAtm3) full3n = .false.
 
 ! generate rot. + trans. modes
-if(.not. full3n)then
-  ! center of mass ---> WORK; XYZ in CMCS --> Sc1
-  call MassCent(NAtm,AMass,XYZ,SC1,WORK)
-  ! principal moment of inertia; Eigenvector --> Sc3(NAtm3+1:NAtm3+9)
-  call MIner(.False.,NAtm,AMass,Sc1,Sc3(NAtm3+1),Sc3(NAtm3+10),WORK)
-  ! generate m.w. vectors of translations and rotations --> WORK
-  call TRVec(.False.,NAtm,NTR,Imiss,AMass,Sc1,WORK,Sc3(NAtm3+1),Sc2)
-  if(NFrq + NTR /= NAtm3) call XError(Intact,"NFrq + NTR /= NAtm3!")
-  ! save NTR rot. & trans. modes to SC2(:,NFrq+1:)
-  call ACopy(NAtm3*NTR,WORK,SC2(1,NFrq+1))
-end if
+  if(.not. full3n)then
+    ! center of mass ---> WORK; XYZ in CMCS --> Sc1
+    call MassCent(NAtm,AMass,XYZ,SC1,WORK)
+    ! principal moment of inertia; Eigenvector --> Sc3(NAtm3+1:NAtm3+9)
+    call MIner(.False.,NAtm,AMass,Sc1,Sc3(NAtm3+1),Sc3(NAtm3+10),WORK)
+    ! generate m.w. vectors of translations and rotations --> WORK
+    call TRVec(.False.,NAtm,NTR,Imiss,AMass,Sc1,WORK,Sc3(NAtm3+1),Sc2)
+    if(NFrq + NTR /= NAtm3) call XError(Intact,"NFrq + NTR /= NAtm3!")
+    ! save NTR rot. & trans. modes to SC2(:,NFrq+1:)
+    call ACopy(NAtm3*NTR,WORK,SC2(1,NFrq+1))
+  end if
 
 ! read NVib or NAtm3 normal modes --> SC2
 ! reordered frequencies --> SC1
-tag='[FR-NORM-COORD]'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=460,err=460)ctmp
-  call charl2u(ctmp)
-  if(index(ctmp,tag(1:15)) /= 0) exit
-end do
+  tag='[FR-NORM-COORD]'
+  rewind(ifchk)
+  do while(.true.)
+    read(ifchk,"(a100)",end=460,err=460)ctmp
+    call charl2u(ctmp)
+    if(index(ctmp,tag(1:15)) /= 0) exit
+  end do
 
-do i=1,NFrq
-  read(ifchk,"(a100)",end=560,err=560)ctmp
-  read(ctmp,*,end=560,err=560)tag,ifrq
-  if(ifrq < 1 .or. ifrq > NFrq)then
-    write(*,"('  NFrq = ',i6,'  IFrq = ',i6)")NFrq,ifrq
-    call XError(Intact,"IFrq in [FR-NORM-COORD] is out of range!")
-  end if
-  SC1(i) = SC3(ifrq)
-  read(ifchk,*,end=570,err=570)(SC2(j,i),j=1,NAtm3)
-end do
+  do i=1,NFrq
+    read(ifchk,"(a100)",end=560,err=560)ctmp
+    read(ctmp,*,end=560,err=560)tag,ifrq
+    if(ifrq < 1 .or. ifrq > NFrq)then
+      write(*,"('  NFrq = ',i6,'  IFrq = ',i6)")NFrq,ifrq
+      call XError(Intact,"IFrq in [FR-NORM-COORD] is out of range!")
+    end if
+    SC1(i) = SC3(ifrq)
+    read(ifchk,*,end=570,err=570)(SC2(j,i),j=1,NAtm3)
+  end do
 ! trans. and rot. frequencies are zero
-if(.not. full3n) call AClear(NAtm3-NFrq,SC1(NFrq+1))
+  if(.not. full3n) call AClear(NAtm3-NFrq,SC1(NFrq+1))
 
 ! normal modes: do mass-unweighting (if necessary) and renormalization of R.+T. and V.
-DoUnWt = .false.
+  DoUnWt = .false.
 ! Check whether the normal modes have been mass weighted:
 ! calculate U = L^T * L; if L is mass weighted, U = I.
-call Transp(NAtm3,NFrq,SC2,SC3)
-call MMpyMF(NFrq,NAtm3,NFrq,SC3,SC2,WORK)
-call MSubI(NFrq,WORK,WORK)
-Amax=ArMax(NFrq*NFrq,i,WORK)
-Amin=ArMin(NFrq*NFrq,i,WORK)
-Amax=max(abs(Amax),abs(Amin))
-if(Amax < 1.d-4) DoUnWt = .true.
+  call Transp(NAtm3,NFrq,SC2,SC3)
+  call MMpyMF(NFrq,NAtm3,NFrq,SC3,SC2,WORK)
+  call MSubI(NFrq,WORK,WORK)
+  Amax=ArMax(NFrq*NFrq,i,WORK)
+  Amin=ArMin(NFrq*NFrq,i,WORK)
+  Amax=max(abs(Amax),abs(Amin))
+  if(Amax < 1.d-4) DoUnWt = .true.
 
-do i=1,NAtm3
-  if(i > NFrq .or. DoUnWt)then
-    do j=1,NAtm3
-      ja=(j-1)/3+1
-      SC2(j,i)=SC2(j,i)/sqrt(AMass(ja))
-    end do
-  end if
-  X = dotx(NAtm3,SC2(1,i),SC2(1,i))
-  X = One/sqrt(X)
-  call AScale(NAtm3,X,SC2(1,i),SC2(1,i))
-end do
+  do i=1,NAtm3
+    if(i > NFrq .or. DoUnWt)then
+      do j=1,NAtm3
+        ja=(j-1)/3+1
+        SC2(j,i)=SC2(j,i)/sqrt(AMass(ja))
+      end do
+    end if
+    X = dotx(NAtm3,SC2(1,i),SC2(1,i))
+    X = One/sqrt(X)
+    call AScale(NAtm3,X,SC2(1,i),SC2(1,i))
+  end do
 
 ! calculate force constant matrix --> FFX
-call Frq2FFX(NAtm3,NAtm3,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+  call Frq2FFX(NAtm3,NAtm3,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+end if
 
 return
 060   call XError(Intact,"[FR-COORD] is not found!")
@@ -2954,13 +3097,13 @@ end
 ! APT is not available at present.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdCry(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
+subroutine RdCry(ifchk,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
 parameter(One=1.d0,ang2au=One/0.52917720859d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*100 :: ctmp
 character*60 :: tag
-logical :: Intact
+logical :: Intact,IfFXX
 
 NAtm3 = NAtm * 3
 NCol = 6
@@ -3007,43 +3150,45 @@ end do
 read(ifchk,*,end=1050,err=1050)
 read(ifchk,"(4(10x,f10.4))",end=1050,err=1050)(AMass(i),i=1,NAtm)
 
+if(IfFXX) then
 ! read NAtm3 trans.+rot.+vib. frequencies and normal modes --> SC1 and SC2
-tag='MODES         EIGV          FREQUENCIES     IRREP  IR'
-do while(.true.)
-  read(ifchk,"(a100)",end=1060,err=1060)ctmp
-  if(index(ctmp,tag(1:53)) /= 0) exit
-end do
-read(ifchk,*,end=1060,err=1060)
-do i=1,NAtm3
-  read(ifchk,"(a100)",end=1065,err=1065)ctmp
-  ctmp(6:6)=" "
-  call CClear(14,ctmp(11:))
-  read(ctmp(1:100),*)i1,i2,X
-  SC1(i1:i2)=X
-  if(i2 >= NAtm3) exit
-end do
+  tag='MODES         EIGV          FREQUENCIES     IRREP  IR'
+  do while(.true.)
+    read(ifchk,"(a100)",end=1060,err=1060)ctmp
+    if(index(ctmp,tag(1:53)) /= 0) exit
+  end do
+  read(ifchk,*,end=1060,err=1060)
+  do i=1,NAtm3
+    read(ifchk,"(a100)",end=1065,err=1065)ctmp
+    ctmp(6:6)=" "
+    call CClear(14,ctmp(11:))
+    read(ctmp(1:100),*)i1,i2,X
+    SC1(i1:i2)=X
+    if(i2 >= NAtm3) exit
+  end do
 
 ! cm-1 --> a.u.
-call AScale(NAtm3,wn2au,SC1,SC1)
+  call AScale(NAtm3,wn2au,SC1,SC1)
 
-tag='NORMAL MODES NORMALIZED TO CLASSICAL AMPLITUDES'
-do while(.true.)
-  read(ifchk,"(a100)",end=1070,err=1070)ctmp
-  if(index(ctmp,tag(1:47)) /= 0) exit
-end do
-NBlock=(NAtm3-1)/NCol+1
-do i=1,NBlock
-  iv1=(i-1)*NCol+1
-  iv2=min(i*NCol,NAtm3)
-  read(ifchk,"(//)",end=1075,err=1075)
-  do j=1,NAtm3
-    read(ifchk,"(a100)",end=1075,err=1075)ctmp
-    read(ctmp(15:100),*,end=1075,err=1075)(SC2(j,k),k=iv1,iv2)
+  tag='NORMAL MODES NORMALIZED TO CLASSICAL AMPLITUDES'
+  do while(.true.)
+    read(ifchk,"(a100)",end=1070,err=1070)ctmp
+    if(index(ctmp,tag(1:47)) /= 0) exit
   end do
-end do
+  NBlock=(NAtm3-1)/NCol+1
+  do i=1,NBlock
+    iv1=(i-1)*NCol+1
+    iv2=min(i*NCol,NAtm3)
+    read(ifchk,"(//)",end=1075,err=1075)
+    do j=1,NAtm3
+      read(ifchk,"(a100)",end=1075,err=1075)ctmp
+      read(ctmp(15:100),*,end=1075,err=1075)(SC2(j,k),k=iv1,iv2)
+    end do
+  end do
 
 ! calculate force constant matrix --> FFX
-call Frq2FFX(NAtm3,NAtm3,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+  call Frq2FFX(NAtm3,NAtm3,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+end if
 
 return
 1010  call XError(Intact,"This is not a molecular calculation.")
@@ -3206,13 +3351,13 @@ end
 ! APT is not available at present.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdDMol(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
+subroutine RdDMol(ifchk,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
 character*200 :: ctmp
 character*36 :: tag
 character*3 :: Elem
-logical :: Intact,found
+logical :: Intact,IfFXX,found
 
 NAtm3 = NAtm * 3
 NCol = 9
@@ -3234,39 +3379,41 @@ do while(.true.)
   end if
 end do
 
+if(IfFXX) then
 ! read NAtm3 or Nvib frequencies (a.u.) --> SC1
-tag='vibrational frequencies, intensities'
-do while(.true.)
-  read(ifchk,"(a100)",end=1030,err=1030)ctmp
-  if(index(ctmp,tag(1:36)) /= 0) exit
-end do
-read(ifchk,*,end=1040,err=1040)
-do i=1,NAtm3
-  read(ifchk,"(a100)",end=1040,err=1040)ctmp
-  read(ctmp(1:100),*,end=1040,err=1040)Nvib,SC1(i)
-  if(Nvib == NAtm3) exit
-end do
-Nvib = i
+  tag='vibrational frequencies, intensities'
+  do while(.true.)
+    read(ifchk,"(a100)",end=1030,err=1030)ctmp
+    if(index(ctmp,tag(1:36)) /= 0) exit
+  end do
+  read(ifchk,*,end=1040,err=1040)
+  do i=1,NAtm3
+    read(ifchk,"(a100)",end=1040,err=1040)ctmp
+    read(ctmp(1:100),*,end=1040,err=1040)Nvib,SC1(i)
+    if(Nvib == NAtm3) exit
+  end do
+  Nvib = i
 
 ! read normal modes --> SC2
-tag='Frequencies (cm-1) and normal modes'
-do while(.true.)
-  read(ifchk,"(a100)",end=1050,err=1050)ctmp
-  if(index(ctmp,tag(1:36)) /= 0) exit
-end do
-NBlock=(Nvib-1)/NCol+1
-do i=1,NBlock
-  iv1=(i-1)*NCol+1
-  iv2=min(i*NCol,Nvib)
-  read(ifchk,"(/)",end=1060,err=1060)
-  do j=1,NAtm3
-    read(ifchk,"(a200)",end=1060,err=1060)ctmp
-    read(ctmp(6:200),*,end=1060,err=1060)(SC2(j,k),k=iv1,iv2)
+  tag='Frequencies (cm-1) and normal modes'
+  do while(.true.)
+    read(ifchk,"(a100)",end=1050,err=1050)ctmp
+    if(index(ctmp,tag(1:36)) /= 0) exit
   end do
-  read(ifchk,"(/)",end=1060,err=1060)
-end do
+  NBlock=(Nvib-1)/NCol+1
+  do i=1,NBlock
+    iv1=(i-1)*NCol+1
+    iv2=min(i*NCol,Nvib)
+    read(ifchk,"(/)",end=1060,err=1060)
+    do j=1,NAtm3
+      read(ifchk,"(a200)",end=1060,err=1060)ctmp
+      read(ctmp(6:200),*,end=1060,err=1060)(SC2(j,k),k=iv1,iv2)
+    end do
+    read(ifchk,"(/)",end=1060,err=1060)
+  end do
 ! trans. and rot. mode elements are zero
-if(Nvib < NAtm3) call AClear((NAtm3-Nvib)*NAtm3,SC2(1,Nvib+1))
+  if(Nvib < NAtm3) call AClear((NAtm3-Nvib)*NAtm3,SC2(1,Nvib+1))
+end if
 
 ! read atomic masses
 tag='   Zero point vibrational energy: '
@@ -3283,19 +3430,21 @@ do i=1,NAtm
   read(ctmp(j+8:),*,end=1090,err=1090)AMass(i)
 end do
 
+if(IfFXX) then
 ! normal modes: do mass-unweighting and renormalization
-do i=1,Nvib
-  do j=1,NAtm3
-    ja=(j-1)/3+1
-    SC2(j,i)=SC2(j,i)/sqrt(AMass(ja))
+  do i=1,Nvib
+    do j=1,NAtm3
+      ja=(j-1)/3+1
+      SC2(j,i)=SC2(j,i)/sqrt(AMass(ja))
+    end do
+    X = dotx(NAtm3,SC2(1,i),SC2(1,i))
+    X = 1.d0/sqrt(X)
+    call AScale(NAtm3,X,SC2(1,i),SC2(1,i))
   end do
-  X = dotx(NAtm3,SC2(1,i),SC2(1,i))
-  X = 1.d0/sqrt(X)
-  call AScale(NAtm3,X,SC2(1,i),SC2(1,i))
-end do
 
 ! calculate force constant matrix --> FFX
-call Frq2FFX(NAtm3,Nvib,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+  call Frq2FFX(NAtm3,Nvib,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+end if
 
 return
 1010  call XError(Intact,"No Cartesian coordinates found.")
@@ -3315,13 +3464,13 @@ end
 ! For analytical freq by ACES2, APT is printed, but the atoms are reordered. So APT will not be read.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdACES(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
+subroutine RdACES(ifchk,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
 parameter(One=1.d0,ang2au=One/0.52917720859d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(3,NAtm,*),SC3(*),WORK(*)
 character*200 :: ctmp
 character*98 :: tag
-logical :: Intact
+logical :: Intact,IfFXX
 
 NAtm3 = NAtm * 3
 NCol = 3
@@ -3344,66 +3493,68 @@ call AScale(NAtm3,ang2au,XYZ,XYZ)
 ! the most abundant isotopic masses are assumed
 call MasLib(0,NAtm,AMass,ZA)
 
+if(IfFXX) then
 ! read Nvib frequencies (cm-1) --> SC1
-tag='Normal Coordinate Analysis'
-do while(.true.)
-  read(ifchk,"(a100)",end=1040,err=1040)ctmp
-  if(index(ctmp,tag(1:26)) /= 0) exit
-end do
-tag='VIBRATION'
-read(ifchk,"(5/)",end=1050,err=1050)
-Nvib = 0
-do i=1,NAtm3
-  read(ifchk,"(a100)",end=1050,err=1050)ctmp
-  if(index(ctmp,tag(1:9)) /= 0) then
-    Nvib = Nvib + 1
-    if(ctmp(25:25) == "i") ctmp(25:25)= " "
-    if(ctmp(34:34) == "i") ctmp(34:34)= " "
-    read(ctmp(12:100),*,end=1050,err=1050)SC1(Nvib)
-  end if
-end do
+  tag='Normal Coordinate Analysis'
+  do while(.true.)
+    read(ifchk,"(a100)",end=1040,err=1040)ctmp
+    if(index(ctmp,tag(1:26)) /= 0) exit
+  end do
+  tag='VIBRATION'
+  read(ifchk,"(5/)",end=1050,err=1050)
+  Nvib = 0
+  do i=1,NAtm3
+    read(ifchk,"(a100)",end=1050,err=1050)ctmp
+    if(index(ctmp,tag(1:9)) /= 0) then
+      Nvib = Nvib + 1
+      if(ctmp(25:25) == "i") ctmp(25:25)= " "
+      if(ctmp(34:34) == "i") ctmp(34:34)= " "
+      read(ctmp(12:100),*,end=1050,err=1050)SC1(Nvib)
+    end if
+  end do
 ! cm-1 --> a.u.
-call AScale(NAtm3,wn2au,SC1,SC1)
+  call AScale(NAtm3,wn2au,SC1,SC1)
 
 ! read m.w. normal modes --> SC2
 ! This part doesn't work for the first column of normal modes in CFour output.
-tag='                                   Normal Coordinates'
-do while(.true.)
-  read(ifchk,"(a100)",end=1060,err=1060)ctmp
-  if(index(ctmp,tag(1:53)) /= 0) exit
-end do
-NBlock=(Nvib-1)/NCol+1
-tag='VIBRATIONX       Y       Z'
-do i=1,NBlock
-  iv1=(i-1)*NCol+1
-  iv2=min(i*NCol,Nvib)
+  tag='                                   Normal Coordinates'
   do while(.true.)
-    read(ifchk,"(a100)",end=1070,err=1070)ctmp
-    if(index(ctmp,tag(1:9)) /= 0) exit
+    read(ifchk,"(a100)",end=1060,err=1060)ctmp
+    if(index(ctmp,tag(1:53)) /= 0) exit
   end do
-  do j=1,NAtm
-    read(ifchk,"(a100)",end=1070,err=1070)ctmp
-    if(index(ctmp,tag(10:26)) /= 0) read(ifchk,"(a100)",end=1070,err=1070)ctmp
-    read(ctmp(5:100),*,end=1070,err=1070) ((SC2(ix,j,k),ix=1,3),k=iv1,iv2)
-  end do
-end do
-! trans. and rot. mode elements are zero
-if(Nvib < NAtm3)call AClear((NAtm3-Nvib)*NAtm3,SC2(1,1,Nvib+1))
-
-! normal modes: do mass-unweighting and renormalization
-do i=1,Nvib
-  do j=1,NAtm
-    do k=1,3
-      SC2(k,j,i)=SC2(k,j,i)/sqrt(AMass(j))
+  NBlock=(Nvib-1)/NCol+1
+  tag='VIBRATIONX       Y       Z'
+  do i=1,NBlock
+    iv1=(i-1)*NCol+1
+    iv2=min(i*NCol,Nvib)
+    do while(.true.)
+      read(ifchk,"(a100)",end=1070,err=1070)ctmp
+      if(index(ctmp,tag(1:9)) /= 0) exit
+    end do
+    do j=1,NAtm
+      read(ifchk,"(a100)",end=1070,err=1070)ctmp
+      if(index(ctmp,tag(10:26)) /= 0) read(ifchk,"(a100)",end=1070,err=1070)ctmp
+      read(ctmp(5:100),*,end=1070,err=1070) ((SC2(ix,j,k),ix=1,3),k=iv1,iv2)
     end do
   end do
-  X = dotx(NAtm3,SC2(1,1,i),SC2(1,1,i))
-  X = 1.d0/sqrt(X)
-  call AScale(NAtm3,X,SC2(1,1,i),SC2(1,1,i))
-end do
+! trans. and rot. mode elements are zero
+  if(Nvib < NAtm3)call AClear((NAtm3-Nvib)*NAtm3,SC2(1,1,Nvib+1))
+
+! normal modes: do mass-unweighting and renormalization
+  do i=1,Nvib
+    do j=1,NAtm
+      do k=1,3
+        SC2(k,j,i)=SC2(k,j,i)/sqrt(AMass(j))
+      end do
+    end do
+    X = dotx(NAtm3,SC2(1,1,i),SC2(1,1,i))
+    X = 1.d0/sqrt(X)
+    call AScale(NAtm3,X,SC2(1,1,i),SC2(1,1,i))
+  end do
 
 ! calculate force constant matrix --> FFX
-call Frq2FFX(NAtm3,Nvib,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+  call Frq2FFX(NAtm3,Nvib,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+end if
 
 return
 1010  call XError(Intact,"No Cartesian coordinates found.")

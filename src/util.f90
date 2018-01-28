@@ -132,6 +132,47 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
+! take the APT element(s) in the out of plane (ip=1) as the atomic IR charge
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function AIRCrg(ip,AtmAPT)
+implicit real(kind=8) (a-h,o-z)
+real(kind=8) :: AtmAPT(3,3),ip(3)
+
+AIRCrg = 0.0d0
+do i=1,3
+  if(ip(i) == 1) AIRCrg = AIRCrg + AtmAPT(i,i)
+end do
+AIRCrg = AIRCrg / dble(sum(ip))
+
+return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! check whether the molecule is planar (or linear as a special case).
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine planar(NAtm,XYZ,ip)
+implicit real(kind=8) (a-h,o-z)
+parameter(tol=1.0d-6)
+real(kind=8) :: XYZ(3,*),ip(3)
+
+ip = 0
+
+do ix = 1, 3
+  x = 0.0d0
+  do i=1,NAtm
+    x = x + abs(XYZ(ix,i))
+  end do
+  if(x <= tol) ip(ix) = 1
+end do
+
+return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
 ! distance between points a and b
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -899,7 +940,7 @@ end
 subroutine TRVec(Intact,NAtm,NTR,Imiss,AMass,XYZCM,AL,ROT,ALtmp)
 implicit real(kind=8) (a-h,o-z)
 parameter(tol=1.d-10)
-real(kind=8) :: AMass(*),XYZCM(3,*),AL(3,NAtm,*),ALtmp(3,NAtm,6),ROT(3,3)
+real(kind=8) :: AMass(*),XYZCM(3,*),AL(3,NAtm,*),ROT(3,3),ALtmp(3,NAtm,6)
 logical :: Intact
 
 NAtm3=3*NAtm
@@ -961,7 +1002,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine MIner(Intact,NAtm,AMass,XYZCM,RI,E,WORK)
 implicit real(kind=8) (a-h,o-z)
-real(kind=8) :: AMass(*),XYZCM(3,*),RI(3,3),E(*),WORK(9)
+real(kind=8) :: AMass(*),XYZCM(3,NAtm),RI(3,3),E(3),WORK(9)
 logical :: Intact
 
 call AClear(9,RI)

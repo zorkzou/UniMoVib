@@ -8,7 +8,7 @@
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 program UniMoVib
 implicit real(kind=8) (a-h,o-z)
-parameter (NOption=10, Nrslt=8, iudt=47, imdn=48, idt0=51, idt1=52, idt2=53, irep=54, iloc=55)
+parameter (NOption=18, Nrslt=8, iudt=47, imdn=48, iloc=49, idt0=51, idt1=52, idt2=53, irep=54, ibmt=55)
 dimension     :: IOP(NOption)
 character*5   :: ver
 character*12  :: dat
@@ -17,8 +17,8 @@ logical       :: Intact, ifopen
 real(kind=8),allocatable :: AMass(:), ZA(:), XYZ(:), FFx(:), APT(:), DPol(:), AL(:), Rslt(:), Scr1(:), Scr2(:), Scr3(:), &
   Scr4(:), Work(:)
 
-ver="1.1.1"
-dat="Jan 18, 2018"
+ver="1.2.0"
+dat="Jan 28, 2018"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O
@@ -49,13 +49,15 @@ call head2(iout,ver,dat)
 !    IOP(6)   0 (IFSAVE=.False.) or 1 (IFSAVE=.True.)
 !    IOP(7)   0 (IFMOLDEN=.False.), 1 (IFMOLDEN=.True.)
 !    IOP(8)   0 (IFLOCAL=.False.), 1 (IFLOCAL=.True.)
+!    IOP(9)   0 (IFRdNM=.False.), 1 (IFRdNM=.True.)
+!    IOP(10)  0 (IFApprx=.False.), NPar (IFApprx=.True.)
 !-----------------------------------------------------------------------
 call RdContrl(iinp,iout,iudt,imdn,iloc,Intact,NOption,IOP,ctmp,cname)
 
 !-----------------------------------------------------------------------
 !  4. Read $qcdata
 !-----------------------------------------------------------------------
-call RdQCDt(iinp,iout,idt0,idt1,idt2,Intact,IOP)
+call RdQCDt(iinp,iout,idt0,idt1,idt2,ibmt,Intact,IOP)
 
 !-----------------------------------------------------------------------
 ! 5. Read NAtm
@@ -68,29 +70,38 @@ call RdNAtm1(idt0,idt1,Intact,IOP,NAtm,ctmp)
 NAtm3=3*NAtm
 NSS=NAtm3*NAtm3
 NWK=2*max(NAtm3,2)*NAtm3
-allocate(AMass(NAtm), ZA(NAtm), XYZ(NAtm3), FFx(NSS), APT(NAtm3*3), DPol(NAtm3*6), AL(NSS))
-allocate(Rslt(NAtm3*Nrslt), Scr1(NSS), Scr2(NSS), Scr3(NSS), Scr4(NSS), Work(NWK))
+allocate(AMass(NAtm), ZA(NAtm), XYZ(NAtm3), FFx(NSS), APT(NAtm3*3), DPol(NAtm3*6), AL(NSS), stat=ierr)
+  if(ierr /= 0) call XError(Intact,"Insufficient Memory (1)!")
+allocate(Rslt(NAtm3*Nrslt), Scr1(NSS), Scr2(NSS), stat=ierr)
+  if(ierr /= 0) call XError(Intact,"Insufficient Memory (2)!")
+if(IOP(9) /= 1) allocate(Scr3(NSS), Scr4(NSS), Work(NWK), stat=ierr)
+  if(ierr /= 0) call XError(Intact,"Insufficient Memory (3)!")
 
 APT=0.d0
-call RdData1(iout,idt0,idt1,idt2,Intact,IOP,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Work)
+call RdData1(iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Work)
 
 ! read atomic masses from input
 call RdIsot(iinp,iout,Intact,IOP(4),NAtm,ctmp,AMass)
 
-! check data and print geometry
-if(IOP(1) /= -1) call ChkDat(iout,Intact,NAtm,AMass,ZA,XYZ)
+if(IOP(1) /= -1) then
+! check data
+  call ChkDat(iout,Intact,NAtm,AMass,ZA,XYZ)
+! print geometry and probably atomic IR charges
+  call PrtCoord(iout,Infred,NAtm,AMass,ZA,XYZ,APT)
+end if
 
 !-----------------------------------------------------------------------
 ! 7. Solve Secular equation in Cartesian coordinates
 !    Symmetry is also analyzed therein.
 !-----------------------------------------------------------------------
-call SolvSec(iinp,iout,irep,iudt,imdn,iloc,Intact,IOP,Infred,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL,Rslt, &
-  Scr1,Scr2,Scr3,Scr4,Work,Eig)
+call SolvSec(iinp,iout,idt0,irep,iudt,imdn,iloc,Intact,IOP,Infred,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL,Rslt, &
+  Scr1,Scr2,Scr3,Scr4,Work)
 
 !-----------------------------------------------------------------------
 ! xx. the last step
 !-----------------------------------------------------------------------
-deallocate(AMass, ZA, XYZ, FFx, APT, DPol, AL, Rslt, Scr1, Scr2, Scr3, Scr4, Work)
+deallocate(AMass, ZA, XYZ, FFx, APT, DPol, AL, Rslt, Scr1, Scr2)
+if(IOP(9) /= 1) deallocate(Scr3, Scr4, Work)
 
 call fdate(ctmp)
 write(*,"(//,' UniMoVib job terminated correctly! ',a)")trim(ctmp)

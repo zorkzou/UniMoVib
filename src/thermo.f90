@@ -141,11 +141,11 @@ else
   end do
   if(IFLin)then
     write(iout,"(/,' Rotational temperature',2x,f20.6,'    Kelvin')") Sc1(3,1)
-    write(iout,"(' Rotational constant',5x,f20.6,'    cm**-1')") Sc1(3,1)*cf3
+    write(iout,"(' Rotational constant',5x,f20.6,'    cm^-1')") Sc1(3,1)*cf3
     write(iout,"(25x,f20.6,'    GHz')")Sc1(3,1)*cf2
   else
     write(iout,"(/,' Rotational temperatures',1x,3f20.6,'    Kelvin')") Sc1(1:3,1)
-    write(iout,"(' Rot. constants A, B, C',2x,3f20.6,'    cm**-1')")Sc1(1:3,1)*cf3
+    write(iout,"(' Rot. constants A, B, C',2x,3f20.6,'    cm^-1')")Sc1(1:3,1)*cf3
     write(iout,"(25x,3f20.6,'    GHz')")Sc1(1:3,1)*cf2
   end if
 

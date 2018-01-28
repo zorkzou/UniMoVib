@@ -149,21 +149,23 @@ subroutine RdContrl(iinp,iout,iudt,imdn,iloc,Intact,NOp,IOP,qcprog,cname)
 implicit real(kind=8) (a-h,o-z)
 parameter(NProg=26)
 dimension :: IOP(NOp)
-logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal
-namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal
+logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx
+namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx
 character*200 :: qcprog, cname
 character*9,allocatable  :: DATFMT(:)
 
 IOP=0
 ! default values
-qcprog= 'GAUSSIAN'
-Isotop= 0
-ISyTol= 0
-ifconc= .false.
-ifexp = .false.
-ifsave= .false.
+qcprog   = 'GAUSSIAN'
+Isotop   = 0
+ISyTol   = 0
+IApprox  = 0
+ifconc   = .false.
+ifexp    = .false.
+ifsave   = .false.
 ifmolden = .false.
-iflocal = .false.
+iflocal  = .false.
+ifrdnm   = .false.
 
 rewind(iinp)
 read(iinp,Contrl,end=100,err=10)
@@ -367,6 +369,24 @@ if(iflocal)then
   if(Intact) write(*,"(' LOCALMODE file:',2x,'localmode.dat')")
 end if
 
+!>>>  ifrdnm --> IOP(9) = 0 (ifrdnm=.false.) or 1 (ifrdnm=.true.)
+if(ifrdnm) then
+! Compatibility: IFExp
+  if(IOP(3) /= 0) call XError(Intact,"IFRdNM is incompatible with IFExp=.True.!")
+! Compatibility: Isotop
+  if(IOP(4) /= 0) call XError(Intact,"IFRdNM is incompatible with Isotop!")
+! Compatibility: QCProg
+  if(IOP(1) /= 1) call XError(Intact,"At present, IFRdNM supports QCProg=Gaussian only!")
+  IOP(9) = 1
+end if
+
+!>>>  ifapprx --> IOP(10) = 0 (ifapprx=.false.) or 1 (ifapprx=.true.)
+if(ifapprx) then
+! Compatibility: ifrdnm
+  if(IOP(9) /= 0) call XError(Intact,"IFApprx is incompatible with IFRdNM!")
+  IOP(10) = 1
+end if
+
 return
 end
 
@@ -375,12 +395,12 @@ end
 ! Read $QCData group
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdQCDt(iinp,iout,idt0,idt1,idt2,Intact,IOP)
+subroutine RdQCDt(iinp,iout,idt0,idt1,idt2,ibmt,Intact,IOP)
 implicit real(kind=8) (a-h,o-z)
 dimension :: IOP(*)
 logical :: Intact
-namelist/QCData/fchk,hess,ddip,geom
-character*100 :: fchk, hess, ddip, geom
+character*100 :: fchk, hess, ddip, geom, bmat
+namelist/QCData/fchk,hess,ddip,geom,bmat
 
 ! atomic calculation
 if(IOP(1) == -1) return
@@ -389,6 +409,7 @@ fchk=' '
 hess=' '
 ddip=' '
 geom=' '
+bmat=' '
 rewind(iinp)
 read(iinp,QCData,end=100,err=10)
 goto 100
@@ -426,6 +447,10 @@ else if(IOP(1) == 10) then
   if(LEN_TRIM(ddip) == 0) ddip='dipgrad'
 ! open $(ddip)
   call DFOpen(iout,idt1,Intact,.False.,'DDIP',ddip)
+
+! IApprox: open $(bmat)
+else if(IOP(10) /= 0) then
+  call DFOpen(iout,ibmt,Intact,.True.,'BMAT',bmat)
 end if
 
 return
@@ -487,24 +512,23 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
-! check data and print geometry
+! check data
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine ChkDat(iout,Intact,NAtm,AMass,ZA,XYZ)
 implicit real(kind=8) (a-h,o-z)
-parameter(tolmass=1.d-2,tolz=0.99d0,tolr=0.5d0,au2ang=0.52917720859d0)
+parameter(tolmass=1.d-2,tolz=0.99d0,tolr=0.5d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*)
-character*3 :: Elm
 logical :: Intact
 
 ! check AMass and ZA
 do i=1,NAtm
   if(AMass(i) < tolmass)then
-    write(*,"(/,' Mass(',i3,') = ',f9.5)")i,AMass(i)
+    write(iout,"(/,' Mass(',i3,') = ',f9.5)")i,AMass(i)
     call XError(Intact,"Atomic mass is not reasonable!")
   end if
   if(ZA(i) < tolz)then
-    write(*,"(/,' Z(',i3,') = ',f5.1)")i,ZA(i)
+    write(iout,"(/,' Z(',i3,') = ',f5.1)")i,ZA(i)
     call XError(Intact,"Dummy atom is not allowed!")
   end if
 end do
@@ -514,7 +538,7 @@ do i=1,NAtm-1
   do j=i+1,NAtm
     r=distance(XYZ(1,i),XYZ(1,j))
     if(r < tolr)then
-      write(*,"(/,' R(',i3,',',i3,') = ',f6.4)")i,j,r
+      write(iout,"(/,' R(',i3,',',i3,') = ',f6.4)")i,j,r
       call XError(Intact,"Distance is too short!")
     end if
   end do
@@ -522,14 +546,47 @@ end do
 
 call RmNoise(NAtm*3,1.0d-8,XYZ)
 
-write(iout,"(//,' Cartesian coordinates (Angstrom)',/,1x,90('-'),/, &
-  3x,'No.   Atom    ZA                 X             Y             Z                Mass',/,1x,90('-'))")
-do i=1,NAtm
-  iza = nint(ZA(i))
-  call ElemZA(1,Elm,iza,Elm)
-  write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8,8x,f14.8)") i,Elm,iza,(XYZ(j,i)*au2ang,j=1,3),AMass(i)
-end do
-write(iout,"(1x,90('-'))")
+return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! print geometry and probably atomic IR charges
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine PrtCoord(iout,Infred,NAtm,AMass,ZA,XYZ,APT)
+implicit real(kind=8) (a-h,o-z)
+parameter(au2ang=0.52917720859d0)
+real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),APT(3,3,*), ip(3)
+character*3 :: Elm
+
+call planar(NAtm,XYZ,ip)
+
+if(Infred == 0 .or. sum(ip) == 0) then
+  write(iout,"(//,' Cartesian coordinates (Angstrom)',/,1x,90('-'),/,3x, &
+    'No.   Atom    ZA                 X             Y             Z                Mass',/,1x,90('-'))")
+
+  do i=1,NAtm
+    iza = nint(ZA(i))
+    call ElemZA(1,Elm,iza,Elm)
+    write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8,8x,f14.8)") i,Elm,iza,(XYZ(j,i)*au2ang,j=1,3),AMass(i)
+  end do
+
+  write(iout,"(1x,90('-'))")
+else
+  write(iout,"(//,' Cartesian coordinates (Angstrom)',/,1x,108('-'),/,3x, &
+    'No.   Atom    ZA                 X             Y             Z                Mass               IR charge',/,1x,108('-'))")
+
+  do i=1,NAtm
+    iza = nint(ZA(i))
+    Charge = AIRCrg(ip,APT(1,1,i))
+    call ElemZA(1,Elm,iza,Elm)
+    write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8,8x,f14.8,9x,f9.4)") i,Elm,iza,(XYZ(j,i)*au2ang,j=1,3),AMass(i),Charge
+  end do
+
+  write(iout,"(1x,108('-'),/,' Reference of IR charge:',/, &
+    ' A. Milani, M. Tommasini, C. Castiglioni, Theor. Chem. Acc. 131, 1139 (2012).')")
+end if
 
 return
 end

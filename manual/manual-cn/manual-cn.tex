@@ -54,9 +54,9 @@
 
 程序支持的点群列于表\ref{tab:symm}中。
 
-程序会打印两个点群，即``\verb|Point Group (Z)|''和``\verb|Point Group (Z+M)|''。二者的区别是，\\
-``\verb|Point Group (Z)|''不依赖同位素质量，而``\verb|Point Group (Z+M)|''依赖同位素质量。同位素可能会降低振动模式的对称性，因此应当用后者去分析振动模式和进行热化学计算。不过，有些量子化学程序并不是这么做的，导致无法分析振动模式的不可约表示。
-一个极端的例子是富勒烯$^{12}$C$_{59}{}^{13}$C，其几何结构和电子结构的对称性是$I_h$，而振动和转动的对称性是$C_1$。若热化学计算使用$I_h$，Gibbs自由能的误差将会达到 2.5 kcal/mol！
+程序会打印分子的两个点群对称性，即``\verb|Electronic Wavefunctions|''的点群对称性和 \\
+``\verb|Nuclear & Total Wavefunctions|''的点群对称性。二者的区别是，前者不依赖同位素质量，而后者依赖同位素质量。应当用后者去分析振动模式和进行热化学计算。不过，有些量子化学程序并不是这么做的，导致无法分析振动模式的不可约表示，并导致错误的Gibbs自由能。
+一个极端的例子是富勒烯$^{12}$C$_{59}{}^{13}$C，其电子波函的对称性是$I_h$，而核波函以及总波函的对称性是$C_1$。若热化学计算使用$I_h$，Gibbs自由能的误差将会达到 2.5 kcal/mol！
 
 \begin{table}[!htbp]
 \caption{可用的点群}\label{tab:symm}
@@ -118,7 +118,7 @@ make
 
 该输入组指定计算类型。关键词：
 
-\bigskip{}\bigskip{}
+\bigskip{}
 \verb|QCProg="XXXX"|: \verb|XXXX|是计算分子 Hessian和振动频率的量子化学程序名。支持以下程序：
 \begin{itemize}
 \item \verb|Gaussian| （默认）。
@@ -151,10 +151,7 @@ make
 \end{itemize}
 \verb|     |此外，\verb|QCProg="AtomCalc"|可用于做原子热化学计算（参见第\ref{sec:inp-atom}节）。
 
-\bigskip{}\bigskip{}
-\verb|IFConc|：（\verb|.True.|/\verb|.False.|）控制是否简明频率输出。默认：\verb|.False.|
-
-\bigskip{}\bigskip{}
+\bigskip{}
 \verb|Isotop|：设定同位素质量。
 \begin{description}
 \item[ ]\verb|  = 0|：（默认）从频率计算的数据文件读入全部原子量；若不存在，原子量从程序的数据库读取（除个别程序外，都使用最丰同位素质量）。
@@ -162,21 +159,37 @@ make
 \item[ ]\verb|  = 2|：所有的原子质量都在\verb|$IsoMas|输入组（参见第\ref{sec:inp-isomas}节）之后提供。
 \end{description}
 
-\bigskip{}\bigskip{}
-\verb|ISyTol = MN|：判断对称性的精度阈值$M*10^{N-3}$，其中M总为正数，正负号只分配给N。于是，\verb|ISyTol = 21|表示0.02，而\verb|-21|表示0.0002。默认：10，即0.001。
-
-\bigskip{}\bigskip{}
+\bigskip{}
 \verb|IFExp|：（\verb|.True.|/\verb|.False.|）用实验振动频率校正Hessian矩阵，在\verb|$ExpFrq|输入组（参见第\ref{sec:inp-expfrq}节）之后提供。默认：\verb|.False.|
 
-\bigskip{}\bigskip{}
-\verb|IFSAVE|：（\verb|.True.|/\verb|.False.|）把原子质量（受\verb|Isotop|影响），直角坐标，Hessian矩阵（受\verb|IFExp|影响），APT矩阵保存到纯文本数据文件*.umv中。该选项不能与\verb|QCProg="AtomCalc"|或\verb|"UniMoVib"|同时用。默认：\verb|.False.|。关于数据格式，参见附录\ref{sec:almfmt}。
+\bigskip{}
+\verb|IFSAVE|：（\verb|.True.|/\verb|.False.|）把原子质量（受\verb|Isotop|影响），直角坐标，Hessian矩阵（受\verb|IFExp|影响），APT矩阵保存到纯文本数据文件*.umv中。该关键词不能与\verb|QCProg="AtomCalc"|或\verb|"UniMoVib"|同时用。默认：\verb|.False.|。关于数据格式，参见附录\ref{sec:almfmt}。
 
-\bigskip{}\bigskip{}
+\bigskip{}
 \verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|或\verb|"MOLDEN"|之外，保存\textsc{Molden}文件，它可以用\href{http://www.cmbi.ru.nl/molden/molden.html}{\textsc{Molden}}或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|
 
-\bigskip{}\bigskip{}
-\verb|IFLOCAL|：（\verb|.True.|/\verb|.False.|）保存数据文件，用于\textsc{LocalModes}程序的局域模式分析（主页：\href{https://github.com/zorkzou/OpenLocalModes}{https://github.com/zorkzou/OpenLocalModes}）。该选项不能用于
+\bigskip{}
+\verb|IFLOCAL|：（\verb|.True.|/\verb|.False.|）保存数据文件，用于\textsc{LocalModes}程序的局域模式分析（主页：\href{https://github.com/zorkzou/OpenLocalModes}{https://github.com/zorkzou/OpenLocalModes}）。该关键词不能用于
 \verb|QCProg="AtomCalc"|。默认：\verb|.False.|。
+
+\subsection{专家级关键词} \label{subsec:inp-qcdata-expert}
+
+一般不需要在\texttt{\$Contrl}中设置这些关键词。
+
+\bigskip{}
+\verb|QCProg="XYZ"|：仅用于调试。
+
+\bigskip{}
+\verb|IFConc|：（\verb|.True.|/\verb|.False.|）控制是否简明频率输出。默认：\verb|.False.|
+
+\bigskip{}
+\verb|ISyTol = MN|：判断对称性的精度阈值$M*10^{N-3}$，其中M总为正数，正负号只分配给N。于是，\verb|ISyTol = 21|表示0.02，而\verb|-21|表示0.0002。默认：10，即0.001。
+
+\bigskip{}
+\verb|IFRdNM|：（\verb|.True.|/\verb|.False.|）是否从\texttt{\$QCData}输入组指定的数据文件直接读取简正模式，避免做对角化，从而节省内存并加快计算速度。若设定该关键词，不能同时用\verb|Isotop|设定同位素质量，或者用\verb|IFExp=.True.|进行振动频率校正。该关键词目前仅支持\verb|QCProg="Gaussian"|。默认：\verb|.False.|。
+
+\bigskip{}
+\verb|IFApprx|：（\verb|.True.|/\verb|.False.|）是否从外部文件读取内坐标力常数（伸缩：mDyn/\AA，角度：mDyn$\cdot$\AA/Rad$^2$）和Wilson B矩阵，并构造近似的Hessian矩阵进行简正振动频率计算。数据文件在\texttt{\$QCData}输入组指定。该关键词不能与\verb|IFRdNM=.True.|同时使用。默认：\verb|.False.|。
 
 %\newpage
 
@@ -184,6 +197,8 @@ make
 
 这一输入组指定数据文件（包含原子质量，坐标，APT，和 Hessian），用双引号括起。一般只需要一个数据文件，由选项\verb|FCHK|指定，但是对于有些程序，需要使用关键词
 \verb|HESS|，\verb|DDIP|，和/或\verb|GEOM|指定多个数据文件。
+
+若\verb|IFApprx=.True.|，构造近似Hessian矩阵的数据文件由\verb|BMAT|指定。
 
 \begin{itemize}
 \item \textsc{Gaussian}：*.fchk。默认情况下，fchk文件 不包含原子质量，于是程序假定为最丰同位素质量。但是对于\textsc{Gaussian} 09（以及更高的版本），可以用\texttt{FREQ(SaveNormalModes)}把原子质量保存到fchk文件。用关键词\texttt{FREQ(Raman)}可以保存拉曼强度计算所需的极化率导数。
@@ -306,6 +321,8 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \item[ ]\verb|  = 2|：使用依赖同位素的点群。
 \item[ ]\verb|  = "XXXX"|：直接指定点群名称，特别适用于程序不支持的高点群，例如，\verb|"D10h"|。不要忘记加上引号。
 \end{description}
+
+在以上关键词中除了\verb|Eel|以外，都会影响Gibbs自由能的结果。
 
 输入组之后是额外提供的温度（若\verb|Temp| < 0）或压强（若\verb|Press| < 0）值，每行一个数值，连续多行，直到遇到空行或输入结束为止。例如，
 \begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]

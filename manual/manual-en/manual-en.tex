@@ -116,7 +116,7 @@ Others            & $R_3$, $T$, $T_d$, $T_h$, $O$, $O_h$, $I$, $I_h$, $C_{\infty
 \end{tabular}
 \end{table}
 
-Two point groups will be printed by the program, \emph{i.e.} "\verb|Point Group (Z)|" and "\verb|Point Group (Z+M)|". \verb|Point Group (Z)| is independent of isotopic masses whereas \verb|Point Group (Z+M)| is. Isotopes may lead to lower symmetry of vibrational normal modes, so the latter point group should be used to analyze vibrations and do thermochemistry calculations. However, some quantum chemistry programs use the former symmetry, which is not correct, and therefore the \emph{irreps.} cannot be correctly analyzed. A extreme case is the fullerence $^{12}$C$_{59}{}^{13}$C, which has $I_h$ symmetry for geometry and electronic structure, but $C_1$ for vibration and rotation. If $I_h$ is used in thermochemistry calculations, the error in Gibbs free energy will be as large as 2.5 kcal/mol!
+Two point groups will be printed by the program, \emph{i.e.} the molecular point group of ``\verb|Electronic| \verb|Wavefunctions|'' and the molecular point group of ``\verb| Nuclear & Total Wavefunctions|''. The former does not depend on isotopic masses whereas the latter does. The latter point group symmetry should be used to analyze vibrations and do thermochemistry calculations. However, some quantum chemistry programs use the former symmetry by mistake, and therefore the \emph{irreps.} cannot be correctly analyzed and the Gibbs free energy may be wrong. A extreme case is the fullerence $^{12}$C$_{59}{}^{13}$C, which has $I_h$ symmetry for electronic wavefunctions, but $C_1$ for nuclear wavefunctions and total wavefunctions. If $I_h$ is used in thermochemistry calculations, the error in the Gibbs free energy will be as large as 2.5 kcal/mol!
 
 \pagebreak{}
 
@@ -236,10 +236,6 @@ least three sections: \verb|[FREQ]|, \verb|[FR-COORD]|, and \verb|[FR-NORM-COORD
 \verb|     |In addition, \verb|QCProg="AtomCalc"| will do an atomic thermochemistry calculation (see section \ref{sec:inp-atom}).
 
 \bigskip{}\bigskip{}
-\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFConc}}
-\verb|IFConc|: (\verb|.True.|/\verb|.False.|) Concise output of frequencies or not. Default: \verb|.False.|
-
-\bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{Isotop}}
 \index{{\texttt{\$IsoMas} group}@{\texttt{\$IsoMas} group}}
 \index{{Isotopic mass}@{Isotopic mass}}
@@ -254,13 +250,6 @@ replaced by the values provided after the \verb|$IsoMas| group (section \ref{sec
 \end{description}
 
 \bigskip{}\bigskip{}
-\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{ISyTol}}
-\index{{Symmetry}@{Symmetry}}
-\verb|ISyTol = MN|: the symmetry tolerance is defined by $M*10^{N-3}$ where M
-is always positive and the sign of \verb|ISyTol| will pass to N. So
-\verb|ISyTol = 21| means 0.02 whereas \verb|-21| means 0.0002. Default: 10, \emph{i.e.} the tolerance is 0.001.
-
-\bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFExp}}
 \index{{\texttt{\$ExpFrq} group}@{\texttt{\$ExpFrq} group}}
 \index{{Experimental frequency correction}@{Experimental frequency correction}}
@@ -272,7 +261,7 @@ Default: \verb|.False.|
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFSAVE}}
 \verb|IFSAVE|: (\verb|.True.|/\verb|.False.|) Save the atomic masses (affected by
 \verb|Isotop|), Cartesian coordinates, Hessian matrix (affected by
-\verb|IFExp|), and the APT matrix into a plain text data file *.umv. This option
+\verb|IFExp|), and the APT matrix into a plain text data file *.umv. This keyword
 doesn't work with \verb|QCProg="AtomCalc"| or \verb|"UniMoVib"|. Default: \verb|.False.| See Appendix \ref{sec:almfmt} for the format.
 
 \bigskip{}\bigskip{}
@@ -286,6 +275,36 @@ doesn't work with \verb|QCProg="AtomCalc"| or \verb|"UniMoVib"|. Default: \verb|
 \index{{Quantum chemistry program}@{Quantum chemistry program}!LocalModes}
 \verb|IFLOCAL|: (\verb|.True.|/\verb|.False.|) Save a data file for the local mode analysis by \textsc{LocalModes} (URL: \href{https://github.com/zorkzou/OpenLocalModes} {https://github.com/zorkzou/OpenLocalModes}). It doesn't work with \verb|QCProg="AtomCalc"|. Default: \verb|.False.|
 
+\subsubsection{Expert keywords} \label{subsec:inp-qcdata-expert}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!{Expert keywords}}
+
+Usually it is not necessary to set up the following keywords in \texttt{\$Contrl}.
+
+\bigskip{}\bigskip{}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{QCProg}}
+\verb|QCProg="XYZ"|: For debugging only.
+
+\bigskip{}\bigskip{}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFConc}}
+\verb|IFConc|: (\verb|.True.|/\verb|.False.|) Concise output of frequencies or not. Default: \verb|.False.|
+
+\bigskip{}\bigskip{}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{ISyTol}}
+\index{{Symmetry}@{Symmetry}}
+\verb|ISyTol = MN|: the symmetry tolerance is defined by $M*10^{N-3}$ where M
+is always positive and the sign of \verb|ISyTol| will pass to N. So
+\verb|ISyTol = 21| means 0.02 whereas \verb|-21| means 0.0002. Default: 10, \emph{i.e.} the tolerance is 0.001.
+
+\bigskip{}\bigskip{}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFRdNM}}
+\verb|IFRdNM|: (\verb|.True.|/\verb|.False.|) The normal modes are read directly from the data files specified in the \texttt{\$QCData} group, which may significantly save memory and speed up the calculations since the diagonalization is not performed any more. This keyword
+doesn't work with \verb|Isotop| and \verb|IFExp=.True.|. Only \verb|QCProg="Gaussian"| is supported at present. Default: \verb|.False.|
+
+\bigskip{}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFApprx}}
+\verb|IFApprx|: (\verb|.True.|/\verb|.False.|) The force constants (mDyn/\AA ~for stretchings and mDyn$\cdot$\AA/Rad$^2$ for angles) and Wilson's B-matrix of internal coordinates will be read from an external data file (specified in the \texttt{\$QCData} group), and then an approximate Hessian matrix will be constructed to calculate vibrational normal frequencies.  This keyword
+doesn't work with \verb|IFRdNM=.True.|. Default: \verb|.False.|
+
 \subsection{\texttt{\$QCData} group} \label{sec:inp-qcdata}
 \index{{\texttt{\$QCData} group}@{\texttt{\$QCData} group}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}}
@@ -296,6 +315,9 @@ only one data file is required, which is defined by the option
 \verb|FCHK|. However for some programs, multiple data files should be
 defined separately by the keywords \verb|HESS|, \verb|DDIP|, and/or
 \verb|GEOM|.
+
+\index{{\texttt{\$QCData} group}@{\texttt{\$QCData} group}!\texttt{AHESS}}
+If \verb|IFApprx=.True.|, the data file to construct an approximate Hessian matrix is specified by the keyword \verb|BMAT|.
 
 \index{{\texttt{\$QCData} group}@{\texttt{\$QCData} group}!\texttt{FCHK}}
 \index{{\texttt{\$QCData} group}@{\texttt{\$QCData} group}!\texttt{HESS}}
@@ -507,6 +529,8 @@ not correct.
 \item[ ]\verb|  = 2|: use the isotope dependent point group.
 \item[ ]\verb|  = "XXXX"|: specify the name of point group, which is useful for the high symmetry not supported by the program, for example, \verb|"D10h"|. Don't forget the quotes.
 \end{description}
+
+Gibbs free energy may be affected by all of the above keywords except \verb|Eel|.
 
 If \verb|Temp| < 0 or \verb|Press| < 0, a list of additional temperatures or pressures will be provided. One value per line. The program will
 read the values until a blank line or the end is encountered.

@@ -89,9 +89,10 @@ do igp=1,2
    nclass,nirred,PGNAME(igp),CORE(IJX),CORE(IJY),CORE(IGRP),CORE(ISC1),CORE(ISC2))
 
   if(igp == 1) then
-    write(iout,"(//,1x,'<<< SYMMETRY >>>',/,' Molecular Point Group (Z)   :   ',A4)") PGNAME(igp)
+    write(iout,"(//,1x,'<<< POINT GROUP SYMMETRY >>>')")
+    write(iout,"(' Electronic Wavefunctions      :  ',A4)") PGNAME(igp)
   else
-    write(iout,"(' Molecular Point Group (Z+M) :   ',A4)") PGNAME(igp)
+    write(iout,"(' Nuclear & Total Wavefunctions :  ',A4)") PGNAME(igp)
   end if
 end do
 
