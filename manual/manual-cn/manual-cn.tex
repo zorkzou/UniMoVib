@@ -8,12 +8,12 @@
 \title{
 \vspace{-3cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\
-\vspace{1cm} \zihao{3}（1.1.0版）\vspace{30 mm} \\
+\vspace{1cm} \zihao{3}（1.2.0版）\vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm}}
 
 \author{
 \textbf{邹文利} \\ \vspace{5mm}
-西北大学现代物理研究所，西安，710069 \\ \vspace{5mm}
+西北大学现代物理研究所，西安，710127 \\ \vspace{5mm}
 \href{mailto:qcband@gmail.com}{qcband@gmail.com}
 }
 
@@ -34,7 +34,7 @@
 \chapter{关于\textsc{UniMoVib}}
 \label{part:about}
 
-\textsc{UniMoVib}是进行分子振动频率计算的统一接口。程序是我于2014至2015年在达拉斯和加里敦期间用 Fortran 77编写，作为分子局域模式程序\textsc{Localmodes}（\href{https://sites.smu.edu/dedman/catco/}{CATCO小组}，SMU）的前端接口，不过程序的雏形早在2009年于 UT Austin时就开始了。
+\textsc{UniMoVib}是进行分子振动频率计算的统一接口。程序最初是我于2014至2015年在德州达拉斯市的南方卫理会大学期间用 FORTRAN 77编写，用作\href{https://sites.smu.edu/dedman/catco/}{CATCO小组}的分子局域模式程序\href{https://github.com/catco-smu}{\textsc{LocalMode}}的前端接口。本项工作得到美国NSF项目CHE 1152357和CHE 1464906的支持，并得到已故 的Dieter Cremer教授的鼎力支持和指导。
 从2017年春天开始，\textsc{UniMoVib}用Fortran 90重新改写，作为独立程序发布。
 
 \section{功能} \label{sec:feature}
@@ -169,7 +169,7 @@ make
 \verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|或\verb|"MOLDEN"|之外，保存\textsc{Molden}文件，它可以用\href{http://www.cmbi.ru.nl/molden/molden.html}{\textsc{Molden}}或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|
 
 \bigskip{}
-\verb|IFLOCAL|：（\verb|.True.|/\verb|.False.|）保存数据文件，用于\textsc{LocalModes}程序的局域模式分析（主页：\href{https://github.com/zorkzou/OpenLocalModes}{https://github.com/zorkzou/OpenLocalModes}）。该关键词不能用于
+\verb|IFLOCAL|：（\verb|.True.|/\verb|.False.|）保存数据文件，用于\textsc{LocalModes}程序的局域模式分析（主页：\href{https://github.com/catco-smu}{https://github.com/catco-smu}）。该关键词不能用于
 \verb|QCProg="AtomCalc"|。默认：\verb|.False.|。
 
 \subsection{专家级关键词} \label{subsec:inp-qcdata-expert}

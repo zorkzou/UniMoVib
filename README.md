@@ -17,7 +17,7 @@ Version 1.2.0 (Jan/28/2018).
 5. Save a Molden file for animation of normal modes.
 6. Set up isotopic masses, temperature, pressure, scale factor and/or experimental frequencies, and so on.
 7. Can be used as a third party module for frequency and thermochemistry calculations in a quantum chemistry program.
-8. Interface to [LocalModes](https://github.com/zorkzou/OpenLocalModes) for the local mode analysis (e.g. force constants of chemical bonds, bond angles, and so on).
+8. Interface to [LocalModes](https://github.com/catco-smu) for the local mode analysis (e.g. force constants of chemical bonds, bond angles, and so on).
 
 ### To be done:
 
