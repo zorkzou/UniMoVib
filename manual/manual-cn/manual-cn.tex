@@ -542,16 +542,17 @@ return
 end
 \end{lstlisting}\end{colorboxed}
 \begin{enumerate}
-\item[2] 读取原子单位的直角坐标（\verb|XYZ|），原子核电荷数（\verb|ZA|），原子单位的原子量或同位素质量（\verb|AMass|；可选），原子单位的直角坐标力常数矩阵（\verb|FFx|，必须是未做质量加权的对称方阵），以及原子单位的偶极矩梯度（也叫做原子极化张量APT，\verb|APT|；可选）。该子例程在\verb|subroutine RdData1|中调用。例如：
+\item[2] 读取原子单位的直角坐标（\verb|XYZ|），原子核电荷数（\verb|ZA|），原子单位的原子量或同位素质量（\verb|AMass|；可选），原子单位的直角坐标力常数矩阵（\verb|FFx|，必须是未做质量加权的对称方阵），原子单位的偶极矩梯度（即原子极化张量，\verb|APT|；可选），以及原子单位的极化率导数（\verb|DPol|；可选）。该子例程在\verb|subroutine RdData1|中调用。例如：
 \end{enumerate}
 \begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
 \begin{lstlisting}[language={[90]Fortran}]
 !-----------------------------------------------------------------------
 ! Read data from XXXX output
 !-----------------------------------------------------------------------
-subroutine RdXXXX(ifchk,tag,ctmp,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdXXXX(ifchk,tag,ctmp,NAtm,AMass,ZA,XYZ,FFx,APT,DPol)
 implicit real(kind=8) (a-h,o-z)
-real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(3,NAtm),FFx(3*NAtm,3*NAtm),APT(3,3*NAtm)
+real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(3,NAtm),FFx(3*NAtm,3*NAtm), &
+  APT(3,3*NAtm),DPol(6,3*NAtm)
 character*100 :: ctmp
 character*100 :: tag
 (...)

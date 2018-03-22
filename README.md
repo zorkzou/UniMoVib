@@ -1,5 +1,7 @@
 # UniMoVib
-A unified interface for molecular harmonic vibrational frequency calculations. It was initially written in Fortran 77 during 2014 and 2015, but its ancient predecessor has been started since 2009. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
+A unified interface for molecular harmonic vibrational frequency calculations.
+
+The UniMoVib programs were originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas,Texas, within the framework of the LocalMode program of the Computational and Theoretical Chemistry Group (CATCO} of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
 
 ## Latest Version
 Version 1.2.0 (Jan/28/2018).
@@ -19,7 +21,7 @@ Version 1.2.0 (Jan/28/2018).
 7. Can be used as a third party module for frequency and thermochemistry calculations in a quantum chemistry program.
 8. Interface to [LocalModes](https://github.com/catco-smu) for the local mode analysis (e.g. force constants of chemical bonds, bond angles, and so on).
 
-### To be done:
+### To be done
 
 1. An interface between UniMoVib and the quantum chemistry program [BDF](http://182.92.69.169:7226/).
 2. Symmetrize normal modes for open-shell systems.

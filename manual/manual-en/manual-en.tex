@@ -294,7 +294,7 @@ Usually it is not necessary to set up the following keywords in \texttt{\$Contrl
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{ISyTol}}
 \index{{Symmetry}@{Symmetry}}
 \verb|ISyTol = MN|: the symmetry tolerance is defined by $M*10^{N-3}$ where M
-is always positive and the sign of \verb|ISyTol| will pass to N. So
+is always positive and the sign of \verb|ISyTol| will be assigned to N. So
 \verb|ISyTol = 21| means 0.02 whereas \verb|-21| means 0.0002. Default: 10, \emph{i.e.} the tolerance is 0.001.
 
 \bigskip{}\bigskip{}
@@ -303,6 +303,7 @@ is always positive and the sign of \verb|ISyTol| will pass to N. So
 doesn't work with \verb|Isotop| and \verb|IFExp=.True.|. Only \verb|QCProg="Gaussian"| is supported at present. Default: \verb|.False.|
 
 \bigskip{}
+\index{{Approximate Hessian}@{Approximate Hessian}}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFApprx}}
 \verb|IFApprx|: (\verb|.True.|/\verb|.False.|) The force constants (mDyn/\AA ~for stretchings and mDyn$\cdot$\AA/Rad$^2$ for angles) and Wilson's B-matrix of internal coordinates will be read from an external data file (specified in the \texttt{\$QCData} group), and then an approximate Hessian matrix will be constructed to calculate vibrational normal frequencies.  This keyword
 doesn't work with \verb|IFRdNM=.True.|. Default: \verb|.False.|
@@ -318,7 +319,8 @@ only one data file is required, which is defined by the option
 defined separately by the keywords \verb|HESS|, \verb|DDIP|, and/or
 \verb|GEOM|.
 
-\index{{\texttt{\$QCData} group}@{\texttt{\$QCData} group}!\texttt{AHESS}}
+\index{{Approximate Hessian}@{Approximate Hessian}}
+\index{{\texttt{\$QCData} group}@{\texttt{\$QCData} group}!\texttt{BMAT}}
 If \verb|IFApprx=.True.|, the data file to construct an approximate Hessian matrix is specified by the keyword \verb|BMAT|.
 
 \index{{\texttt{\$QCData} group}@{\texttt{\$QCData} group}!\texttt{FCHK}}
@@ -634,7 +636,7 @@ a test job
  $end
 \end{Verbatim}
 
-\subsection{Calculate ``experimental'' frequencies of HDO} \label{sec:exp4}
+\subsection{Calculation of the ``experimental'' frequencies of HDO} \label{sec:exp4}
 \index{{Example}@{Example}!{``Experimental'' frequencies of HDO}}
 \index{{UniMoVib format}@{UniMoVib format}}
 
@@ -786,15 +788,17 @@ end
 \end{lstlisting}
 
 \item Read in Cartesian coordinates in \emph{a.u.} (\verb|XYZ|), atomic nuclear charge number (\verb|ZA|), atomic or isotopic masses in \emph{a.u.} (\verb|AMass|; optional), Cartesian force constant matrix in \emph{a.u.}
-(\verb|FFx|; a mass-unweighted square matrix), and dipole moment gradient (\emph{i.e.} atomic polar tensor; APT) in \emph{a.u.}
-(\verb|APT|; optional). This subroutine is called in \verb|subroutine RdData1| . Example:
+(\verb|FFx|; a mass-unweighted square matrix), dipole moment gradient (\emph{i.e.} atomic polar tensor; APT) in \emph{a.u.}
+(\verb|APT|; optional), and polarizability derivatives in \emph{a.u.}
+(\verb|DPol|; optional). This subroutine is called in \verb|subroutine RdData1| . Example:
 \begin{lstlisting}[language={[90]Fortran}]
 !-----------------------------------------------------------------------
 ! Read data from XXXX output
 !-----------------------------------------------------------------------
-subroutine RdXXXX(ifchk,tag,ctmp,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdXXXX(ifchk,tag,ctmp,NAtm,AMass,ZA,XYZ,FFx,APT,DPol)
 implicit real(kind=8) (a-h,o-z)
-real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(3,NAtm),FFx(3*NAtm,3*NAtm),APT(3,3*NAtm)
+real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(3,NAtm),FFx(3*NAtm,3*NAtm), &
+  APT(3,3*NAtm),DPol(6,3*NAtm)
 character*100 :: ctmp
 character*100 :: tag
 (...)
