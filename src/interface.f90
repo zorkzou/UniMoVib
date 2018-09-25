@@ -177,6 +177,9 @@ end
 !
 ! Read Q.C. data
 !
+!   IfFXX = .true.  : since Hessian is missing in the data file, construct Hessian from normal modes and normal frequencies
+!   IfFXX = .false. : do not read Hessian, and an approximate Hessian will be constructed later (for expert only!)
+!
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdData1(iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Scr4)
 implicit real(kind=8) (a-h,o-z)
@@ -2959,7 +2962,7 @@ end
 ! The normal mode can be mass-unweighted or mass-weighted, which will be detected by the program.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdMOLDEN(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
+subroutine RdMOLDEN(ifchk,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
 implicit real(kind=8) (a-h,o-z)
 parameter(One=1.d0,wn2au=One/5140.48714376d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),SC1(*),SC2(NAtm*3,*),SC3(*),WORK(*)
