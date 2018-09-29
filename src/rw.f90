@@ -145,12 +145,12 @@ end
 !
 ! (*) For debugging only.
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdContrl(iinp,iout,iudt,imdn,iloc,Intact,NOp,IOP,qcprog,cname)
+subroutine RdContrl(iinp,iout,iudt,imdn,iloc,igau,Intact,NOp,IOP,qcprog,cname)
 implicit real(kind=8) (a-h,o-z)
 parameter(NProg=26)
 dimension :: IOP(NOp)
-logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx
-namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx
+logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts
+namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts
 character*200 :: qcprog, cname
 character*9,allocatable  :: DATFMT(:)
 
@@ -166,6 +166,8 @@ ifsave   = .false.
 ifmolden = .false.
 iflocal  = .false.
 ifrdnm   = .false.
+ifapprx  = .false.
+ifgauts  = .false.
 
 rewind(iinp)
 read(iinp,Contrl,end=100,err=10)
@@ -385,6 +387,14 @@ if(ifapprx) then
 ! Compatibility: ifrdnm
   if(IOP(9) /= 0) call XError(Intact,"IFApprx is incompatible with IFRdNM!")
   IOP(10) = 1
+end if
+
+!>>>  ifgauts --> IOP(11) = 0 (ifgauts=.false.) or 1 (ifgauts=.true.)
+if(ifgauts) then
+  IOP(11) = 1
+  open(igau,file='gaussian-ts.gjf')
+  write(iout,"(' TS input file:',3x,'gaussian-ts.gjf')")
+  if(Intact) write(*,"(' TS input file:',3x,'gaussian-ts.gjf')")
 end if
 
 return

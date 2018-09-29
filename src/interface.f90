@@ -3766,5 +3766,57 @@ write(imdn,"(/)")
 return
 end
 
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Save a templet of Gaussian's gjf for TS optimization.
+!
+! This gjf doesn't work for ONIOM since redundant internal coordinates are always used.
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine SavGJF(igau,NAtm,NAtm3,NVib,ifreq,Rslt,XYZ,ZA,AMass,FFx,AL,Scr1,Scr2,WORK,EIG)
+implicit real(kind=8) (a-h,o-z)
+parameter(au2ang=0.52917720859d0)
+real(kind=8) :: Rslt(NAtm3,*),ZA(NAtm),AMass(NAtm),XYZ(3,NAtm),FFX(*),AL(*),Scr1(*),Scr2(*),WORK(*),EIG(*)
+character*3 :: Elm
+
+ write(igau,"('%mem=2GB')")
+ write(igau,"('%nprocshared=2')")
+ write(igau,"('#p b3lyp/genecp iop(1/10=1) opt(ts,ReadFC,cartesian,noeigentest)')")
+ write(igau,"(/,'This is a templet for TS optimization. Do not use it for ONIOM!',/)")
+
+ totel=sum(ZA)
+ amaxz=ArMax(NAtm,i,ZA)
+ NTT = NAtm3 * (NAtm3+1) / 2
+
+ if(mod(nint(totel),2) .eq. 0) then
+   write(igau,"('0  1')")
+ else
+   write(igau,"('0  2')")
+ end if
+
+! print Cartesian coordinates
+ do i=1,NAtm
+   call ElemZA(1,Elm,nint(ZA(i)),Elm)
+   write(igau,"(1x,a3,4x,3f14.8)") Elm,(XYZ(j,i)*au2ang,j=1,3)
+ end do
+ write(igau,*)
+
+! print Hessian
+ if(ifreq .eq. 0) then
+   call Sq2Tr(NAtm,FFx,Scr2)
+ else
+   ! calculate experimentally corrected force constant matrix --> Scr1
+   call Frq2FFX(NAtm3,NVib,AMass,Rslt(1,5),AL,Scr1,Scr2,WORK,EIG)
+   call Sq2Tr(NAtm,Scr1,Scr2)
+ end if
+ write(igau,"(8f10.6)")Scr2(1:NTT)
+
+! print basis set
+ call ElemZA(1,Elm,nint(amaxz),Elm)
+ write(igau,"(a3,' 0',/,'sdd',/,'****',//,a3,' 0',/,'sdd',////)")Elm,Elm
+
+return
+end
+
 !--- END
 

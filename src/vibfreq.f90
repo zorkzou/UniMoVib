@@ -3,8 +3,8 @@
 ! Solve Secular equation in Cartesian coordinates
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SolvSec(iinp,iout,idt0,irep,iudt,imdn,iloc,Intact,IOP,Infred,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL,Rslt, &
-  Scr1,Scr2,Scr3,Scr4,Work)
+subroutine SolvSec(iinp,iout,idt0,irep,iudt,imdn,iloc,igau,Intact,IOP,Infred,IRaman,NAtm,NVib,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,AL, &
+  Rslt,Scr1,Scr2,Scr3,Scr4,Work)
 implicit real(kind=8) (a-h,o-z)
 dimension :: IOP(*),AMass(*),ZA(*),XYZ(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),Scr1(*),Scr2(*),Scr3(*),Scr4(*),Work(*)
 character*4 :: PGNAME(2)
@@ -62,6 +62,9 @@ if(IOP(7) == 1) call SavMDN(imdn,NAtm,NAtm3,NVib,ZA,XYZ,IOP(3),AL,Rslt)
 
 ! save localmode.dat (part II)
 if(IOP(8) == 1) call SavLOC(iloc,irep,NAtm3,IOP(3),Rslt,PGNAME,ctmp)
+
+! save gjf for TS optimization
+if(IOP(11)== 1) call SavGJF(igau,NAtm,NAtm3,NVib,IOP(3),Rslt,XYZ,ZA,AMass,FFx,AL,Scr2,Scr3,WORK,Scr4)
 
 1000  continue
 ! Thermochemistry calculation. Frequencies are saved in Rslt(1:NVib,3/5) in a.u.

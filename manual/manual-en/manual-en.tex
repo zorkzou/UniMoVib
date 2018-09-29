@@ -53,7 +53,7 @@
 \begin{document}
 
 \title{User's Guide of the Program \textsc{UniMoVib} \\
-\vspace{10 mm} (Ver. 1.2.0) \vspace{30 mm} \\
+\vspace{10 mm} (Ver. 1.2.1) \vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm} }
 
 \date{\today}
@@ -66,7 +66,7 @@
 \thispagestyle{empty}
 
 \begin{center}
-\emph{Institute of Modern Physics, Northwest University, Xi'an, China}
+\emph{Institute of Modern Physics, Northwest University, Xi'an, Shaanxi, China}
 \end{center}
 
 \pagebreak{}
@@ -278,6 +278,12 @@ doesn't work with \verb|QCProg="AtomCalc"| or \verb|"UniMoVib"|. Default: \verb|
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFLOCAL}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!LocalModes}
 \verb|IFLOCAL|: (\verb|.True.|/\verb|.False.|) Save a data file for the local mode analysis by \textsc{LocalModes} (URL: \href{https://github.com/catco-smu}{https://github.com/catco-smu}). It doesn't work with \verb|QCProg="AtomCalc"|. Default: \verb|.False.|
+
+\bigskip{}\bigskip{}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFGauTS}}
+\index{{Quantum chemistry program}@{Quantum chemistry program}!Gaussian}
+\verb|IFGauTS|: (\verb|.True.|/\verb|.False.|) Save a templet input file for \textsc{Gaussian} with Cartesian coordinates and Hessian, which (after some modifications) may be used for the calculaion of transition state optimization. It doesn't work with \verb|QCProg="AtomCalc"|. Default: \verb|.False.| \\
+Since the ONIOM method in \textsc{Gaussian} uses redundant coordinates only, this templet doesn't work in this case.
 
 \subsubsection{Expert keywords} \label{subsec:inp-qcdata-expert}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!{Expert keywords}}
