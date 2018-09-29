@@ -4,11 +4,10 @@ A unified interface for molecular harmonic vibrational frequency calculations.
 The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas, Texas, within the framework of the LocalMode program of the Computational and Theoretical Chemistry Group (CATCO} of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
 
 ## Latest Version
-Version 1.2.0 (Jan/28/2018).
+Version 1.2.1 (Sep/30/2018).
 
-1. Calculate atomic IR charges of planar and linear molecules. Reference: A. Milani, M. Tommasini, C. Castiglioni, [Theor. Chem. Acc. 131, 1139 (2012)](https://rd.springer.com/article/10.1007/s00214-012-1139-5).
-2. Read vibrational normal modes directly from the data file (Gaussian only). It can significantly save memory and speed up the calculation for big molecules.
-3. Construct an approximate Hessian matrix from the force constants & Wilson's B-matrices of internal coordinates.
+1. Save a templet input file for Gaussian, which may be used for the calculaion of transition state optimization.
+2. Bug fix.
 
 ## Features
 
