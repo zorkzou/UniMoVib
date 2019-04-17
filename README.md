@@ -29,7 +29,7 @@ Version 1.2.2 (Apr/17/2019).
 
 * [Aces](http://www.qtp.ufl.edu/ACES/)
 * [Adf](http://www.scm.com/)
-* `Ampac` 2.x. See [Semichem, Inc.](http://www.semichem.com/)
+* Ampac 2.x. See [Semichem, Inc.](http://www.semichem.com/)
 * [Amsol](http://comp.chem.umn.edu/amsol/)
 * [CFour](http://www.cfour.de/)
 * [Columbus](http://www.univie.ac.at/columbus/)
@@ -49,7 +49,7 @@ Version 1.2.2 (Apr/17/2019).
 * [Molcas](http://www.molcas.org/) and [OpenMolcas](https://gitlab.com/Molcas/OpenMolcas)
 * [Molden](http://www.cmbi.ru.nl/molden/molden.html)
 * [Molpro](http://www.molpro.net/)
-* [Mopac](http://openmopac.net/). See also `Mo-g` in [Scigress](http://www.scigress.com/)
+* [Mopac](http://openmopac.net/). See also Mo-g in [Scigress](http://www.scigress.com/)
 * [NWChem](http://www.nwchem-sw.org/index.php/Main_Page)
 * [Orca](https://orcaforum.kofo.mpg.de)
 * [Pqs](http://www.pqs-chem.com/)
