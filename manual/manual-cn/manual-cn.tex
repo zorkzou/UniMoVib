@@ -8,7 +8,7 @@
 \title{
 \vspace{-3cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\
-\vspace{1cm} \zihao{3}（1.2.1版）\vspace{30 mm} \\
+\vspace{1cm} \zihao{3}（1.2.2版）\vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm}}
 
 \author{
@@ -44,7 +44,7 @@
 目前已经支持近30个量子化学程序（参见第\ref{sec:inp-contrl}节），尽管有些程序可能自己做得更好。
 \item 分析结构的最高点群以及简正振动模式的不可约表示(\emph{irreps.})。（\emph{irreps.}：仅闭壳层分子。） \\
 对称性分析基于\textsc{Mopac} 7.1程序包中的对称性子程序，\textsc{Mopac} 7.1的源代码已经开放，不受版权限制（参见\href{http://openmopac.net/Downloads/Downloads.html}{openmopac.net} and \href{https://sourceforge.net/projects/mopac7/}{sourceforge.net}）。
-\item 使用最高点群做热化学计算，并打印 Gaussian风格的热化学计算结果（详细解释，参见： Foresman and Frisch, \emph{Exploring Chemistry With Electronic Structure Methods}, Ed.2, Gaussian Inc., Pittsburgh, PA, \textbf{1996}, pp.66）。
+\item 使用最高点群做热化学计算，并打印 Gaussian风格的热化学计算结果（详细解释，参见： Foresman and Frisch, \emph{Exploring Chemistry With Electronic Structure Methods}, Ed.2, Gaussian Inc., Pittsburgh, PA, \textbf{1996}, p.66）。
 \item 保存\textsc{Molden}文件，用于动画显示振动模式。
 \item 设定同位素，温度，压强，频率换算因子或实验频率，等。
 \item 可作为量子化学程序（尤其是不支持非阿贝尔点群的程序）的第三方模块，用于频率和热化学计算。
@@ -119,7 +119,7 @@ make
 该输入组指定计算类型。关键词：
 
 \bigskip{}
-\verb|QCProg="XXXX"|: \verb|XXXX|是计算分子 Hessian和振动频率的量子化学程序名。支持以下程序：
+\verb|QCProg="XXXX"|: \verb|XXXX|是产生 Hessian和振动频率的量子化学程序名或数据格式。支持以下程序/格式：
 \begin{itemize}
 \item \verb|Gaussian| （默认）。
 \item \verb|GAMESS| （同义词：\verb|GAMESS-US|，\verb|GAMESSUS|）。
@@ -147,7 +147,7 @@ make
 \item \verb|PSI|。仅对\textsc{Psi} 4进行了测试。
 \item \verb|DMOL3| （同义词：\verb|DMOL|）。仅支持分子的谐振频率计算。
 \item \verb|ACES|。对\textsc{Aces-II}和\textsc{Aces-III}都进行了测试。
-\item \verb|UniMoVib| （同义词：\verb|ALM|）。\textsc{UniMoVib}产生的纯文本数据文件。参见附录\ref{sec:almfmt}。
+\item \verb|UniMoVib| （同义词：\verb|ALM|）。\textsc{UniMoVib}或第三方程序产生的纯文本数据文件。参见附录\ref{sec:almfmt}。
 \end{itemize}
 \verb|     |此外，\verb|QCProg="AtomCalc"|可用于做原子热化学计算（参见第\ref{sec:inp-atom}节）。
 
@@ -503,7 +503,7 @@ real experimental frequencies:      1402  2727  3707 cm-1
 \section{UniMoVib数据文件格式} \label{sec:almfmt}
 
 UniMoVib数据文件是纯文本自由格式。 \\
-1.0.1版(2017.10.15)
+1.0.2版(2019.04.17)
 \begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
 \ttfamily
 \begin{lstlisting}
@@ -523,8 +523,10 @@ APT
 DPR
   （6*3NATM，极化率导数数据值；若以9*3NATM格式给出，改用DPRSQ；
   若不提供 DPR数据，改用 NODPR）
+GRD
+  （3*NATM，直角坐标下的梯度数组；若不提供梯度，改用 NOGRD）
 \end{lstlisting}\end{colorboxed}
-目前\verb|DPR|数据和拉曼强度仅支持Gaussian产生的fchk文件。
+目前\verb|DPR|数据和拉曼强度仅支持Gaussian产生的fchk文件。\verb|GRD|数据仅用于某些外部程序（如\textsc{LocalModes}）。
 
 \section{开发人员：到其它量子化学程序的接口} \label{sec:interface}
 

@@ -181,16 +181,18 @@ end
 !   IfFXX = .false. : do not read Hessian, and an approximate Hessian will be constructed later (for expert only!)
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdData1(iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr1,Scr2,Scr3,Scr4)
+subroutine RdData1(iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr1,Scr2,  &
+  Scr3,Scr4)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact, IfFXX
 dimension :: IOP(*)
-real(kind=8) :: AMass(*), ZA(*), XYZ(*), FFx(*), APT(*), DPol(*), Scr1(*), Scr2(*), Scr3(*), Scr4(*)
+real(kind=8) :: AMass(*), ZA(*), XYZ(*), Grd(*), FFx(*), APT(*), DPol(*), Scr1(*), Scr2(*), Scr3(*), Scr4(*)
 character*100 :: tag,ctmp
 
 NAtm3=3*NAtm
 Infred=0
 IRaman=0
+IGrd  =0
 IfFXX = IOP(10) == 0
 
 select case(IOP(1))
@@ -199,7 +201,7 @@ select case(IOP(1))
     return
 
   case(-2) ! UniMoVib (ALM); the size of Scr4 should be 9*NAtm3 at least
-    call RdALMode(idt0,iout,Intact,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr4)
+    call RdALMode(idt0,iout,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr4)
 
   case(-3) ! xyz
     call RdXYZ(idt0,iout,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
@@ -207,7 +209,7 @@ select case(IOP(1))
     call MasLib(0,NAtm,AMass,ZA)
 
   case(1)  ! Gaussian
-    call RdGauss(idt0,iout,tag,ctmp,Intact,IOP(4),Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr1)
+    call RdGauss(idt0,iout,tag,ctmp,Intact,IOP(4),Infred,IRaman,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr1)
 !   the most abundant isotopic masses are assumed
     if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
@@ -1155,10 +1157,10 @@ end
 ! Read data from UniMoVib (ALM) data file
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdALMode(ifchk,iout,Intact,Infred,IRaman,NAtm,ctmp,AMass,ZA,XYZ,FFx,APT,DPol,Scr)
+subroutine RdALMode(ifchk,iout,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr)
 implicit real(kind=8) (a-h,o-z)
 parameter(ang2au=1.d0/0.52917720859d0)
-real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(*),DPol(6,*),Scr(*)
+real(kind=8) :: AMass(*),ZA(*),XYZ(*),Grd(*),FFx(*),APT(*),DPol(6,*),Scr(*)
 character*100 :: ctmp
 logical :: Intact
 
@@ -1166,8 +1168,6 @@ NAtm3 = NAtm * 3
 NAtm9 = NAtm * 9
 NSS = NAtm3 * NAtm3
 NTT = NAtm3 * (NAtm3+1) / 2
-Infred = 0
-IRaman = 0
 
 rewind(ifchk)
 
@@ -1219,6 +1219,14 @@ if(index(ctmp,"NODPR") == 0) then
   end if
 end if
 
+! read GRD in a.u.
+read(ifchk,"(a100)",err=1080,end=1080)ctmp
+call charl2u(ctmp)
+if(len_trim(ctmp) > 0 .and. index(ctmp,"NOGRD") == 0) then
+  IGrd = 1
+  read(ifchk,*,err=1080,end=1080)(Grd(i),i=1,NAtm3)
+end if
+
 return
 
 1010  call XError(Intact,"Please check AMASS data!")
@@ -1229,6 +1237,7 @@ return
 1060  call XError(Intact,"Please check APT data!")
 1070  call XError(Intact,"Please check DPR data!")
 1071  call XError(Intact,"Please check DPRSQ data!")
+1080  call XError(Intact,"Please check GRD data!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1275,18 +1284,16 @@ end
 ! Read data from Gaussian fchk
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdGauss(ifchk,iout,tag,ctmp,Intact,IRdMas,Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr)
+subroutine RdGauss(ifchk,iout,tag,ctmp,Intact,IRdMas,Infred,IRaman,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact
 
-real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFx(*),APT(3,*),DPol(6,*),Scr(*)
+real(kind=8) :: AMass(*),ZA(*),XYZ(*),Grd(*),FFx(*),APT(3,*),DPol(6,*),Scr(*)
 character*100 :: ctmp
 character*49 :: tag
 
 NAtm3 = NAtm * 3
 NTT = NAtm3*(NAtm3+1)/2
-Infred=0
-IRaman=0
 
 !! read nuclear charges; they lead to errors in the case of ECP
 !tag='Nuclear charges                            R   N='
@@ -1304,8 +1311,16 @@ rewind(ifchk)
 if(index(ctmp,tag)==0)goto 101
 read(ifchk,"(5e16.8)")(XYZ(i),i=1,NAtm3)
 
+! read Grd (a.u.)
+tag='Cartesian Gradient                         R   N='
+!rewind(ifchk)
+161   read(ifchk,"(a100)",end=200)ctmp
+if(index(ctmp,tag)==0)goto 161
+read(ifchk,"(5e16.8)")(Grd(i),i=1,NAtm3)
+IGrd= 1
+
 ! read FFx (a.u.)
-tag='Cartesian Force Constants                  R   N='
+200 tag='Cartesian Force Constants                  R   N='
 rewind(ifchk)
 201   read(ifchk,"(a100)",end=210)ctmp
 if(index(ctmp,tag)==0)goto 201
@@ -3582,107 +3597,123 @@ end
 ! FFX (square matrix in a.u.)
 ! APT (in a.u.)
 ! DPR(6,NAtm3) (in a.u.)
+! GRD
 !
 ! If the frequencies are corrected by the experimental ones (saved in Freq(:,5)), the force constant matrix will be recalculated.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SavALM(ifalm,ifloc,ialm,iloc,Infred,IRaman,NAtm,NAtm3,NVib,AMass,ZA,XYZ,FFX,APT,DPol,IExpt,AL,Freq,SC1,SC2,WORK,EIG)
-implicit real(kind=8) (a-h,o-z)
-logical :: ifalm,ifloc
-real(kind=8) :: AMass(*),ZA(*),XYZ(*),FFX(*),APT(*),DPol(*),AL(*),Freq(NAtm3,*), SC1(*),SC2(*),WORK(*),EIG(*)
+subroutine SavALM(ifalm,ifloc,ialm,iloc,Infred,IRaman,IGrad,NAtm,NAtm3,NVib,AMass,ZA,XYZ,Grd,FFX,APT,DPol,IExpt,AL,Freq,SC1,SC2, &
+  WORK,EIG)
+ implicit real(kind=8) (a-h,o-z)
+ logical :: ifalm,ifloc
+ real(kind=8) :: AMass(*),ZA(*),XYZ(*),Grd(*),FFX(*),APT(*),DPol(*),AL(*),Freq(NAtm3,*), SC1(*),SC2(*),WORK(*),EIG(*)
 
-NAtm9 = NAtm * 9
-NSS = NAtm3 * NAtm3
+ NAtm9 = NAtm * 9
+ NSS = NAtm3 * NAtm3
 
-if(ifalm) then
-  rewind(ialm)
+ if(ifalm) then
+   rewind(ialm)
 
-  write(ialm,"(' UniMoVib DATA FILE (THIS TITLE CAN BE MODIFIED)')")
+   write(ialm,"(' UniMoVib DATA FILE (THIS TITLE CAN BE MODIFIED)')")
 
-  write(ialm,"('NATM')")
-  write(ialm,"(i5)")NAtm
+   write(ialm,"('NATM')")
+   write(ialm,"(i5)")NAtm
 
-  write(ialm,"('AMASS')")
-  write(ialm,"(5d20.10)")(AMass(i),i=1,NAtm)
+   write(ialm,"('AMASS')")
+   write(ialm,"(5d20.10)")(AMass(i),i=1,NAtm)
 
-  write(ialm,"('ZA')")
-  write(ialm,"(5d20.10)")(ZA(i),i=1,NAtm)
+   write(ialm,"('ZA')")
+   write(ialm,"(5d20.10)")(ZA(i),i=1,NAtm)
 
-  write(ialm,"('XYZ')")
-  write(ialm,"(5d20.10)")(XYZ(i),i=1,NAtm3)
+   write(ialm,"('XYZ')")
+   write(ialm,"(5d20.10)")(XYZ(i),i=1,NAtm3)
 
-  write(ialm,"('FFX')")
-end if
+   write(ialm,"('FFX')")
+ end if
 
-if(ifloc) then
-  rewind(iloc)
+ if(ifloc) then
+   rewind(iloc)
 
-  write(iloc,"(' LOCALMODE DATA FILE (THIS TITLE CAN BE MODIFIED)')")
+   write(iloc,"(' LOCALMODE DATA FILE (THIS TITLE CAN BE MODIFIED)')")
 
-  write(iloc,"(' $CONTRL NAtm=',i5.5,' NVib=',i5.5,' $END')")NAtm,NVib
+   write(iloc,"(' $CONTRL NAtm=',i5.5,' NVib=',i5.5,' $END')")NAtm,NVib
 
-  write(iloc,"(' $AMASS  $END')")
-  write(iloc,"(5d20.10)")(AMass(i),i=1,NAtm)
+   write(iloc,"(' $AMASS  $END')")
+   write(iloc,"(5d20.10)")(AMass(i),i=1,NAtm)
 
-  write(iloc,"(' $ZA  $END')")
-  write(iloc,"(5d20.10)")(ZA(i),i=1,NAtm)
+   write(iloc,"(' $ZA  $END')")
+   write(iloc,"(5d20.10)")(ZA(i),i=1,NAtm)
 
-  write(iloc,"(' $XYZ  $END')")
-  write(iloc,"(5d20.10)")(XYZ(i),i=1,NAtm3)
+   write(iloc,"(' $XYZ  $END')")
+   write(iloc,"(5d20.10)")(XYZ(i),i=1,NAtm3)
 
-  write(iloc,"(' $FFX  $END')")
-end if
+   write(iloc,"(' $FFX  $END')")
+ end if
 
-if(IExpt == 0)then
-  if(ifalm) write(ialm,"(5d20.10)")(FFX(i),i=1,NSS)
-  if(ifloc) write(iloc,"(5d20.10)")(FFX(i),i=1,NSS)
-else
-  ! calculate experimentally corrected force constant matrix --> SC1
-  call Frq2FFX(NAtm3,NVib,AMass,Freq(1,5),AL,SC1,SC2,WORK,EIG)
-  if(ifalm) write(ialm,"(5d20.10)")(SC1(i),i=1,NSS)
-  if(ifloc) write(iloc,"(5d20.10)")(SC1(i),i=1,NSS)
-end if
+ if(IExpt == 0)then
+   if(ifalm) write(ialm,"(5d20.10)")(FFX(i),i=1,NSS)
+   if(ifloc) write(iloc,"(5d20.10)")(FFX(i),i=1,NSS)
+ else
+   ! calculate experimentally corrected force constant matrix --> SC1
+   call Frq2FFX(NAtm3,NVib,AMass,Freq(1,5),AL,SC1,SC2,WORK,EIG)
+   if(ifalm) write(ialm,"(5d20.10)")(SC1(i),i=1,NSS)
+   if(ifloc) write(iloc,"(5d20.10)")(SC1(i),i=1,NSS)
+ end if
 
-if(ifalm) then
+ if(ifalm) then
 
-  if(Infred == 0) then
-    write(ialm,"('NOAPT')")
-  else
-    write(ialm,"('APT')")
-    write(ialm,"(5d20.10)")(APT(i),i=1,NAtm9)
-  end if
+   if(Infred == 0) then
+     write(ialm,"('NOAPT')")
+   else
+     write(ialm,"('APT')")
+     write(ialm,"(5d20.10)")(APT(i),i=1,NAtm9)
+   end if
 
-  if(IRaman == 0) then
-    write(ialm,"('NODPR')")
-  else
-    write(ialm,"('DPR')")
-    write(ialm,"(5d20.10)")(DPol(i),i=1,6*NAtm3)
-  end if
+   if(IRaman == 0) then
+     write(ialm,"('NODPR')")
+   else
+     write(ialm,"('DPR')")
+     write(ialm,"(5d20.10)")(DPol(i),i=1,6*NAtm3)
+   end if
 
-  write(ialm,"(/)")
-end if
+   if(IGrad == 0) then
+     write(ialm,"('NOGRD')")
+   else
+     write(ialm,"('GRD')")
+     write(ialm,"(5d20.10)")(Grd(i),i=1,NAtm3)
+   end if
 
-if(ifloc) then
-! vib + trans & rot
-  write(iloc,"(' $NMMODE  $END')")
-  write(iloc,"(5d20.10)")(AL(i),i=1,NSS)
+   write(ialm,"(/)")
+ end if
 
-  if(Infred == 0) then
-    write(iloc,"(' $APT NOAPT=.TRUE. $END')")
-  else
-    write(iloc,"(' $APT NOAPT=.FALSE. $END')")
-    write(iloc,"(5d20.10)")(APT(i),i=1,NAtm9)
-  end if
+ if(ifloc) then
+ ! vib + trans & rot
+   write(iloc,"(' $NMMODE  $END')")
+   write(iloc,"(5d20.10)")(AL(i),i=1,NSS)
 
-  if(IRaman == 0) then
-    write(iloc,"(' $DPR NODPR=.TRUE. $END')")
-  else
-    write(iloc,"(' $DPR NODPR=.FALSE. $END')")
-    write(iloc,"(5d20.10)")(DPol(i),i=1,6*NAtm3)
-  end if
-end if
+   if(Infred == 0) then
+     write(iloc,"(' $APT NOAPT=.TRUE. $END')")
+   else
+     write(iloc,"(' $APT NOAPT=.FALSE. $END')")
+     write(iloc,"(5d20.10)")(APT(i),i=1,NAtm9)
+   end if
 
-return
+   if(IRaman == 0) then
+     write(iloc,"(' $DPR NODPR=.TRUE. $END')")
+   else
+     write(iloc,"(' $DPR NODPR=.FALSE. $END')")
+     write(iloc,"(5d20.10)")(DPol(i),i=1,6*NAtm3)
+   end if
+
+   if(IGrad == 0) then
+     write(iloc,"(' $GRD NOGRD=.TRUE. $END')")
+   else
+     write(iloc,"(' $GRD NOGRD=.FALSE. $END')")
+     write(iloc,"(5d20.10)")(Grd(i),i=1,NAtm3)
+   end if
+ end if
+
+ return
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
