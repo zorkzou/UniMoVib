@@ -1,12 +1,20 @@
 # UniMoVib
 A unified interface for molecular harmonic vibrational frequency calculations.
 
-The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas, Texas, within the framework of the LocalMode program of the Computational and Theoretical Chemistry Group (CATCO} of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
+The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas, Texas, within the framework of the LocalMode (now LModeA) program of the Computational and Theoretical Chemistry Group (CATCO) of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
 
 ## Latest Version
-Version 1.2.2 (Apr/17/2019).
+Version 1.2.5 (Feb/10/2020).
 
-1. A gradient data block (GRD) has been added in the UniMoVib file.
+1. Analytic Hessian by [Psi4](http://www.psicode.org/) may be used.
+2. In the UniMoVib data file, the atomic mass block is optional now.
+3. Bug fix: print complex frequency corrections if there are imaginary frequencies.
+
+Version 1.2.4 (Jul/15/2019).
+
+1. Bug fix for [CFour](http://www.cfour.de/) if there are dummy atoms or imaginary frequencies.
+2. A tolerance of scaling for thermochemistry calculation is introduced.
+3. Save a new Molden file by `IFMOLDEN=.t.` when `QCProg="MOLDEN"`.
 
 ## Features
 
@@ -16,14 +24,12 @@ Version 1.2.2 (Apr/17/2019).
 4. Thermochemistry calculation uses the point group in full symmetry, and the results are printed in Gaussian-style.
 5. Save a Molden file for animation of normal modes.
 6. Set up isotopic masses, temperature, pressure, scale factor and/or experimental frequencies, and so on.
-7. Can be used as a third party module for frequency and thermochemistry calculations in a quantum chemistry program.
-8. Interface to [LocalModes](https://github.com/catco-smu) for the local mode analysis (e.g. force constants of chemical bonds, bond angles, and so on).
+7. Can be used as a third party module for frequency and thermochemistry calculations in a quantum chemistry program, for example, [BDF](http://182.92.69.169:7226/).
+8. Interface to [LModeA](https://sites.smu.edu/dedman/catco/) for the local mode analysis (e.g. force constants of chemical bonds, bond angles, and so on).
 
 ### To be done
 
-1. An interface between UniMoVib and the quantum chemistry program [BDF](http://182.92.69.169:7226/).
-2. Symmetrize normal modes for open-shell systems.
-3. Ring coordinates of D. Cremer et. al.
+1. Symmetrize normal modes for open-shell systems.
 
 ## Supported quantum chemistry programs
 
@@ -53,7 +59,7 @@ Version 1.2.2 (Apr/17/2019).
 * [NWChem](http://www.nwchem-sw.org/index.php/Main_Page)
 * [Orca](https://orcaforum.kofo.mpg.de)
 * [Pqs](http://www.pqs-chem.com/)
-* [Psi](http://www.psicode.org/)
+* [Psi4](http://www.psicode.org/)
 * [Q-Chem](http://www.q-chem.com/)
 * [Spartan](http://www.wavefun.com/)
 * [Turbomole](http://www.cosmologic.de/)

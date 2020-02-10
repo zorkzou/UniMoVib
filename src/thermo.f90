@@ -7,8 +7,7 @@
 ! PGNAME  : point group symmetry symbol (without and with masses)
 ! AMass   : (array) atomic masses (a.m.u)
 ! XYZ     : (array) Cartesian coordinates (a.u.)
-! Freq    : (array) vib. frequencies (a.u.) in Freq(1:NVib,IFrq),
-!            where IFrq depends on IExpt
+! Freq    : (array) vib. frequencies (a.u.) in Freq(1:NVib,IFrq), where IFrq =3 (IExpt /= 1) or 5 (IExpt == 1)
 ! Sc1,Sc2 : scratch. Size = NAtm3*NAtm3
 ! ctmp    : scratch for characters.
 !
@@ -48,7 +47,8 @@ logical :: Intact,IFAtom,IFLin,IFRdT,IfRdP
 ! PG =1   : use the point group without mass
 !     2   : use the point group with mass (default)
 !     xxxx: specify the name of point group, for example, D10h
-namelist/Thermo/Eel,NDeg,temp,press,scale,PG
+namelist/Thermo/Eel,NDeg,temp,press,scale,sctol,PG
+allocatable  :: freqtmp(:)
 
 write(iout,"(//,1x,45('*'),/, ' ***   Thermal Contributions to Energies   ***',/, 1x,45('*'))")
 
@@ -57,6 +57,7 @@ NDeg=1
 temp=298.15d0
 press=1.d0
 scale=1.d0
+sctol=0.d0
 IFRdT=.false.
 IfRdP=.false.
 PG="2    "
@@ -92,10 +93,10 @@ if(IFAtom) then
   ' Electronic total energy   :',4x,f13.6,4x,'Hartree' )")VMas,Eel
 
 else
-  IFrq = 3
   scale=abs(scale)
-  ! expt. freq.
-  if(IExpt .eq. 1) IFrq = 5
+
+  allocate(freqtmp(NVib))   ! scaled frequencies
+  call ScaleF(NVib,NAtm3,IExpt,scale,sctol,Freq,freqtmp)
 
   ! PG = 1 or 2 (default)?
   IPG = 0
@@ -118,9 +119,10 @@ else
   write(iout,"(/, &
   ' Molecular mass            :',4x,f13.6,4x,'AMU',/,    &
   ' Electronic total energy   :',4x,f13.6,4x,'Hartree',/,&
-  ' Scale factor of Frequency :',4x,f13.6,/,             &
+  ' Scaling factor of Freq.   :',4x,f13.6,/,             &
+  ' Tolerance of scaling      :',4x,f13.6,4x,'cm^-1',/,  &
   ' Rotational symmetry number:',4x,i6,/,                &
-  ' The ',a4,' point group is used to calculate rotational entropy.' )") VMas,Eel,scale,NSigma,PG
+  ' The ',a4,' point group is used to calculate rotational entropy.' )") VMas,Eel,scale,sctol,NSigma,PG
 
 ! calculate principal axes and moments of inertia --> Sc1(:,1:4)
   call RotCons(Intact,NAtom,AMass,XYZ,Sc1,Sc2)
@@ -204,10 +206,7 @@ do while(.true.)
     ! at low temperature, no contributions from vibration
     if(Temp <= 10.d0) exit
 
-    scale0=scale
-    ! expt. freq should not be scaled
-    if(Freq(i,6) > 0.0d0) scale0=1.0d0
-    VT = Freq(i,IFrq)*scale0/cf4
+    VT = freqtmp(i)/cf4
     VTT= VT/temp
     ! neglect small freq. because it leads to big errors
     if(VT <= 1.d0) cycle
@@ -224,12 +223,9 @@ do while(.true.)
   zpe=0.d0
   do i=1,NVib
     ! neglect imag. freq.
-    if(Freq(i,IFrq) <= 0.d0) cycle
+    if(freqtmp(i) <= 0.d0) cycle
 
-    scale0=scale
-    ! expt. freq should not be scaled
-    if(Freq(i,6) > 0.0d0) scale0=1.0d0
-    zpe = zpe + Freq(i,IFrq)*scale0
+    zpe = zpe + freqtmp(i)
   end do
   zpe=zpe*0.5d0*Rval/cf4
 
@@ -253,7 +249,10 @@ do while(.true.)
 
 end do
 
-1000  return
+1000 continue
+if(.not. IFAtom) deallocate(freqtmp)
+
+return
 2000  call XError(Intact,"Please check your input of $Thermo!")
 end
 
@@ -345,6 +344,33 @@ if(NSigma < 1)then
 end if
 
 return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Put vibrational theoretical/experimental frequencies into freqtmp. The real theoretical ones may be scaled.
+!
+! Freq(:,3) : theoretical frequencies
+! Freq(:,5) : theoretical (and experimentally corrected if Freq(:,6) = 1.0) frequencies if IExpt = 1
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine ScaleF(NVib,NAtm3,IExpt,fscale,sctol,Freq,freqtmp)
+ Implicit Real*8(A-H,O-Z)
+ dimension Freq(NAtm3,*),freqtmp(*)
+
+ if(IExpt == 1) then
+   do ivib=1,NVib
+     freqtmp(ivib) = Freq(ivib,5)
+     if(Freq(ivib,6) < 0.0d0 .and. freqtmp(ivib) > max(sctol,0.0d0)) freqtmp(ivib) = freqtmp(ivib) * fscale
+   end do
+ else
+   do ivib=1,NVib
+     freqtmp(ivib) = Freq(ivib,3)
+     if(freqtmp(ivib) > max(sctol,0.0d0)) freqtmp(ivib) = freqtmp(ivib) * fscale
+   end do
+ end if
+
+ return
 end
 
 !--- END

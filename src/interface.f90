@@ -66,11 +66,11 @@ end
 ! Read NAtm
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdNAtm1(idt0,idt1,Intact,IOP,NAtm,ctmp)
+subroutine RdNAtm1(idt0,idt1,Intact,IOP,NAtm,tag,ctmp)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact
 dimension :: IOP(*)
-character*100 :: tag, ctmp
+character*200 :: tag, ctmp
 
 NAtm=0
 
@@ -96,7 +96,7 @@ select case(IOP(1))
     call RdNAtmORCA(idt0,NAtm,tag,ctmp)
 
   case(5)  ! CFour
-    call RdNAtmCFour(idt1,NAtm,ctmp)
+    call RdNAtmCFour(idt0,idt1,NAtm,tag,ctmp)
 
   case(6)  ! Molpro
     call RdNAtmMolp(idt0,NAtm,tag,ctmp)
@@ -181,8 +181,8 @@ end
 !   IfFXX = .false. : do not read Hessian, and an approximate Hessian will be constructed later (for expert only!)
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdData1(iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr1,Scr2,  &
-  Scr3,Scr4)
+subroutine RdData1(iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,IGrd,NAtm,tag,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,  &
+  Scr1,Scr2,Scr3,Scr4)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact, IfFXX
 dimension :: IOP(*)
@@ -202,6 +202,8 @@ select case(IOP(1))
 
   case(-2) ! UniMoVib (ALM); the size of Scr4 should be 9*NAtm3 at least
     call RdALMode(idt0,iout,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr4)
+!   the most abundant isotopic masses are assumed
+    if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
   case(-3) ! xyz
     call RdXYZ(idt0,iout,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
@@ -220,8 +222,7 @@ select case(IOP(1))
     call RdORCA(idt0,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
 
   case(5)  ! CFour
-    call ChkAFRQ(idt0,tag,ctmp,Intact)
-    call RdCFour(idt0,idt1,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
+    call RdCFour(idt0,idt1,tag,ctmp,Intact,IfFXX,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,Scr4)
 
   case(6)  ! Molpro
     call RdMolp(idt0,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
@@ -493,23 +494,75 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
+! Read NAtm from *.out or GRD of CFour
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdNAtmCFour(iout,igeom,NAtm,tag,ctmp)
+ implicit real(kind=8) (a-h,o-z)
+ character*100 :: tag, ctmp
+ logical :: ifopen
+
+ inquire(unit=igeom,opened=ifopen)
+ if(ifopen) then
+   call RdNAtmCFour1(igeom,NAtm,ctmp)
+ else
+   call RdNAtmCFour2(iout,NAtm,tag,ctmp)
+ end if
+
+return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
 ! Read NAtm from GRD of CFour
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdNAtmCFour(igeom,NAtm,ctmp)
-implicit real(kind=8) (a-h,o-z)
-character*100 :: ctmp
+subroutine RdNAtmCFour1(igeom,NAtm,ctmp)
+ implicit real(kind=8) (a-h,o-z)
+ character*100 :: ctmp
 
-i=0
-rewind(igeom)
-read(igeom,"(a100)",err=100,end=100)ctmp
-if(len_trim(ctmp) == 0)goto 100
+ i=0
+ rewind(igeom)
+ read(igeom,"(a100)",err=100,end=100)ctmp
+ if(len_trim(ctmp) == 0)goto 100
 
-read(ctmp,*,err=100) i
+ read(ctmp,*,err=100) i
 
-100   NAtm=i
+ 100   NAtm=i
 
-return
+ return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read NAtm from *.out of CFour
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdNAtmCFour2(iout,NAtm,tag,ctmp)
+ implicit real(kind=8) (a-h,o-z)
+ character*58 :: tag
+ character*100 :: ctmp
+
+ i=0
+ tag="Symbol    Number           X              Y              Z"
+
+ rewind(iout)
+ do while(.true.)
+   read(iout,"(a100)",err=100,end=100)ctmp
+   if(index(ctmp,tag) /= 0) exit
+ end do
+
+ read(iout,*,err=100,end=100)
+ do while(.true.)
+   read(iout,"(a20)",err=100,end=100)ctmp
+   if(index(ctmp,"---") /= 0) exit
+   read(ctmp(10:),*) ia
+   if(ia > 0) i = i + 1
+ end do
+
+ 100   NAtm=i
+
+ return
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1172,8 +1225,10 @@ NTT = NAtm3 * (NAtm3+1) / 2
 rewind(ifchk)
 
 ! read mass
-read(ifchk,"(///)",err=1010,end=1010)
-read(ifchk,*,err=1010,end=1010)(AMass(i),i=1,NAtm)
+AMass(1)=-1.d0
+read(ifchk,"(///a100)",err=1010,end=1010)ctmp
+call charl2u(ctmp)
+if(index(ctmp,"NOMASS") == 0) read(ifchk,*,err=1010,end=1010)(AMass(i),i=1,NAtm)
 
 ! read IZ
 read(ifchk,*,err=1020,end=1020)
@@ -1412,8 +1467,10 @@ Infred= 1
 
 ! read atomic masses
 401   rewind(ifchk)
-read(ifchk,"(a13)",end=410)ctmp
-if(index(ctmp,'ATOMIC MASSES')==0)goto 401
+do while(.true.)
+  read(ifchk,"(a13)",end=410)ctmp
+  if(index(ctmp,'ATOMIC MASSES')/=0) exit
+end do
 read(ifchk,*,err=410,end=410)(AMass(i),i=1,NAtm)
 
 return
@@ -1478,23 +1535,56 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
+! PSI: check whether this is an analytic frequency calculation
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+logical function ChkAFRQPsi(ifchk,tag,ctmp,Intact)
+ implicit real(kind=8) (a-h,o-z)
+ character*100 :: ctmp
+ character*43 :: tag
+ logical :: Intact
+
+ ChkAFRQPsi = .false.
+ tag='                                   SCF HESS'
+
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=010)ctmp
+   if(index(ctmp,tag) /= 0) then
+     ChkAFRQPsi = .true.
+     exit
+   end if
+ end do
+
+ return
+ 010   call XError(Intact,"Is this a PSI4 freq. calculation?")
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
 ! CFour: check whether this is an analytic frequency calculation
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine ChkAFRQ(ifchk,tag,ctmp,Intact)
-implicit real(kind=8) (a-h,o-z)
-character*100 :: ctmp
-character*32 :: tag
-logical :: Intact
+logical function ChkAFRQCfour(ifchk,tag,ctmp,Intact)
+ implicit real(kind=8) (a-h,o-z)
+ character*100 :: ctmp
+ character*32 :: tag
+ logical :: Intact
 
-tag='       VIBRATION            IVIB'
-rewind(ifchk)
-001   read(ifchk,"(a100)",end=010)ctmp
-if(index(ctmp,tag) == 0)goto 001
-if(index(ctmp,"ANALYTIC") == 0) call XError(Intact,"This is not an analytic frequency calculation!")
+ ChkAFRQCfour = .false.
+ tag='       VIBRATION            IVIB'
 
-return
-010   call XError(Intact,"Is this a CFour freq. calculation?")
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=010)ctmp
+   if(index(ctmp,tag) /= 0) then
+     if(index(ctmp,"ANALYTIC") /= 0) ChkAFRQCfour = .true.
+     exit
+   end if
+ end do
+
+ return
+ 010   call XError(Intact,"Is this a CFour freq. calculation?")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1502,7 +1592,173 @@ end
 ! Read data from CFour *.out
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdCFour(ifchk,igeom,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr)
+subroutine RdCFour(ifchk,igeom,tag,ctmp,Intact,IfFXX,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,Scr4)
+ implicit real(kind=8) (a-h,o-z)
+ real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*),Scr1(*),Scr2(*),Scr3(*),Scr4(*)
+ character*100 :: tag,ctmp
+ logical :: Intact,IfFXX,itrue,ChkAFRQCfour
+
+ ! Is the GRD file available?
+ inquire(unit=igeom,opened=itrue)
+ ! Is this an analytic frequency calculation?
+ itrue = itrue .and. ChkAFRQCfour(ifchk,tag,ctmp,Intact)
+
+ if(itrue) then
+   call RdCFourA(ifchk,igeom,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
+ else
+   Infred= 0
+   call RdCFourN(ifchk,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+ end if
+
+ return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read data from CFour *.out
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdCFourN(ifchk,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,SC1,SC2,SC3,WORK)
+ implicit real(kind=8) (a-h,o-z)
+ parameter(One=1.d0,wn2au=One/5140.48714376d0)
+ real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),SC1(*),SC2(3,NAtm,*),SC3(*),WORK(*)
+ character*100 :: tag,ctmp
+ logical :: Intact,IfFXX,ImgFrq
+
+ NAtm3 = NAtm * 3
+ NCol = 3
+
+ ! read nuclear charges and Cartesian coordinates (a.u.)
+ ! NOTE: Atoms in the frequrncy part may have been reordered, so the Cartesian coordinates read here can be not right!
+ tag="Symbol    Number           X              Y              Z"
+
+ rewind(ifchk)
+ loop1 : do while(.true.)
+   read(ifchk,"(a100)",err=100,end=100)ctmp
+   if(index(ctmp,tag(1:58)) /= 0) then
+     read(ifchk,*,err=100,end=100)
+     i=0
+     loop2 : do while(.true.)
+       read(ifchk,"(a100)",err=110,end=110)ctmp
+       read(ctmp(10:),*) j
+       if(j <= 0) cycle
+
+       i=i+1
+       read(ctmp(10:),*) ZA(i),XYZ(1,i),XYZ(2,i),XYZ(3,i)
+       if(i == NAtm) exit loop1
+     end do loop2
+   end if
+ end do loop1
+
+ ! Ana. freq: masses used (in AMU) in vibrational analysis:
+ ! Num. freq: Used masses (in AMU) in vibrational analysis:
+ tag=" (in AMU) in vibrational analysis:"
+ do while(.true.)
+   read(ifchk,"(a100)",err=200,end=200)ctmp
+   if(index(ctmp,tag(1:34)) /= 0) then
+     read(ifchk,*,err=210,end=210) (AMass(i),i=1,NAtm)
+     exit
+   end if
+ end do
+
+ ! read freq & normal modes to construct Hessian (a.u.)
+ if(IfFXX) then
+  ! read Nvib frequencies (cm-1) --> SC1
+  tag='Normal Coordinate Analysis'
+  do while(.true.)
+    read(ifchk,"(a100)",end=300,err=300)ctmp
+    if(index(ctmp,tag(1:26)) /= 0) exit
+  end do
+  tag='VIBRATION'
+  read(ifchk,"(5/)",end=310,err=310)
+  Nvib = 0
+  do i=1,NAtm3
+    read(ifchk,"(a100)",end=310,err=310)ctmp
+    if(index(ctmp,tag(1:9)) /= 0) then
+      Nvib = Nvib + 1
+      ImgFrq=.false.
+      if(ctmp(25:25) == "i") then
+        ctmp(25:25)= " "
+        ImgFrq=.true.
+      end if
+      if(ctmp(34:34) == "i") then
+        ctmp(34:34)= " "
+        ImgFrq=.true.
+      end if
+      read(ctmp(12:100),*,end=310,err=310)SC1(Nvib)
+      if(ImgFrq) SC1(Nvib)=-SC1(Nvib)
+    end if
+  end do
+  ! cm-1 --> a.u.
+  call AScale(NAtm3,wn2au,SC1,SC1)
+
+  ! read m.w. normal modes --> SC2
+  ! There is a bug for linear molecules in CFour: 3N-6 instead of 3N-5 normal modes are printed out.
+  if(NAtm3-Nvib == 5) then
+    call XError(Intact,"CFour prints normal modes wrongly for linear molecules!")
+  else if(NAtm3-Nvib /= 5 .and. NAtm3-Nvib /= 6) then
+    call XError(Intact,"The number of vibration frequency is wrong!")
+  end if
+
+  tag='                                   Normal Coordinates'
+  do while(.true.)
+    read(ifchk,"(a100)",end=320,err=320)ctmp
+    if(index(ctmp,tag(1:53)) /= 0) exit
+  end do
+  NBlock=(Nvib-1)/NCol+1
+  tag='VIBRATIONX       Y       Z'
+  do i=1,NBlock
+    iv1=(i-1)*NCol+1
+    iv2=min(i*NCol,Nvib)
+    do while(.true.)
+      read(ifchk,"(a100)",end=330,err=330)ctmp
+      if(index(ctmp,tag(1:9)) /= 0) exit
+    end do
+    do j=1,NAtm
+      read(ifchk,"(a100)",end=330,err=330)ctmp
+      ! no such a line in ana. freq
+      if(index(ctmp,tag(10:26)) /= 0) read(ifchk,"(a100)",end=330,err=330)ctmp
+      ! The first column of normal modes is printed differently
+      read(ctmp(5:100),"(f9.3,f7.4,f8.4,2(2x,3f8.4))",end=330,err=330) ((SC2(ix,j,k),ix=1,3),k=iv1,iv2)
+    end do
+  end do
+  ! trans. and rot. mode elements are zero
+  if(Nvib < NAtm3)call AClear((NAtm3-Nvib)*NAtm3,SC2(1,1,Nvib+1))
+
+  ! normal modes: do mass-unweighting and renormalization
+  do i=1,Nvib
+    do j=1,NAtm
+      do k=1,3
+        SC2(k,j,i)=SC2(k,j,i)/sqrt(AMass(j))
+      end do
+    end do
+    X = dotx(NAtm3,SC2(1,1,i),SC2(1,1,i))
+    X = 1.d0/sqrt(X)
+    call AScale(NAtm3,X,SC2(1,1,i),SC2(1,1,i))
+  end do
+
+  ! calculate force constant matrix --> FFX
+  call Frq2FFX(NAtm3,Nvib,AMass,SC1,SC2,FFX,SC3,WORK,SC1(NAtm3+1))
+
+ end if
+
+ return
+ 100   call XError(Intact,"No Cartesian coordinates found!")
+ 110   call XError(Intact,"Please check Cartesian coordinates!")
+ 200   call XError(Intact,"No atomic masses found!")
+ 210   call XError(Intact,"Please check atomic masses!")
+ 300   call XError(Intact,"No frequencies found!")
+ 310   call XError(Intact,"Failed to read frequencies.")
+ 320   call XError(Intact,"No normal modes found!")
+ 330   call XError(Intact,"Failed to read normal modes.")
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read data from CFour *.out & GRD. For analytic frequency only.
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdCFourA(ifchk,igeom,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*),Scr(*)
 character*100 :: ctmp
@@ -3285,12 +3541,95 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
-! Read data from PSI log file
+! Read data from PSI4 log file
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdPSI(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx)
+ implicit real(kind=8) (a-h,o-z)
+ real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*)
+ character*100 :: ctmp, tag
+ character*3 :: Elem
+ logical :: Intact,ChkAFRQPsi
+
+ if(ChkAFRQPsi(ifchk,tag,ctmp,Intact)) then
+   call RdPSIAna(ifchk,tag,ctmp,Elem,Intact,NAtm,AMass,ZA,XYZ,FFx)
+ else
+   call RdPSINum(ifchk,tag,ctmp,Elem,Intact,NAtm,AMass,ZA,XYZ,FFx)
+ end if
+
+ return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read data from PSI log file with analytic Hessian
 !
 ! APT is not available at present.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdPSI(ifchk,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx)
+subroutine RdPSIAna(ifchk,tag,ctmp,Elem,Intact,NAtm,AMass,ZA,XYZ,FFx)
+ implicit real(kind=8) (a-h,o-z)
+ real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*)
+ character*100 :: ctmp
+ character*79 :: tag
+ character*3 :: Elem
+ logical :: Intact
+
+ NAtm3 = NAtm * 3
+
+ rewind(ifchk)
+
+ ! read Cartesian coordinates in a.u.
+ tag='                                   SCF HESS'
+ do while(.true.)
+   read(ifchk,"(a100)",end=1010,err=1010)ctmp
+   if(index(ctmp,tag(1:43)) /= 0) exit
+ end do
+ tag='Center              X                  Y                   Z               Mass'
+ do while(.true.)
+   read(ifchk,"(a100)",end=1010,err=1010)ctmp
+   if(index(ctmp,tag(1:79)) /= 0) exit
+ end do
+ read(ifchk,*)
+ do i=1,NAtm
+   read(ifchk,"(a100)",end=1020,err=1020)ctmp
+   read(ctmp,*,end=1020,err=1020) Elem, XYZ(:,i), AMass(i)
+   call ElemZA(0,Elem,Elem,ZA(i))
+ end do
+
+ ! read FFx (a.u.)
+ tag='  ## Total Hessian (Symmetry 0) ##'
+ do while(.true.)
+   read(ifchk,"(a100)",end=1050,err=1050)ctmp
+   if(index(ctmp,tag(1:34)) /= 0) exit
+ end do
+
+ NBlock=(NAtm3-1)/5+1
+ read(ifchk,*)
+ do i=1,NBlock
+   iv1=i*5-4
+   iv2=min(i*5,NAtm3)
+   read(ifchk,"(//)",end=1060,err=1060)
+   do j=1,NAtm3
+     read(ifchk,*,end=1060,err=1060)IX,(FFx(k,j),k=iv1,iv2)
+   end do
+ end do
+
+ return
+ 1010  call XError(Intact,"No Cartesian coordinates found!")
+ 1020  call XError(Intact,"Please check Cartesian coordinates!")
+ 1050  call XError(Intact,"No Hessian found!")
+ 1060  call XError(Intact,"Failed to read Hessian.")
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read data from PSI log file with numerical Hessian
+!
+! APT is not available at present.
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdPSINum(ifchk,tag,ctmp,Elem,Intact,NAtm,AMass,ZA,XYZ,FFx)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*)
 character*100 :: ctmp

@@ -1,54 +1,44 @@
-SOURCE=../
-NAME=unimovib.exe
+#
+# Written by W. Zou <qcband@gmail.com>. Tue Jun 5 2019.
+#
 
-UNIMOVIB=$(SOURCE)$(NAME)
+#DIR        = ../win32/
+DIR        = ../
+NAME       = unimovib.exe
+EXE        = $(DIR)$(NAME)
 
-F90     = gfortran
-#FFLAGS  = -O2 -w -static
-FFLAGS  = -O3
-LDFLAGS =
+OBJ        = object
 
-all:;
-	make unimovibsrc
+FCOM       = gfortran
+COMPFLAGS  = -O3
+#            Looking for .mod files here!
+COMPFLAGS += -I$(OBJ)
 
-unimovibsrc:;
-	make DIR=.             obj90  FF=$(F90)
-	make DIR=.             obj77  FF=$(F90)
-	make $(UNIMOVIB)
+SRC90      = interface.f90  main.f90  rw.f90  symmetry.f90  thermo.f90  util.f90  vibfreq.f90
+SRC77      = BLAS.f  LAPACK.f
+MODS       = 
 
+F90OBJ     = $(addprefix $(OBJ)/, $(SRC90:.f90=.o))
+F77OBJ     = $(addprefix $(OBJ)/, $(SRC77:.f=.o))
+MODOBJ     = $(addprefix $(OBJ)/, $(MODS:.f90=.o))
 
-$(UNIMOVIB): objects90/*.o objects77/*.o
-	rm -f $(UNIMOVIB)
-	$(F90) $(FFLAGS) objects90/*.o objects77/*.o -o $(UNIMOVIB)
-
+all: $(MODOBJ) $(F90OBJ) $(F77OBJ)
 	@echo
-	@echo Compiling -- $(UNIMOVIB) -- is done !
+	$(FCOM) $(COMPFLAGS) $(OBJ)/*.o -o $(EXE)
+	@echo
+	@echo "  --- $(NAME) has been compiled successfully!"
 	@echo
 
-obj90:;
-	ext=".f90";\
-	for d in  $$DIR/*.f90; \
-	do \
-	  filename=`basename $$d $$ext`; \
-	  make FILE=$$filename DIR=$$DIR FF=$$FF objects90/$$filename.o; \
-	done 
+$(MODOBJ): $(OBJ)/%.o: %.f90
+	$(FCOM) -c -o $@ $(COMPFLAGS) $*.f90
+	mv *.mod $(OBJ)
 
-obj77:;
-	ext=".f";\
-	for d in  $$DIR/*.f; \
-	do \
-	  filename=`basename $$d $$ext`; \
-	  make FILE=$$filename DIR=$$DIR FF=$$FF objects77/$$filename.o; \
-	done 
+$(F90OBJ): $(OBJ)/%.o: %.f90
+	$(FCOM) -c -o $@ $(COMPFLAGS) $*.f90
 
-objects90/$(FILE).o: $(DIR)/$(FILE).f90 ;
-	$(FF) $(FFLAGS) -c $(DIR)/$(FILE).f90;\
-	mv $(FILE).o objects90
+$(F77OBJ): $(OBJ)/%.o: %.f
+	$(FCOM) -c -o $@ $(COMPFLAGS) $*.f
 
-objects77/$(FILE).o: $(DIR)/$(FILE).f ;
-	$(FF) $(FFLAGS) -c $(DIR)/$(FILE).f;\
-	mv $(FILE).o objects77
-
+.PHONY: clean
 clean:
-	rm -f objects90/*.o
-	rm -f objects77/*.o
+	rm -f $(OBJ)/*.o $(OBJ)/*.mod $(OBJ)/*.MOD

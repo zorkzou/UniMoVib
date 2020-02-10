@@ -353,14 +353,23 @@ if(IOP(6) == 1)then
 end if
 
 !>>>  ifmolden --> IOP(7) = 0 (ifmolden=.false.) or 1 (ifmolden=.true.)
-if(IOP(1) == 21) ifmolden=.false.
 if(ifmolden)then
   IOP(7) = 1
   istr=nonspace(cname)
   iend=LEN_TRIM(cname)
-  open(imdn,file=cname(istr:iend)//'.molden')
-  write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
-  if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
+  open(imdn,file=cname(istr:iend)//'.molden',status='new',iostat=ioper)
+  if(ioper == 0)then
+    write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
+    if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
+  else
+    open(imdn,file=cname(istr:iend)//'_new.molden',status='new',iostat=ioper)
+    if(ioper > 0) then
+      write(iout,"(/,' You have to delete or rename this file first:',5x,a)") cname(istr:iend)//'_new.molden'
+      call XError(Intact,"New molden file exist!")
+    end if
+    write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'_new.molden'
+    if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'_new.molden'
+  end if
 end if
 
 !>>>  iflocal --> IOP(8) = 0 (iflocal=.false.) or 1 (iflocal=.true.)
@@ -440,10 +449,15 @@ end if
 ! open $(fchk)
 call DFOpen(iout,idt0,Intact,.True.,'FCHK',fchk)
 
-! Cfour, Gamess, Firefly: open $(geom)
-if(IOP(1) == 2 .or. IOP(1) == 3 .or. IOP(1) == 5) then
-  if(LEN_TRIM(geom) == 0) geom='GRD'
+! Gamess, Firefly: open $(geom)
+if(IOP(1) == 2 .or. IOP(1) == 3) then
+  if(LEN_TRIM(geom) == 0) geom='gamess.out'
   call DFOpen(iout,idt1,Intact,.True.,'GEOM',geom)
+
+! Cfour: open $(geom); optional
+else if(IOP(1) == 5) then
+  if(LEN_TRIM(geom) == 0) geom='GRD'
+  call DFOpen(iout,idt1,Intact,.False.,'GEOM',geom)
 
 ! NWChem, PQS, FHI-AIMS: open $(hess) and optional $(ddip)
 else if(IOP(1) == 8 .or. IOP(1) == 12 .or. IOP(1) == 16) then

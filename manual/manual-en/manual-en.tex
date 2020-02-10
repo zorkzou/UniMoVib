@@ -53,7 +53,7 @@
 \begin{document}
 
 \title{User's Guide of the Program \textsc{UniMoVib} \\
-\vspace{10 mm} (Ver. 1.2.2) \vspace{30 mm} \\
+\vspace{10 mm} (Ver. 1.2.5) \vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm} }
 
 \date{\today}
@@ -80,7 +80,7 @@
 \textsc{UniMoVib} is a \textsc{Uni}fied interface for \textsc{Mo}lecular \textsc{Vib}rational harmonic frequency calculations.
 
 The \textsc{UniMoVib} program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas,
-Texas, within the framework of the \href{https://github.com/catco-smu}{\textsc{LocalMode}} program of the Computational and Theoretical Chemistry Group (\href{https://sites.smu.edu/dedman/catco/}{CATCO}) of SMU. This work was
+Texas, within the framework of the \textsc{LocalMode} program (now \href{https://sites.smu.edu/dedman/catco/}{\textsc{LModeA}}) of the Computational and Theoretical Chemistry Group (\href{https://sites.smu.edu/dedman/catco/}{CATCO}) of SMU. This work was
 supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, \textsc{UniMoVib} has been released as a stand-alone program.
 
 \subsection{Features} \label{sec:feature}
@@ -120,7 +120,7 @@ Others            & $R_3$, $T$, $T_d$, $T_h$, $O$, $O_h$, $I$, $I_h$, $C_{\infty
 \end{tabular}
 \end{table}
 
-Two point groups will be printed by the program, \emph{i.e.} the molecular point group of ``\verb|Electronic| \verb|Wavefunctions|'' and the molecular point group of ``\verb|美国国家自然科学基金会Nuclear & Total Wavefunctions|''. The former does not depend on isotopic masses whereas the latter does. The latter point group symmetry should be used to analyze vibrations and do thermochemistry calculations. However, some quantum chemistry programs use the former symmetry by mistake, and therefore the \emph{irreps.} cannot be correctly analyzed and the Gibbs free energy may be wrong. A extreme case is the fullerence $^{12}$C$_{59}{}^{13}$C, which has $I_h$ symmetry for electronic wavefunctions, but $C_1$ for nuclear wavefunctions and total wavefunctions. If $I_h$ is used in thermochemistry calculations, the error in the Gibbs free energy will be as large as 2.5 kcal/mol!
+Two point groups will be printed by the program, \emph{i.e.} the molecular point group of ``\verb|Electronic| \verb|Wavefunctions|'' and the molecular point group of ``\verb|Nuclear & Total Wavefunctions|''. The former does not depend on isotopic masses whereas the latter does. The latter point group symmetry should be used to analyze vibrations and do thermochemistry calculations. However, some quantum chemistry programs use the former symmetry by mistake, and therefore the \emph{irreps.} cannot be correctly analyzed and the Gibbs free energy may be wrong. A extreme case is the fullerence $^{12}$C$_{59}{}^{13}$C, which has $I_h$ symmetry for electronic wavefunctions, but $C_1$ for nuclear wavefunctions and total wavefunctions. If $I_h$ is used in thermochemistry calculations, the error in the Gibbs free energy will be as large as 2.5 kcal/mol!
 
 \pagebreak{}
 
@@ -260,6 +260,9 @@ replaced by the values provided after the \verb|$IsoMas| group (section \ref{sec
 experimental vibrational frequencies which are provided after the \verb|$ExpFrq| group (section \ref{sec:inp-expfrq}).
 Default: \verb|.False.|
 
+\subsubsection{Keywords to save data} \label{subsec:inp-qcdata-save}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!{Keywords to save data}}
+
 \bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFSAVE}}
 \verb|IFSAVE|: (\verb|.True.|/\verb|.False.|) Save the atomic masses (affected by
@@ -271,12 +274,12 @@ doesn't work with \verb|QCProg="AtomCalc"| or \verb|"UniMoVib"|. Default: \verb|
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFMOLDEN}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!MOLDEN}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Gabedit}
-\verb|IFMOLDEN|: (\verb|.True.|/\verb|.False.|) Save a \textsc{Molden} file except when \verb|QCProg="AtomCalc"| or \verb|"MOLDEN"|, which may be opened by the \textsc{Molden} or \textsc{Gabedit} program to view geometry and normal vibration modes. Default: \verb|.False.|
+\verb|IFMOLDEN|: (\verb|.True.|/\verb|.False.|) Save a \textsc{Molden} file except for \verb|QCProg="AtomCalc"|, which may be opened by the \textsc{Molden} or \textsc{Gabedit} program to view geometry and normal vibration modes. Default: \verb|.False.|
 
 \bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFLOCAL}}
-\index{{Quantum chemistry program}@{Quantum chemistry program}!LocalModes}
-\verb|IFLOCAL|: (\verb|.True.|/\verb|.False.|) Save a data file for the local mode analysis by \textsc{LocalModes} (URL: \href{https://github.com/catco-smu}{https://github.com/catco-smu}). It doesn't work with \verb|QCProg="AtomCalc"|. Default: \verb|.False.|
+\index{{Quantum chemistry program}@{Quantum chemistry program}!LModeA}
+\verb|IFLOCAL|: (\verb|.True.|/\verb|.False.|) Save a data file for the local mode analysis by \textsc{LModeA} (URL: \href{https://sites.smu.edu/dedman/catco/}{https://sites.smu.edu/dedman/catco/}). It doesn't work with \verb|QCProg="AtomCalc"|. Default: \verb|.False.|
 
 \bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFGauTS}}
@@ -361,11 +364,12 @@ neglected if you are not interested in the IR intensities.
 \index{{Quantum chemistry program}@{Quantum chemistry program}!CFour}
 \item \textsc{CFour}
   \begin{description}
-  \item[ ]For analytical frequency (\texttt{VIB=ANALYTIC}): *.out file (by \verb|FCHK|) + GRD
+  \item For analytical frequency (\texttt{VIB=ANALYTIC}): *.out file (by \verb|FCHK|) + GRD
   (by \verb|GEOM|).
   \index{{Quantum chemistry program}@{Quantum chemistry program}!MOLDEN}
-  \item[ ]For both numerical frequency and analytical frequency: Use the \textsc{Molden} file. However, no IR intensities.
+  \item For both numerical frequency (\texttt{VIB=FINDIF}) and analytical frequency: Use the \textsc{Molden} file. However, no IR intensities.
   See also \texttt{MOLDEN} below.
+  \item If the GRD file or the \textsc{Molden} file is missing, or the \textsc{Molden} file doesn't contain frequency data due to some reasons, you may use the *.out file only by \verb|FCHK| and then \textsc{UniMoVib} tries to construct the Hessian matrix from atomic masses, vibrational frequencies, and normal modes printed in the *.out file. However, this option is not fully supported due to some defects and errors in the printed normal modes by \textsc{CFour} (see the Known problems section (\ref{part:problem})), and therefore is NOT SUGGESTED.
   \end{description}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Turbomole}
 \item \textsc{Turbomole}: *.out file of aoforce (by \verb|FCHK|; default: aoforce.out) +
@@ -421,8 +425,7 @@ See the Known problems section (\ref{part:problem}).
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Spartan}
 \item \textsc{Spartan}: the *.smol archive file (by \verb|FCHK|). The most abundant isotopic masses are assumed.
 \index{{Quantum chemistry program}@{Quantum chemistry program}!PSI}
-\item \textsc{Psi}: the output file (by \verb|FCHK|). In your \textsc{Psi} 4 frequency calculation, use \texttt{set print 3} to
-print Hessian matrix.
+\item \textsc{Psi}: the output file (by \verb|FCHK|). In your \textsc{Psi} 4 numerical frequency calculation, use \texttt{set print 3} to print Hessian matrix.
 \index{{Quantum chemistry program}@{Quantum chemistry program}!DMOL3}
 \item \textsc{Dmol3}: the output file (by \verb|FCHK|).
 \index{{Quantum chemistry program}@{Quantum chemistry program}!ACES}
@@ -524,7 +527,11 @@ This group controls the thermochemistry calculation. Keywords:
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Scale}}
 \index{{\texttt{\$ExpFrq} group}@{\texttt{\$ExpFrq} group}}
 \index{{Experimental frequency correction}@{Experimental frequency correction}}
-\verb|Scale|: frequency scale factor. Default: 1.0. Experimental frequencies defined in the \texttt{\$ExpFrq} group will not be scaled.
+\verb|Scale|: scaling factor for real frequencies. Default: 1.0. Experimental frequencies defined in the \texttt{\$ExpFrq} group will not be scaled.
+
+\bigskip{}
+\index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{ScTol}}
+\verb|ScTol|: tolerance of scaling (in cm$^{-1}$). Low frequencies below this value will not be scaled. All the frequencies except experimental and imaginary ones will be scaled by default.
 
 \bigskip{}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{PG}}
@@ -533,7 +540,7 @@ This group controls the thermochemistry calculation. Keywords:
 entropy. It may affect the entropy and Gibbs free energy, so the correct point group
 name must be provided.
 \begin{description}
-\item[ ]\verb|  = 0|: (default) 2.
+\item[ ]\verb|  = 0|: (default) =2.
 \item[ ]\verb|  = 1|: use the isotope independent point group. If isotope leads to lower symmetry, this option may
 reproduce the results of other quantum chemistry programs, but unfortunately this is
 not correct.
@@ -676,7 +683,7 @@ Step 2.
 Calculate "experimental" frequencies of HDO using the experimental frequencies of H2O.
 CCSD(T)/cc-pVTZ frequencies:        1463  2828  3895 cm-1
 "experimental" frequencies:         1398  2692  3708 cm-1
-real experimental frequencies:      1402  2727  3707 cm-1
+genuine experimental frequencies:   1402  2727  3707 cm-1
 
  $contrl
    qcprog="unimovib"
@@ -735,6 +742,16 @@ abundant isotopic masses are assumed. If this is not true, however, the results
 will be totally wrong. So you have to use the most abundant isotopic masses
 in your frequency calculation (this is default in \textsc{Aces}) to generate a \textsc{Aces} output file.
 
+\index{{Quantum chemistry program}@{Quantum chemistry program}!CFour}
+\item \textsc{CFour}
+
+If only a single *.out file is specified by \verb|FCHK|, \textsc{UniMoVib} tries to construct the Hessian matrix. However this may do not work well due to some defects and errors in the printed normal modes by \textsc{CFour},
+  \begin{enumerate}
+    \item If the molecule has a high symmetry, the atoms therein may be reordered in the frequency output, and therefore the atom orderings in the geometry and frequency parts will be different.
+    \item For linear polyatomic molecules, one normal mode can be missing.
+    \item Due to very low accuracy of the printed normal mode data (3 significant digits for the first column and 4 for the others), some low frequencies cannot be well reproduced by \textsc{UniMoVib}.
+  \end{enumerate}
+
 \end{itemize}
 
 
@@ -746,13 +763,14 @@ in your frequency calculation (this is default in \textsc{Aces}) to generate a \
 \subsection{Format of the UniMoVib data file} \label{sec:almfmt}
 \index{{UniMoVib format}@{UniMoVib format}}
 
-The UniMoVib data file is an ASCII one in free format.
-\begin{Verbatim}[frame=single,label=Format(Ver.1.0.2 2019.04.17),labelposition=topline,rulecolor=\color{green},fontsize=\small,baselinestretch=1.0]
+The \textsc{UniMoVib} data file is an ASCII one in free format.
+\begin{Verbatim}[frame=single,label=Format(Ver.1.0.3 2020.02.10),labelposition=topline,rulecolor=\color{green},fontsize=\small,baselinestretch=1.0]
 (One title line)
 NATM
   (An positive integer)
 AMASS
-  (NATM number of atomic masses)
+  (NATM number of atomic masses;
+  Use NOMASS instead if no atomic masses provided)
 ZA
   (NATM number of nuclear charge numbers)
 XYZ
@@ -773,8 +791,9 @@ GRD
   Use NOGRD instead if no GRD data provided)
 \end{Verbatim}
 \index{{Raman intensities}@{Raman intensities}}
-\index{{Quantum chemistry program}@{Quantum chemistry program}!LocalModes}
-At present \verb|DPR| data and Raman intensities are supported only for the .fchk file generated by Gaussian. Only some external programs (\emph{e.g.} \textsc{LocalModes}) need the \verb|GRD| data.
+\index{{Quantum chemistry program}@{Quantum chemistry program}!LModeA}
+\index{{Quantum chemistry program}@{Quantum chemistry program}!Gaussian}
+At present \verb|DPR| data and Raman intensities are supported only for the .fchk file generated by \textsc{Gaussian}. Only some external programs (\emph{e.g.} \textsc{LModeA}) need the \verb|GRD| data.
 
 \pagebreak{}
 

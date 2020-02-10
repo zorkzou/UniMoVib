@@ -51,7 +51,7 @@ subroutine SolvSec(iinp,iout,idt0,irep,iudt,imdn,iloc,igau,Intact,IOP,Infred,IRa
  call PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,(IOP(1)==-3),IOP(2),IOP(10),ZA,AL,Rslt,Scr2)
 
  ! experimental frequencies
- if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Rslt,Scr2,Scr3,Scr4,ctmp)
+ if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Rslt,Scr2,Scr3,Scr4,Work,ctmp)
 
  ! save plain UniMoVib (ALM) data file and/or localmode.dat (part I)
  if(IOP(6) == 1 .or. IOP(8) == 1) call SavALM((IOP(6) == 1),(IOP(8) == 1),iudt,iloc,Infred,IRaman,IGrd,NAtm,NAtm3,NVib,AMass, &
@@ -82,14 +82,14 @@ end
 ! Reslt(:,5): expt. corrected freq.;  Reslt(:,6): expt. corrected (1.0) or not (-1.0)
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Reslt,expf,IRNAME,Ifexpf,ctmp)
+subroutine RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Reslt,expf,IRNAME,Ifexpf,dfreq,ctmp)
  implicit real(kind=8) (a-h,o-z)
  parameter(au2wn=5140.48714376d0,epsfrq=5.0d-5,one=1.d0)
- real(kind=8) :: Reslt(NAtm3,*),expf(*)
+ real(kind=8) :: Reslt(NAtm3,*),expf(*),dfreq(*)
  character*100 :: ctmp
  character*4 :: IRNAME(NAtm3)
  namelist/ExpFrq/Mode
- logical :: Intact,OK,Degen,Ifexpf(*)
+ logical :: Intact,OK,Degen,imgfrq,Ifexpf(*)
 
  write(iout,"(//, 1x,36('*'),/, 1x,'***     Frequency Correction     ***',/, 1x,36('*'))")
 
@@ -153,19 +153,31 @@ subroutine RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Reslt,expf,IRNAME,Ifexpf,ctmp
  if(.not. OK) goto 200
 
  ! check frequencies
+ imgfrq = .false.
  do i=1,NVib
    if(expf(i) < -9.0d3 .or. expf(i) > 9.0d3)then
      write(iout,"(/,2x,'Ifq = ',i4,', Freq = ',f16.4)")i,expf(i)
      goto 1040
    end if
+   if(expf(i) < 0.0d0 .or. Reslt(i,3) < 0.0d0) imgfrq = .true.
  end do
 
- ! print vib. frequencies
- write(iout,"(/, 1x,52('-'),/, 1x,'No.      Symm    Expt.Freq    Theo.Freq        Corr.',/, 1x,52('-'))")
- do i=1,NVib
-   if(Ifexpf(i)) write(iout,"(1x,i5,4x,a4,3(3x,f10.4))")i,IRNAME(i),expf(i),Reslt(i,3)*au2wn,expf(i)-Reslt(i,3)*au2wn
- end do
- write(iout,"(1x,52('-'),//,' <<< NOTE >>>',/,' The corrected frequencies will be used in the following analysis.')")
+ ! print corrected vib. frequencies
+ if(imgfrq) then
+   write(iout,"(/, 1x,65('-'),/, 1x,'No.      Symm    Expt.Freq    Theo.Freq     Re(Corr)     Im(Corr)',/, 1x,65('-'))")
+   do i=1,NVib
+     call cplxsub(expf(i),Reslt(i,3)*au2wn,dfreq)
+     if(Ifexpf(i)) write(iout,"(1x,i5,4x,a4,4(3x,f10.4))")i,IRNAME(i),expf(i),Reslt(i,3)*au2wn,dfreq(1),dfreq(2)
+   end do
+   write(iout,"(1x,65('-'),/)")
+ else
+   write(iout,"(/, 1x,52('-'),/, 1x,'No.      Symm    Expt.Freq    Theo.Freq        Corr.',/, 1x,52('-'))")
+   do i=1,NVib
+     if(Ifexpf(i)) write(iout,"(1x,i5,4x,a4,3(3x,f10.4))")i,IRNAME(i),expf(i),Reslt(i,3)*au2wn,expf(i)-Reslt(i,3)*au2wn
+   end do
+   write(iout,"(1x,52('-'),/)")
+ end if
+ write(iout,"(' <<< NOTE >>>',/,' The corrected frequencies will be used in the following analysis.')")
 
  do i=1,NVib
    ! cm^-1 --> a.u.

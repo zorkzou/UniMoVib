@@ -8,7 +8,7 @@
 \title{
 \vspace{-3cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\
-\vspace{1cm} \zihao{3}（1.2.2版）\vspace{30 mm} \\
+\vspace{1cm} \zihao{3}（1.2.5版）\vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm}}
 
 \author{
@@ -34,7 +34,7 @@
 \chapter{关于\textsc{UniMoVib}}
 \label{part:about}
 
-\textsc{UniMoVib}是进行分子振动频率计算的统一接口。程序最初是我于2014至2015年在德州达拉斯市的南方卫理会大学期间用 FORTRAN 77编写，用作\href{https://sites.smu.edu/dedman/catco/}{CATCO小组}的分子局域模式程序\href{https://github.com/catco-smu}{\textsc{LocalMode}}的前端接口。本项工作得到美国NSF项目CHE 1152357和CHE 1464906的支持，并得到已故 的Dieter Cremer教授的鼎力支持和指导。
+\textsc{UniMoVib}是进行分子振动频率计算的统一接口。程序最初是我于2014至2015年在德州达拉斯市的南方卫理会大学期间用 FORTRAN 77编写，用作\href{https://sites.smu.edu/dedman/catco/}{CATCO小组}的分子局域模式程序\textsc{LocalMode}（现在叫\href{https://github.com/catco-smu}{\textsc{LModeA}}）的前端接口。本项工作得到美国NSF项目CHE 1152357和CHE 1464906的支持，并得到已故 的Dieter Cremer教授的鼎力支持和指导。
 从2017年春天开始，\textsc{UniMoVib}用Fortran 90重新改写，作为独立程序发布。
 
 \section{功能} \label{sec:feature}
@@ -162,21 +162,23 @@ make
 \bigskip{}
 \verb|IFExp|：（\verb|.True.|/\verb|.False.|）用实验振动频率校正Hessian矩阵，在\verb|$ExpFrq|输入组（参见第\ref{sec:inp-expfrq}节）之后提供。默认：\verb|.False.|
 
+\subsection{保存数据的关键词} \label{subsec:inp-qcdata-save}
+
 \bigskip{}
 \verb|IFSAVE|：（\verb|.True.|/\verb|.False.|）把原子质量（受\verb|Isotop|影响），直角坐标，Hessian矩阵（受\verb|IFExp|影响），APT矩阵保存到纯文本数据文件*.umv中。该关键词不能与\verb|QCProg="AtomCalc"|或\verb|"UniMoVib"|同时用。默认：\verb|.False.|。关于数据格式，参见附录\ref{sec:almfmt}。
 
 \bigskip{}
-\verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|或\verb|"MOLDEN"|之外，保存\textsc{Molden}文件，它可以用\href{http://www.cmbi.ru.nl/molden/molden.html}{\textsc{Molden}}或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|
+\verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|之外，保存\textsc{Molden}文件，它可以用\href{http://www.cmbi.ru.nl/molden/molden.html}{\textsc{Molden}}或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|
 
 \bigskip{}
-\verb|IFLOCAL|：（\verb|.True.|/\verb|.False.|）保存数据文件，用于\textsc{LocalModes}程序的局域模式分析（主页：\href{https://github.com/catco-smu}{https://github.com/catco-smu}）。该关键词不能用于
-\verb|QCProg="AtomCalc"|。默认：\verb|.False.|。
+\verb|IFLOCAL|：（\verb|.True.|/\verb|.False.|）保存数据文件，用于\textsc{LModeA}程序的局域模式分析（主页：\href{https://sites.smu.edu/dedman/catco/}{https://sites.smu.edu/dedman/catco/}）。
+该关键词不能用于\verb|QCProg="AtomCalc"|。默认：\verb|.False.|。
 
 \bigskip{}
 \verb|IFGauTS|：（\verb|.True.|/\verb|.False.|）把结构和Hessian矩阵存为\textsc{Gaussian}的输入文件模板，用于过渡态优化计算。该关键词不能用于
 \verb|QCProg="AtomCalc"|。默认：\verb|.False.|。注意：此输入对于ONIOM计算类型无效，因为\textsc{Gaussian}此时只能使用默认的冗余内坐标进行优化。
 
-\subsection{专家级关键词} \label{subsec:inp-qcdata-expert}
+\subsection{专业级关键词} \label{subsec:inp-qcdata-expert}
 
 一般不需要在\texttt{\$Contrl}中设置这些关键词。
 
@@ -217,8 +219,11 @@ make
 *.hess （通过\verb|HESS|），其中\verb|DDIP|是可选的，若对红外强度不感兴趣可以忽略。
 \item \textsc{CFour}
   \begin{description}
-  \item[ ]解析频率计算（\texttt{VIB=ANALYTIC}）：*.out文件（通过\verb|FCHK|） + GRD（通过\verb|GEOM|）。
-  \item[ ]数值频率和解析频率计算：使用\textsc{Molden}文件。但是无红外强度。参见下面的\texttt{MOLDEN}。
+  \item 解析频率计算（\texttt{VIB=ANALYTIC}）：*.out文件（通过\verb|FCHK|） + GRD（通过\verb|GEOM|）。
+  \item 数值频率（\texttt{VIB=FINDIF}）和解析频率计算：使用\textsc{Molden}文件。但是无红外强度。参见下面的\texttt{MOLDEN}。
+  \item 如果没有GRD文件或\textsc{Molden}文件，或者由于某些原因导致\textsc{Molden}文件缺少频率数据，也可以仅指定*.out文件（通过\verb|FCHK|），
+  \textsc{UniMoVib}将尝试从*.out中打印的原子量，振动频率，和简正模式构造Hessian矩阵。但是，由于\textsc{CFour}打印的简正模式存在一些缺陷和
+  错误（参见第\ref{part:problem}章），本选项可能无法正常工作，因此不建议使用。
   \end{description}
 \item \textsc{Turbomole}：aoforce模块的*.out文件（通过\verb|FCHK|；默认：aoforce.out） +
 dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强度不感兴趣可以忽略。
@@ -238,7 +243,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \verb|[FR-COORD]|，\verb|[FR-NORM-COORD]|数据区。一些问题参见第\ref{part:problem}章。
 \item \textsc{Crystal}：分子谐振频率计算产生的输出文件（通过\verb|FCHK|）。
 \item \textsc{Spartan}：*.smol存档文件（通过\verb|FCHK|）。假定为最丰同位素质量。
-\item \textsc{Psi}：输出文件（通过\verb|FCHK|）。在\textsc{Psi} 4的频率计算中，用\texttt{set print 3}打印Hessian。
+\item \textsc{Psi}：输出文件（通过\verb|FCHK|）。在\textsc{Psi} 4的数值频率计算中，用\texttt{set print 3}打印Hessian。
 \item \textsc{Dmol3}：输出文件（通过\verb|FCHK|）。
 \item \textsc{Aces}：输出文件（通过\verb|FCHK|），但是建议使用\textsc{Molden}文件，可以得到更高的数字精度。 一些问题参见第\ref{part:problem}章。
 \item \textsc{UniMoVib}：ASCII数据文件（通过\verb|FCHK|），\textsc{UniMoVib}通过选项\verb|IFSAVE=.TRUE.|产生，也可以由用户手工编写（参见附录\ref{sec:almfmt}）。
@@ -315,10 +320,13 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \verb|Press|：压强（单位：大气压atm）。默认：1.0。若\verb|Press| < 0，表示除了默认压强以外，在\texttt{\$Thermo}输入组之后还提供多个额外的压强值。
 
 \bigskip{}
-\verb|Scale|：频率换算因子。默认：1.0。\texttt{\$ExpFrq}输入组中定义的实验频率不做换算。
+\verb|Scale|：实频率的换算因子。默认：1.0。\texttt{\$ExpFrq}输入组中定义的实验频率不做换算。
 
 \bigskip{}
-\verb|PG|：指定用于计算转动熵的点群名。它会影响熵和 Gibbs自由能的结果，因此必须指定正确的点群。
+\verb|ScTol|：换算因子的阈值（单位：cm$^{-1}$）。此值以下的低频不做换算。默认除实验频率和虚频以外的全部频率都做换算。
+
+\bigskip{}
+\verb|PG|：用于计算转动熵的点群名。它影响熵和 Gibbs自由能的结果，因此必须指定正确的点群。
 \begin{description}
 \item[ ]\verb|  = 0|：（默认）2。
 \item[ ]\verb|  = 1|：使用不依赖同位素的点群。若同位素导致对称性降低，该选项可以重复某些量子化学程序计算的错误 结果。
@@ -452,7 +460,7 @@ Step 2.
 Calculate "experimental" frequencies of HDO using the experimental frequencies of H2O.
 CCSD(T)/cc-pVTZ frequencies:        1463  2828  3895 cm-1
 "experimental" frequencies:         1398  2692  3708 cm-1
-real experimental frequencies:      1402  2727  3707 cm-1
+genuine experimental frequencies:   1402  2727  3707 cm-1
 
  $contrl
    qcprog="unimovib"
@@ -495,6 +503,16 @@ real experimental frequencies:      1402  2727  3707 cm-1
 由于\textsc{Aces}输出文件缺少同位素质量信息，程序假定为最丰同位素，若不符合，结果可能会完全错误。
 因此必须在产生\textsc{Aces}输出文件的频率计算中使用最丰同位素（\textsc{Aces}默认）。
 
+\item \textsc{CFour}
+
+在只有单个*.out文件使用的情况下（通过\verb|FCHK|），\textsc{UniMoVib}尝试构造Hessian矩阵。但是由于\textsc{CFour}打印的简正模式
+存在缺陷和错误，结果可能有问题：
+\begin{enumerate}
+  \item 对于高对称分子，在频率输出部分可能会重新排列原子，导致原子顺序在几何结构部分和频率部分不一致。
+  \item 对于线形多原子分子，可能会少打印一个简正模式。
+  \item 由于打印的简正模式数据精度很低（第一列只有3个有效数字，其余列4个），一些低频可能无法被\textsc{UniMoVib}复现。
+\end{enumerate}
+
 \end{itemize}
 
 \appendix
@@ -502,8 +520,8 @@ real experimental frequencies:      1402  2727  3707 cm-1
 
 \section{UniMoVib数据文件格式} \label{sec:almfmt}
 
-UniMoVib数据文件是纯文本自由格式。 \\
-1.0.2版(2019.04.17)
+\textsc{UniMoVib}数据文件是纯文本自由格式。 \\
+1.0.3版(2020.02.10)
 \begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
 \ttfamily
 \begin{lstlisting}
@@ -511,7 +529,7 @@ UniMoVib数据文件是纯文本自由格式。 \\
 NATM
   （一个正整数）
 AMASS
-  （NATM个原子质量）
+  （NATM个原子质量；若不提供原子质量，改用NOMASS）
 ZA
   （NATM个核电荷数）
 XYZ
@@ -526,7 +544,7 @@ DPR
 GRD
   （3*NATM，直角坐标下的梯度数组；若不提供梯度，改用 NOGRD）
 \end{lstlisting}\end{colorboxed}
-目前\verb|DPR|数据和拉曼强度仅支持Gaussian产生的fchk文件。\verb|GRD|数据仅用于某些外部程序（如\textsc{LocalModes}）。
+目前\verb|DPR|数据和拉曼强度仅支持\textsc{Gaussian}产生的fchk文件。\verb|GRD|数据仅用于某些外部程序（如\textsc{LModeA}）。
 
 \section{开发人员：到其它量子化学程序的接口} \label{sec:interface}
 
