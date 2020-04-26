@@ -3,8 +3,8 @@
 ! Solve Secular equation in Cartesian coordinates
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SolvSec(iinp,iout,idt0,irep,iudt,imdn,iloc,igau,Intact,IOP,Infred,IRaman,IGrd,NAtm,NVib,ctmp,AMass,ZA,XYZ,Grd,FFx,  &
-  APT,DPol,AL,Rslt,Scr1,Scr2,Scr3,Scr4,Work)
+subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,Intact,IOP,Infred,IRaman,IGrd,NAtm,NVib,ctmp,AMass,ZA,XYZ,Grd,  &
+  FFx,APT,DPol,AL,Rslt,Scr1,Scr2,Scr3,Scr4,Work)
  implicit real(kind=8) (a-h,o-z)
  dimension :: IOP(*),AMass(*),ZA(*),XYZ(*),Grd(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),Scr1(*),Scr2(*),Scr3(*),Scr4(*),Work(*)
  character*4 :: PGNAME(2)
@@ -13,6 +13,7 @@ subroutine SolvSec(iinp,iout,idt0,irep,iudt,imdn,iloc,igau,Intact,IOP,Infred,IRa
 
  IFAtom = IOP(1) == -1
  NAtm3=3*NAtm
+ NSS=NAtm3*NAtm3
 
  if(IFAtom) then
    NVib = 0
@@ -37,15 +38,25 @@ subroutine SolvSec(iinp,iout,idt0,irep,iudt,imdn,iloc,igau,Intact,IOP,Infred,IRa
    ! generate m.w. vectors of vibrations by Gram-Schmidt orthogonalization
    call GSorth(Intact,.True.,NAtm3,NTR,AL,Scr3)
    ! construct secular equation in pure. vib. subspace, do diagonalization, and renormalize the mass-unweighted eigenvectors
-   call VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
+   if(IOP(12) == 0) then
+     call VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
+   else
+     write(iout,"(//,' IFSymtz=T : vibrational normal modes will be symmetrized and reordered.')")
+     call VibSEqSymm(iout,ireo,Intact,NAtm,NAtm3,NVib,IOP(5),AMass,XYZ,FFx,AL,Scr1,Scr2,Scr3,Scr4,Work(1),Work(1+NSS),ctmp)
+   end if
  end if
- call RmNoise(NAtm3*NAtm3,1.0d-8,AL)
+ call RmNoise(NSS,1.0d-8,AL)
 
  ! calculate freq. and IR int. of normal modes. The results are saved in Rslt.
  call NormFq(iout,Infred,IRaman,NAtm,NAtm3,NVib,IOP(2),AMass,ZA,FFx,APT,DPol,AL,Rslt,Scr1,Scr2)
 
  ! symmetry analysis; irreps of normal modes will be saved in file irep
- call symdrv(iout,irep,NAtm,IOP(5),.true.,XYZ,ZA,AMass,AL,PGNAME)
+ if(IOP(12) == 0) then
+   call symdrv(iout,irep,NAtm,IOP(5),.false.,.true.,XYZ,ZA,AMass,AL,PGNAME)
+ else
+   call symdrv(iout,irep,NAtm,IOP(5),.false.,.false.,XYZ,ZA,AMass,AL,PGNAME)
+   call dumpir(ireo,irep,ctmp)
+ end if
 
  ! print normal modes results saved in Rslt
  call PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,(IOP(1)==-3),IOP(2),IOP(10),ZA,AL,Rslt,Scr2)
@@ -351,6 +362,171 @@ subroutine GSorth(Intact,Reorder,N,M,Vec,Scr)
    Call ACopy(N*(N-M),Scr(Idx),Vec)
    Call ACopy(N*M,Scr,Vec(1,Jdx))
  end if
+
+ return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! sub. VibSEq with symmetry constraint
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine VibSEqSymm(iout,ireo,Intact,NAtm,NAtm3,NVib,ISyTol,AMass,XYZ,FFx,AL,FF0,AL0,IrrMap,Scr1,Scr2,Scr3,ctmp)
+ implicit real(kind=8) (a-h,o-z)
+ parameter(One=1.d0)
+ real(kind=8) :: AMass(*),XYZ(*),FFX(NAtm3,NAtm3),AL(NAtm3,NAtm3),FF0(NAtm3,NAtm3),AL0(NAtm3,NAtm3),Scr1(NAtm3,NAtm3),  &
+                 Scr2(NAtm3,NAtm3),Scr3(NAtm3,NAtm3)
+ integer      :: IrrMap(NAtm3,3)
+ logical      :: Intact
+ character*100 :: ctmp
+ character*4, allocatable :: Irreps(:)
+
+ !  --------------
+ ! | Model system |
+ !  --------------
+
+ AL0 = AL
+ Nrt = NAtm3 - NVib
+
+ ! simulated FF0 by atomic masses.
+ call DDerNRE(NAtm,AMass,XYZ,Scr2,Scr1(1,1),Scr1(1,3))
+ call TrAdd(NAtm3,Scr2,FF0)
+ ! call MPACMF(Scr2,Scr2,FF0,NAtm3,NAtm3,2)
+
+ ! FF0(m.w.) --> Scr1
+ do i=1,NAtm3
+   im=(i-1)/3+1
+   do j=1,i-1
+     jm=(j-1)/3+1
+     Scr1(j,i)=FF0(j,i)/sqrt(AMass(im)*AMass(jm))
+     Scr1(i,j)=Scr1(j,i)
+   end do
+   Scr1(i,i)=FF0(i,i)/AMass(im)
+ end do
+ ! AL0(vib)^T --> Scr2
+ call Transp(NAtm3,NVib,AL0,Scr2)
+ ! AL0(vib)^T * FF0(m.w.) * AL0(vib) --> Scr1
+ call MMpyMF(NVib,NAtm3,NAtm3,Scr2,Scr1,Scr3)
+ call MMpyMF(NVib,NAtm3,NVib,Scr3,AL0,Scr1)
+ ! diagonalization; eigenvector --> Scr1
+ ! The work space is Scr3, which is large enough.
+ call DiagS1(Intact,NVib,Scr1,Scr2,Scr3)
+
+ ! transform eigenvectors (saved in Scr1) into Cart. coordinates: AL0(NAtm3,NVib)*Scr1 --> Scr2
+ call MMpyMF(NAtm3,NVib,NVib,AL0,Scr1,Scr2)
+ Call ACopy(NAtm3*Nrt,AL0(1,NVib+1),Scr2(1,NVib+1))
+ ! replace the mass-weighted Gram-Schmidt vectors by the m.w. model vectors
+ Call ACopy(NAtm3*NVib,Scr2,AL)
+
+ ! mass-unweighting and renormalization --> AL0
+ do i=1,NAtm3
+   do j=1,NAtm3
+     jm=(j-1)/3+1
+     Scr2(j,i) = Scr2(j,i)/sqrt(AMass(jm))
+   end do
+   X = dotx(NAtm3,Scr2(1,i),Scr2(1,i))
+   X = One/sqrt(X)
+   call AScale(NAtm3,X,Scr2(1,i),AL0(1,i))
+ end do
+
+ ! symmetry analysis; irreps of normal modes will be saved in ireo
+ open(ireo,file='SYMFIL2.rep')
+ call symdrv(iout,ireo,NAtm,ISyTol,.true.,.true.,XYZ,AMass,AMass,AL0,ctmp)
+ ! reorder m.w. vib. modes in AL according to irreps --> AL0
+ IrrMap = 0
+ allocate(Irreps(NAtm3))
+ call CountIrrep(Intact,ireo,NAtm3,NVib,NClass,Irreps,IrrMap)
+ !write(iout,"(10i4)")IrrMap(1:NVib,1)
+ ivib = 0
+ IrrMap(1,2) = 1
+ do iclass = 1, NClass
+   if(iclass > 1) IrrMap(iclass,2) = 1 + IrrMap(iclass-1,3)
+   do i=1,NVib
+     if(IrrMap(i,1) == iclass) then
+       ivib = ivib + 1
+       AL0(:,ivib) = AL(:,i)
+     end if
+   end do
+   IrrMap(iclass,3) = ivib
+   ! write(iout,"(i6,4x,a4)") iclass, Irreps(iclass)
+ end do
+ !write(iout,"(10i4)")IrrMap(1:NClass,2)
+ !write(iout,"(10i4)")IrrMap(1:NClass,3)
+
+ !  -------------
+ ! | Real system |
+ !  -------------
+
+ ! FFX(m.w.) --> FF0
+ do i=1,NAtm3
+   im=(i-1)/3+1
+   do j=1,i-1
+     jm=(j-1)/3+1
+     FF0(j,i)=FFx(j,i)/sqrt(AMass(im)*AMass(jm))
+     FF0(i,j)=FF0(j,i)
+   end do
+   FF0(i,i)=FFx(i,i)/AMass(im)
+ end do
+
+ do iclass = 1, NClass
+   ! AL0 --> AL for iclass
+   ivib = IrrMap(iclass,2)
+   NVib0 = IrrMap(iclass,3) - ivib + 1
+   if(NVib0 < 2) then
+     Call ACopy(NAtm3,AL0(1,ivib),AL(1,ivib))
+   else
+     ! AL0(vib)^T --> Scr2
+     call Transp(NAtm3,NVib0,AL0(1,ivib),Scr2)
+     ! AL0(vib)^T * FFX(m.w.) * AL0(vib) --> Scr1
+     call MMpyMF(NVib0,NAtm3,NAtm3,Scr2,FF0,Scr3)
+     call MMpyMF(NVib0,NAtm3,NVib0,Scr3,AL0(1,ivib),Scr1)
+     ! diagonalization; eigenvector --> Scr1
+     ! The work space is Scr3, which is large enough.
+     call DiagS1(Intact,NVib0,Scr1,Scr2,Scr3)
+     ! transform eigenvectors (saved in Scr1) into Cart. coordinates: AL0(NAtm3,NVib0)*Scr1 --> AL(NAtm3,NVib0)
+     call MMpyMF(NAtm3,NVib0,NVib0,AL0(1,ivib),Scr1,AL(1,ivib))
+   end if
+ end do
+
+ ! reorder vib. normal modes according to the lowest eigenvalues of each class --> AL0
+ ! NOTE: symdrv doesn't work well if the degenerate irreps are not continuous after reordering.
+ do i=1,NVib
+   call MMpyMF(1,NAtm3,NAtm3,AL(1,i),FF0,Scr1)
+   Scr3(i,1) = dotx(NAtm3,Scr1,AL(1,i))
+ end do
+ ! lowest eigenvalues of each class
+ do iclass = 1, NClass
+   Scr3(iclass,2) = Scr3(IrrMap(iclass,2),1)
+ end do
+ ! save a data file with reordered irreps
+ rewind(ireo)
+ write(ireo,"(2i6)") NClass, Nrt
+ Emax = ArMax(NClass,jclass,Scr3(1,2)) * 2.0d0
+ ivib = 1
+ do iclass = 1, NClass
+   Emin = ArMin(NClass,jclass,Scr3(1,2))
+   Scr3(jclass,2) = Emax
+   jvib = IrrMap(jclass,2)
+   NVib0 = IrrMap(jclass,3) - jvib + 1
+   write(ireo,"(i6,1x,a4)") NVib0, Irreps(jclass)
+   Call ACopy(NAtm3*NVib0,AL(1,jvib),AL0(1,ivib))
+   ivib = ivib + NVib0
+ end do
+ Call ACopy(NAtm3*Nrt,AL(1,NVib+1),AL0(1,NVib+1))
+ write(ireo,"(a4)") Irreps(NVib+1:NAtm3)
+
+ ! mass-unweighting and renormalization
+ do i=1,NAtm3
+   do j=1,NAtm3
+     jm=(j-1)/3+1
+     Scr2(j,i) = AL0(j,i)/sqrt(AMass(jm))
+   end do
+   X = dotx(NAtm3,Scr2(1,i),Scr2(1,i))
+   X = One/sqrt(X)
+   call AScale(NAtm3,X,Scr2(1,i),AL(1,i))
+ end do
+
+ deallocate(Irreps)
 
  return
 end

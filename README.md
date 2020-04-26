@@ -4,17 +4,16 @@ A unified interface for molecular harmonic vibrational frequency calculations.
 The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas, Texas, within the framework of the LocalMode (now LModeA) program of the Computational and Theoretical Chemistry Group (CATCO) of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
 
 ## Latest Version
+Version 1.3.0 (Apr/26/2020).
+
+1. Due to Jahn-Teller effects or numerical noise, sometimes the irreps of vibrational normal modes cannot be determined by the program.
+A new keyword `IFSymtz` has been introduced which may symmetrize the vibrational normal modes.
+
 Version 1.2.5 (Feb/10/2020).
 
 1. Analytic Hessian by [Psi4](http://www.psicode.org/) may be used.
 2. In the UniMoVib data file, the atomic mass block is optional now.
 3. Bug fix: print complex frequency corrections if there are imaginary frequencies.
-
-Version 1.2.4 (Jul/15/2019).
-
-1. Bug fix for [CFour](http://www.cfour.de/) if there are dummy atoms or imaginary frequencies.
-2. A tolerance of scaling for thermochemistry calculation is introduced.
-3. Save a new Molden file by `IFMOLDEN=.t.` when `QCProg="MOLDEN"`.
 
 ## Features
 
@@ -27,16 +26,13 @@ Version 1.2.4 (Jul/15/2019).
 7. Can be used as a third party module for frequency and thermochemistry calculations in a quantum chemistry program, for example, [BDF](http://182.92.69.169:7226/).
 8. Interface to [LModeA](https://sites.smu.edu/dedman/catco/) for the local mode analysis (e.g. force constants of chemical bonds, bond angles, and so on).
 
-### To be done
-
-1. Symmetrize normal modes for open-shell systems.
-
 ## Supported quantum chemistry programs
 
 * [Aces](http://www.qtp.ufl.edu/ACES/)
 * [Adf](http://www.scm.com/)
 * Ampac 2.x. See [Semichem, Inc.](http://www.semichem.com/)
 * [Amsol](http://comp.chem.umn.edu/amsol/)
+* [BDF](http://182.92.69.169:7226/)
 * [CFour](http://www.cfour.de/)
 * [Columbus](http://www.univie.ac.at/columbus/)
 * [CP2k](http://www.cp2k.org/)

@@ -7,6 +7,7 @@
 !   irep   = port of irrep. file
 !   Natom  = #atoms
 !   ITol   = (MN) symmetry tolerance M * 10^N * 0.001
+!   IFModel= (logical) model system or not
 !   IFVMOD = (logical) analyze vib. normal coordinates or not
 !   coord  = cartesian coordinates of atoms in Angstrom
 !   za     = atomic nuclear charge numbers
@@ -18,12 +19,12 @@
 !   The irrep. names of the mass-dependent point group are saved in irep
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine symdrv(iout,irep,Natom,ITol,IFVMOD,coord,za,amass,vmod,PGNAME)
+subroutine symdrv(iout,irep,Natom,ITol,IFModel,IFVMOD,coord,za,amass,vmod,PGNAME)
 implicit real(kind=8) (a-h,o-z)
 real(kind=8) :: coord(3*Natom),za(Natom),amass(Natom),vmod(*)
 parameter(NOper=20,NGPS=57,NTBS=38)
 character*4 :: PGNAME(2)
-logical :: IFVMOD
+logical :: IFModel,IFVMOD
 real(kind=8),allocatable :: CORE(:)
 
 N = MOD(ITol,10)
@@ -69,7 +70,10 @@ IEND  = ISC2  + NS
 
 allocate(CORE(IEND))
 
-do igp=1,2
+i1=1
+if(IFModel) i1=2
+
+do igp=i1,2
   ! 1: Point group for Cartesian coordinates + ZA
   !    this point group symmetry is used for electronic states and orbitals
   ! 2: Point group for Cartesian coordinates + ZA + M
@@ -84,15 +88,23 @@ do igp=1,2
   call ACopy(NATM3,coord,CORE(IXYZ))
   call symini(Natom,NOper,PGNAME(igp),CORE(IRRP),CORE(IIEM),CORE(IELM),CORE(IJEM),CORE(ICUB))
   call pgsini(CORE(NTAB),CORE(NALG),CORE(NALO),CORE(IARP))
-  call symgrp(iout,Natom,NOper,tol,CORE(IZ),CORE(IAM),CORE(IXYZ),CORE(IIEM),CORE(IELM),CORE(IJEM),CORE(ICUB), &
+  call symgrp(Natom,NOper,tol,CORE(IZ),CORE(IAM),CORE(IXYZ),CORE(IIEM),CORE(IELM),CORE(IJEM),CORE(ICUB), &
    CORE(IROT),CORE(IICY),CORE(IEIG),CORE(NOPE),CORE(NREP),CORE(NTAB),CORE(NALG),CORE(NALO),CORE(IARP), &
    nclass,nirred,PGNAME(igp),CORE(IJX),CORE(IJY),CORE(IGRP),CORE(ISC1),CORE(ISC2))
 
-  if(igp == 1) then
-    write(iout,"(//,1x,'<<< POINT GROUP SYMMETRY >>>')")
-    write(iout,"(' Electronic Wavefunctions      :  ',A4)") PGNAME(igp)
+  if(IFModel) then
+    if(PGNAME(igp) == "****") then
+      call XError(.false.,"The symmetry of model system is not supported.")
+    else if(PGNAME(igp) == "C1  ") then
+      call XError(.false.,"Model system with C1 symmetry doesn't make sense!")
+    end if
   else
-    write(iout,"(' Nuclear & Total Wavefunctions :  ',A4)") PGNAME(igp)
+    if(igp == 1) then
+      write(iout,"(//,1x,'<<< POINT GROUP SYMMETRY >>>')")
+      write(iout,"(' Electronic Wavefunctions      :  ',A4)") PGNAME(igp)
+    else
+      write(iout,"(' Nuclear & Total Wavefunctions :  ',A4)") PGNAME(igp)
+    end if
   end if
 end do
 
@@ -129,7 +141,7 @@ call makopr(iout,Natom,ZA,AMS,XYZ,IELEM,ELEM,JELEM,CUB,ROT,nclass,  JY,  SC1,SC2
 
 ! vibrational analyses
 NATM3 = Natom*3
-call symoir(iout,nclass,nirred,Natom,NATM3,NOper,IRNAME,vmod,ELEM,JELEM,ROT,  JX,group,carmat,tchar,  SC1,SC2)
+call symoir(nclass,nirred,Natom,NATM3,NOper,IRNAME,vmod,ELEM,JELEM,ROT,  JX,group,carmat,tchar,  SC1,SC2)
 
 do i=1,NATM3
   write(irep,"(a4)")adjustl(IRNAME(i))
@@ -145,7 +157,7 @@ end
 ! GROUP(i,j) is the Character of Irreducible Representation i in Class j.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine symoir(iout,nclass,nirred,Natom,NATM3,NOper,IRNAME,vmod,ELEM,JELEM,ROT,  JX,group,carmat,tchar,  SC1,SC2)
+subroutine symoir(nclass,nirred,Natom,NATM3,NOper,IRNAME,vmod,ELEM,JELEM,ROT,  JX,group,carmat,tchar,  SC1,SC2)
 implicit real(kind=8) (a-h,o-z)
 character*4 :: JX(*),IRNAME(NATM3)
 real(kind=8) :: vmod(NATM3,*),ELEM(3,3,*),ROT(3,3),group(NOper,*),carmat(NATM3,*),tchar(*),  SC1(*),SC2(*)
@@ -333,7 +345,7 @@ end
 !   JY     =
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine symgrp(iout,Natom,NOper,tol,ZA,AMS,XYZ,IELEM,ELEM,JELEM,CUB,ROT,ICYC,EIG,  NOPE,NREP,NTAB,NALLG,NALLOP,ALLREP, &
+subroutine symgrp(Natom,NOper,tol,ZA,AMS,XYZ,IELEM,ELEM,JELEM,CUB,ROT,ICYC,EIG,  NOPE,NREP,NTAB,NALLG,NALLOP,ALLREP, &
   nclass,nirred,PGNAME,JX,JY,GROUP, SC1,SC2)
 implicit real(kind=8) (a-h,o-z)
 Dimension :: IELEM(NOper),JELEM(Natom,*),ICYC(6),NOPE(*),NREP(*),NTAB(*),NALLG(*),NALLOP(*),JX(*),JY(*)

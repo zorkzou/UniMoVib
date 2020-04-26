@@ -149,8 +149,8 @@ subroutine RdContrl(iinp,iout,iudt,imdn,iloc,igau,Intact,NOp,IOP,qcprog,cname)
 implicit real(kind=8) (a-h,o-z)
 parameter(NProg=26)
 dimension :: IOP(NOp)
-logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts
-namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts
+logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz
+namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz
 character*200 :: qcprog, cname
 character*9,allocatable  :: DATFMT(:)
 
@@ -168,6 +168,7 @@ iflocal  = .false.
 ifrdnm   = .false.
 ifapprx  = .false.
 ifgauts  = .false.
+ifsymtz  = .false.
 
 rewind(iinp)
 read(iinp,Contrl,end=100,err=10)
@@ -406,6 +407,13 @@ if(ifgauts) then
   if(Intact) write(*,"(' TS input file:',3x,'gaussian-ts.gjf')")
 end if
 
+!>>>  ifsymtz --> IOP(12) = 0 (ifsymtz=.false.) or 1 (ifsymtz=.true.)
+if(ifsymtz) then
+! Compatibility: ifrdnm
+  if(IOP(9) /= 0) call XError(Intact,"IFSymtz is incompatible with IFRdNM!")
+  IOP(12) = 1
+end if
+
 return
 end
 
@@ -615,6 +623,29 @@ end if
 return
 end
 
-!--- END
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! save irreps in ida1 to ida2.
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine dumpir(ida1,ida2,c4)
+ implicit real(kind=8) (a-h,o-z)
+ character*4   :: c4
 
+ rewind(ida1)
+ read(ida1,"(2i6)") NClass, Nrt
+ do i = 1, NClass
+   read(ida1,"(i6,1x,a4)") n, c4
+   write(ida2,"(a4)") (adjustl(c4),j=1,n)
+ end do
+
+ do i = 1, Nrt
+   read(ida1,"(a4)") c4
+   write(ida2,"(a4)") adjustl(c4)
+ end do
+
+ return
+end
+
+!--- END
 

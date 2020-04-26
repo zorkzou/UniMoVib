@@ -1147,6 +1147,26 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
+! B = A + A^T. A is symmetric; A and B can be the same matrix.
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine TrAdd(N,A,B)
+ Implicit Real*8(A-H,O-Z)
+ real(kind=8) :: A(N,N),B(N,N)
+
+ do i=1,N
+   do j=1,i-1
+     B(j,i)=A(j,i)+A(i,j)
+     B(i,j)=B(j,i)
+   end do
+   B(i,i)=A(i,i)+A(i,i)
+ end do
+
+ return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
 ! AT(N,M) = A(M,N)^T
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1405,6 +1425,40 @@ implicit real(kind=8) (a-h,o-z)
 ichawsp = (N - 1) / 8 + 1
 
 return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! counting irreps
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine CountIrrep(Intact,iport,NAtm3,NVib,NClass,Irreps,ModMap)
+ implicit real(kind=8) (a-h,o-z)
+ logical :: Intact
+ character*4 :: Irreps(NAtm3)
+ dimension :: ModMap(NVib)
+
+ rewind(iport)
+ do i = 1, NAtm3
+   read(iport,"(a4)") Irreps(i)
+   if(i <= NVib .and. Irreps(i) == "****") call XError(Intact,"Unknown irreps of model system.")
+ end do
+
+ NClass = 0
+ ModMap = 0
+ do i = 1, NVib
+   if(ModMap(i) == 0) then
+     NClass = NClass + 1
+     ModMap(i) = NClass
+     ! save irreps of each class
+     Irreps(NClass) = Irreps(i)
+     do j = i+1, NVib
+       if(Irreps(i) == Irreps(j)) ModMap(j) = NClass
+     end do
+   end if
+ end do
+
+ return
 end
 
 !--- END
