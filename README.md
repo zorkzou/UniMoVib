@@ -6,8 +6,7 @@ The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 20
 ## Latest Version
 Version 1.3.0 (Apr/26/2020).
 
-1. Due to Jahn-Teller effects or numerical noise, sometimes the irreps of vibrational normal modes cannot be determined by the program.
-A new keyword `IFSymtz` has been introduced which may symmetrize the vibrational normal modes.
+1. Due to Jahn-Teller effects or numerical noise, sometimes the irreps of vibrational normal modes cannot be determined by the program. A new keyword `IFSymtz` has been introduced into the program which may symmetrize the vibrational normal modes.
 
 Version 1.2.5 (Feb/10/2020).
 
