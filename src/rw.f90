@@ -1,3 +1,89 @@
+subroutine RdGSVA(iinp,iout,NAtm,flags,NAtm_sub)
+implicit real(kind=8) (a-h,o-z)
+character*1000 ::subsystem!,pair(2)
+character*1 ::hyphen
+character(20), allocatable :: strarray(:),pair(:)
+character(20) :: tmpstr,before,after
+integer,allocatable :: subsystem_idx(:)
+integer :: flags(*)
+namelist/GSVA/subsystem
+
+hyphen = '-'
+
+Do I=1,NAtm
+   flags(I) = 0
+End Do
+
+rewind(iinp)
+read(iinp,GSVA,end=100,err=10)
+goto 100
+10    call XError(.True.,"$GSVA is wrong!")
+
+100   continue
+
+!debug
+!print *,trim(subsystem)
+
+n = count(transfer(subsystem, 'a', len(subsystem)) == ",")
+allocate(strarray(n+1))
+read(subsystem, *) strarray(1:n+1)
+!print *, 'nvalues=', n+1
+!print '(a)', strarray(1:n+1)
+
+
+Do I=1,n+1
+   if(index(strarray(I),hyphen) == 0 )then
+     read (strarray(I),'(I10)') IAt
+     if ((IAt < 1) .or. (IAt > NAtm))then
+        call XError(.True.,"Invalid atom label for GSVA!")
+     end if  
+     !print *,IAt  
+     flags(IAt) = 1 
+   else
+     !print *,strarray(I)
+     tmpstr = trim(strarray(I))
+     !print *,tmpstr
+     !print *,len(tmpstr)
+     Ihyph = index(tmpstr,hyphen)
+     before = tmpstr(1:Ihyph-1)
+     after  = tmpstr(Ihyph+1:len(tmpstr))
+     
+     read (before,'(I10)') IAt1     
+     read (after,'(I10)') IAt2
+     !print *,IAt1
+     !print *,IAt2
+
+     if ((IAt1 < 1) .or. (IAt1 > NAtm) .or. (IAt1 >= IAt2) )then
+        call XError(.True.,"Invalid atom label for GSVA!")
+     end if  
+     if ((IAt2 < 1) .or. (IAt2 > NAtm))then
+        call XError(.True.,"Invalid atom label for GSVA!")
+     end if  
+
+     Do J=IAt1,IAt2
+        flags(J) = 1
+     End Do 
+
+   end if
+End Do
+
+NAtm_sub=0
+Do I=1,NAtm
+  if(flags(I) == 1)then
+     NAtm_sub=NAtm_sub+1  
+  end if
+End Do
+
+
+write(iout,"(//,' -- Generalized Subsystem Vibrational Analysis (GSVA) --',//,&
+' Subsystem has',1x,1I5,2x, 'atoms:')")(NAtm_sub)
+
+!debug
+!PRINT '(10I10)',(flags(j),j=1,NAtm)
+
+return 
+end 
+
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
 ! Print Head-1
@@ -149,8 +235,8 @@ subroutine RdContrl(iinp,iout,iudt,imdn,iloc,igau,Intact,NOp,IOP,qcprog,cname)
 implicit real(kind=8) (a-h,o-z)
 parameter(NProg=26)
 dimension :: IOP(NOp)
-logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz
-namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz
+logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva
+namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva
 character*200 :: qcprog, cname
 character*9,allocatable  :: DATFMT(:)
 
@@ -169,6 +255,7 @@ ifrdnm   = .false.
 ifapprx  = .false.
 ifgauts  = .false.
 ifsymtz  = .false.
+ifgsva   = .false.
 
 rewind(iinp)
 read(iinp,Contrl,end=100,err=10)
@@ -413,6 +500,9 @@ if(ifsymtz) then
   if(IOP(9) /= 0) call XError(Intact,"IFSymtz is incompatible with IFRdNM!")
   IOP(12) = 1
 end if
+
+!GSVA
+if(ifgsva) IOP(15) = 1
 
 return
 end

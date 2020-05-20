@@ -1,0 +1,14 @@
+a test job
+
+ $contrl
+   qcprog="gaussian"
+   ifgsva=.true.
+ $end
+
+ $gsva
+   subsystem="3,4,5,1-2" 
+ $end
+
+ $qcdata
+   fchk="ch4-c60-opt-b3-symmT.fchk"
+ $end
