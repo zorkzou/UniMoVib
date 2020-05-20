@@ -1,3 +1,41 @@
+subroutine obt_idx(iout,flags,subsystem_idx,NAtm)
+implicit real(kind=8) (a-h,o-z)
+integer :: subsystem_idx(*),flags(*)
+
+J = 1
+Do I=1,NAtm
+   if(flags(I) == 1)then
+     subsystem_idx(J) = I
+     J = J + 1  
+   end if
+End Do
+
+write(iout, '(10I5)'),(subsystem_idx(i),i=1,J-1)
+
+return
+end 
+
+
+subroutine PartMX(NAtm,AMass,XYZ,ZA,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub)
+implicit real(kind=8) (a-h,o-z)
+real(kind=8) :: AMass(*),AMass_sub(NAtm_sub),XYZ(3,*),XYZ_sub(3,NAtm_sub),ZA(*),ZA_sub(NAtm_sub)
+integer :: subsystem_idx(*)
+
+Do I=1,NAtm_sub
+   idx_p = subsystem_idx(I)
+   AMass_sub(I) = AMass(idx_p)
+   ZA_sub(I) = ZA(idx_p)
+   Do J=1,3
+      XYZ_sub(J,I) = XYZ(J,idx_p)  
+   End Do 
+End Do 
+
+!PRINT '(10F7.2)',(AMass_sub(i),i=1,3)
+!PRINT '(10F7.2)',(XYZ_sub(i,2),i=1,3)
+return
+end 
+
+
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
 ! Mode = 0 : returns nuclear charge zchar for an element symbol "el"; iza is not used.
@@ -882,7 +920,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine DiagIv(N,A,B)
 implicit real(kind=8) (a-h,o-z)
-parameter(eps=1.d-8)
+parameter(eps=1.d-12)
 real(kind=8) :: A(N,N),B(N)
 
 call AClear(N*N,A)

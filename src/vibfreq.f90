@@ -1,3 +1,124 @@
+subroutine GSVA_engine(iout,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
+implicit real(kind=8) (a-h,o-z)
+dimension :: IOP(*),FFx(*),AMass_sub(*),XYZ_sub(*),AMass_sub_bak(NAtm_sub),ZA_sub(*)
+integer :: subsystem_idx(*)
+allocatable :: Scr1(:),Scr2(:),Scr3(:),Scr4(:),AL(:)
+allocatable :: FFx_inv(:),Scra(:),Scrb(:),Scrc(:),Scrd(:),prod(:),prod_inv(:)!,Rslt(:)
+real(kind=8), dimension (:, :), ALLOCATABLE :: VibSp,VibSp_t,VibSp_full,VibSp_full_t,compl_m1, &
+compl_m2,compl_inv,newHes_1,FFx_sub,Rslt
+
+ NAtm3_sub = 3*NAtm_sub
+ NSS_sub = NAtm3_sub*NAtm3_sub
+ allocate(Scr2(NSS_sub),Scr1(NSS_sub),Scr3(NSS_sub))
+
+!It is required to use identical mass for all atoms
+ call acopy(NAtm_sub,AMass_sub,AMass_sub_bak) 
+ Do J=1,NAtm_sub 
+   AMass_sub(J) = 1.0E0
+ End Do
+
+ call MassCent(NAtm_sub,AMass_sub,XYZ_sub,Scr1,Scr2) 
+      !PRINT '(10F7.2)',(Scr2(i),i=1,3)
+
+ call MIner(.True.,NAtm_sub,AMass_sub,Scr1,Scr1(NAtm3_sub+1),Scr2,Scr2(4))
+
+ allocate(AL(NSS_sub))
+ call TRVec(.True.,NAtm_sub,NTR_sub,Im,AMass_sub,Scr1,AL,Scr1(NAtm3_sub+1),Scr2)
+ NVib_sub=NAtm3_sub-NTR_sub
+      !PRINT '(10I1)', NVib_sub
+ 
+ call GSorth(.True.,.True.,NAtm3_sub,NTR_sub,AL,Scr3)
+      !PRINT '(18F7.2)',(AL(i),i=1+NAtm3_sub*5,NAtm3_sub+NAtm3_sub*5) 
+ allocate(VibSp(3*NAtm_sub,NVib_sub))
+ call acopy(3*NAtm_sub*NVib_sub,AL,VibSp) 
+ allocate(VibSp_t(NVib_sub,3*NAtm_sub))
+ call Transp(3*NAtm_sub,NVib_sub,VibSp,VibSp_t) 
+
+
+!test print for matlab script - to replace b1,b2
+ Do J=1,3
+    !PRINT '(9E17.8)',(VibSp(i,J),i=1,9)
+    !PRINT '(9E17.8)',(VibSp_t(J,i),i=1,9)
+ End Do 
+ 
+ allocate(VibSp_full(3*NAtm,NVib_sub))
+ call aclear(3*NAtm*NVib_sub,VibSp_full)
+
+ !map from VibSp to VibSp_full
+ Do I=1,NAtm_sub
+    IPos1 = 3*(subsystem_idx(I)-1)+1
+    IPos2 = 3*(subsystem_idx(I)-1)+2
+    IPos3 = 3*(subsystem_idx(I)-1)+3
+    Do J=1,NVib_sub
+       VibSp_full(IPos1,J) = VibSp(3*(I-1)+1,J)
+       VibSp_full(IPos2,J) = VibSp(3*(I-1)+2,J)
+       VibSp_full(IPos3,J) = VibSp(3*(I-1)+3,J) 
+    End Do
+ End Do
+ allocate(VibSp_full_t(NVib_sub,3*NAtm))
+ call Transp(3*NAtm,NVib_sub,VibSp_full,VibSp_full_t)
+
+ Do J=1,3
+     !PRINT '(18E17.8)',(VibSp_full(i,J),i=1,18)
+     !PRINT '(18E17.8)',(VibSp_full_t(J,i),i=1,18)
+ End Do 
+ 
+
+ !moore-penrose inverse of full hessian
+ allocate(FFx_inv(3*NAtm*3*NAtm),Scra(3*NAtm*3*NAtm),Scrb(3*NAtm),Scrc(2*3*NAtm*3*NAtm)) 
+
+ call GInvM(.false.,-1,3*NAtm,FFx,FFx_inv,Scra,Scrb,Scrc)
+ !PRINT '(5F18.5)',(FFx_inv(i),i=1,18) ! to check 'pinv(f)' result
+ !
+ call aclear(3*NAtm*3*NAtm,Scrc)
+ call MPACMF(FFx_inv,FFx,Scrc,3*NAtm,3*NAtm,1)
+ !PRINT '(5E10.2)',(Scrc(i),i=1,18) ! to check unit matrix 
+ 
+ !obtain FFx_sub
+ ! VibSp_full_t (NVib_sub, 3N)  * FFx_inv(3N,3N) -> compl_m1(NVib_sub,3N)
+ allocate(compl_m1(NVib_sub,3*NAtm))
+ call MMpyMF(NVib_sub,3*NAtm,3*NAtm,VibSp_full_t,FFx_inv,compl_m1)  
+ ! compl_m1(NVib_sub,3N) * VibSp_full(3N,NVib_sub) -> compl_m2(NVib_sub,NVib_sub)
+ allocate(compl_m2(NVib_sub,NVib_sub))
+ call MMpyMF(NVib_sub,3*NAtm,NVib_sub,compl_m1,VibSp_full,compl_m2)
+ Do J=1,3
+     !PRINT '(3E17.8)',(compl_m2(i,J),i=1,3)
+ End Do
+ ! compl_m2**-1 -> compl_inv
+ allocate(compl_inv(NVib_sub,NVib_sub))
+ call GInvM(.false.,-1,NVib_sub,compl_m2,compl_inv,Scra,Scrb,Scrc)  
+ Do J=1,3
+     !PRINT '(3E17.8)',(compl_inv(i,J),i=1,3)
+ End Do
+ ! VibSp(3*NAtm_sub,NVib_sub) * compl_inv(NVib_sub,NVib_sub) -> newHes_1(3*NAtm_sub,NVib_sub)
+ allocate(newHes_1(3*NAtm_sub,NVib_sub))  
+ call MMpyMF(3*NAtm_sub,NVib_sub,NVib_sub,VibSp,compl_inv,newHes_1)
+ ! newHes_1(3*NAtm_sub,NVib_sub) * VibSp_t(NVib_sub,3*NAtm_sub) -> FFx_sub(3*NAtm_sub,3*NAtm_sub)
+ allocate(FFx_sub(3*NAtm_sub,3*NAtm_sub))
+ call MMpyMF(3*NAtm_sub,NVib_sub,3*NAtm_sub,newHes_1,VibSp_t,FFx_sub) 
+ Do J=1,3
+     !PRINT '(9E17.8)',(FFx_sub(i,J),i=1,9)
+ End Do
+
+ !obtain freq and normal mode - vibrational analysis with correct atomic mass 
+ call acopy(NAtm_sub,AMass_sub_bak,AMass_sub)
+ call MassCent(NAtm_sub,AMass_sub,XYZ_sub,Scr1,Scr2)
+ call MIner(.True.,NAtm_sub,AMass_sub,Scr1,Scr1(NAtm3_sub+1),Scr2,Scr2(4))
+ call TRVec(.True.,NAtm_sub,NTR_sub,Im,AMass_sub,Scr1,AL,Scr1(NAtm3_sub+1),Scr2)
+ NVib_sub=NAtm3_sub-NTR_sub
+ call GSorth(.True.,.True.,NAtm3_sub,NTR_sub,AL,Scr3)
+ 
+ call VibSEq(.True.,NAtm_sub,NAtm3_sub,NVib_sub,AMass_sub,FFx_sub,AL,Scr1,Scr2,Scr3)
+ call RmNoise(NSS_sub,1.0d-8,AL)
+ allocate(Rslt(3*NAtm_sub,8)) ! 8 - from main.f90
+ Infred = 0
+ IRaman = 0 
+ call NormFq(iout,Infred,IRaman,NAtm_sub,NAtm3_sub,NVib_sub,IOP(2),AMass_sub,Scra,FFx_sub,Scra,Scra,AL,Rslt,Scr1,Scr2) 
+
+ call PrtNFq_gsva(iout,NAtm_sub,NAtm3_sub,NVib_sub,ZA_sub,subsystem_idx,AL,Rslt)
+ !PRINT '(9E17.8)',(Rslt(i),i=1,3)
+end 
+
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
 ! Solve Secular equation in Cartesian coordinates
@@ -37,6 +158,7 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,Intact,IOP,Infre
  else
    ! generate m.w. vectors of vibrations by Gram-Schmidt orthogonalization
    call GSorth(Intact,.True.,NAtm3,NTR,AL,Scr3)
+        !PRINT '(18F7.2)',(AL(i),i=1+NAtm3*5,NAtm3+NAtm3*5)
    ! construct secular equation in pure. vib. subspace, do diagonalization, and renormalize the mass-unweighted eigenvectors
    if(IOP(12) == 0) then
      call VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
@@ -578,6 +700,60 @@ subroutine VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
 
  return
 end
+
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+! print results of normal modes for GSVA
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine PrtNFq_gsva(iout,NAtm,NAtm3,NVib,ZA,subsystem_idx,AL,Reslt)
+implicit real(kind=8) (a-h,o-z)
+parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0,au2ang4=0.52917720859d0**4)
+real(kind=8) :: AL(3,NAtm,*),Reslt(NAtm3,*),ZA(*)
+integer :: subsystem_idx(*)
+
+write(iout,"(//, 1x,65('*'),/, 1x,'***  Properties of Intrinsic Fragmental Vibrations from GSVA  ***',/, 1x,65('*'))")
+
+write(iout,"(/, ' Results of vibrations:',/,' Normal frequencies (cm^-1), reduced masses (AMU), force constants (mDyn/A)')")
+
+ if(1 == 1)then
+   NLine=(NVib-1)/3+1
+   do i=1,NLine
+     iv1=(i-1)*3+1
+     iv2=min(i*3,Nvib)
+     ncol=iv2-iv1+1
+     write(iout,"(/,18x,3i34)")(j,j=iv1,iv2)
+     !write(iout,"('          Irreps',2x,3(30x,a4))")(trim(IRNAME(j)),j=iv1,iv2)
+     write(iout,"('     Frequencies',2x,3f34.4)")(Reslt(j,3)*au2wn,j=iv1,iv2)
+     write(iout,"('  Reduced masses',2x,3f34.4)")(Reslt(j,2),j=iv1,iv2)
+     write(iout,"(' Force constants',2x,3f34.4)")(Reslt(j,1)*au2dy,j=iv1,iv2)
+     !if(Infred == 1) then
+     !  write(iout,"('  IR intensities',2x,3f34.4)")(Reslt(j,4)*cf*cf,j=iv1,iv2)
+     !end if
+     !if(IRaman == 1) then
+     !  write(iout,"(' Raman sc. activ',2x,3f34.4)")(Reslt(j,7)*au2ang4,j=iv1,iv2)
+     !  write(iout,"(' Depolar. ratios',2x,3f34.4)")(Reslt(j,8),j=iv1,iv2)
+     !end if
+     if(ncol == 1)then
+       write(iout,"('        Atom  ZA',2x,  13x,'X         Y         Z') ")
+     else if(ncol == 2)then
+       write(iout,"('        Atom  ZA',2x,2(13x,'X         Y         Z'))")
+     else
+       write(iout,"('        Atom  ZA',2x,3(13x,'X         Y         Z'))")
+     end if
+     do ia=1,NAtm
+       write(iout,"(8x,2i4,2x,3(4x,3f10.5))")subsystem_idx(ia),nint(ZA(ia)),((AL(ix,ia,j),ix=1,3),j=iv1,iv2)
+     end do
+   end do
+ end if
+
+
+
+!PRINT '(3E17.8)',(Reslt(j,3)*au2wn,j=1,3) 
+!PRINT '(3E17.8)',(ZA(j),j=1,3)
+
+return
+end
+
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
