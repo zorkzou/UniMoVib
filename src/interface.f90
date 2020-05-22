@@ -66,7 +66,7 @@ end
 ! Read NAtm
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdNAtm1(idt0,idt1,Intact,IOP,NAtm,tag,ctmp)
+subroutine RdNAtm1(iinp,idt0,idt1,Intact,IOP,NAtm,tag,ctmp)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact
 dimension :: IOP(*)
@@ -85,6 +85,9 @@ select case(IOP(1))
 
   case(-3) ! xyz
     call RdNAtmXYZ(idt0,NAtm,ctmp)
+
+  case(-4) ! xyzinp
+    call RdNAtmINP(iinp,NAtm,ctmp)
 
   case(1)  ! Gaussian
     call RdNAtmGauss(idt0,NAtm,tag,ctmp)
@@ -181,7 +184,7 @@ end
 !   IfFXX = .false. : do not read Hessian, and an approximate Hessian will be constructed later (for expert only!)
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdData1(iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,IGrd,NAtm,tag,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,  &
+subroutine RdData1(iinp,iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,IGrd,NAtm,tag,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,  &
   Scr1,Scr2,Scr3,Scr4)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact, IfFXX
@@ -207,6 +210,11 @@ select case(IOP(1))
 
   case(-3) ! xyz
     call RdXYZ(idt0,iout,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+!   the most abundant isotopic masses are used
+    call MasLib(0,NAtm,AMass,ZA)
+
+  case(-4) ! xyz from input
+    call RdINP(iinp,iout,Intact,IfFXX,NAtm,tag,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
 !   the most abundant isotopic masses are used
     call MasLib(0,NAtm,AMass,ZA)
 
@@ -418,6 +426,33 @@ read(ctmp,*,err=100)i
 100   NAtm=i
 
 return
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read NAtm from input file
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdNAtmINP(iinp,NAtm,ctmp)
+ implicit real(kind=8) (a-h,o-z)
+ character*100 :: ctmp
+ namelist/QCData/null
+
+ rewind(iinp)
+ read(iinp,QCData,end=100,err=100)
+ 100  continue
+
+ i=0
+ do while(.true.)
+   read(iinp,"(a100)",end=200) ctmp
+   if(index(ctmp,"$") /= 0 .or. len_trim(ctmp) == 0) exit
+   if(ctmp(1:1) == "!") cycle
+   i = i + 1
+ end do
+
+ 200   NAtm=i
+
+ return
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1332,6 +1367,52 @@ end if
 
 return
 1010  call XError(Intact,"Please check XYZ file!")
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read XYZ data from input file
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdINP(iinp,iout,Intact,IfFXX,NAtm,Elem,ctmp,ZA,XYZ,FFx,S1,S2,S3,S4)
+ implicit real(kind=8) (a-h,o-z)
+ parameter(ang2au=1.d0/0.52917720859d0)
+ real(kind=8) :: ZA(*),XYZ(3,*),FFx(*),S1(*),S2(*),S3(*),S4(*)
+ character*3 :: Elem
+ character*100 :: ctmp
+ logical :: Intact,IfFXX
+ namelist/QCData/null
+
+ NAtm3 = NAtm * 3
+
+ rewind(iinp)
+ read(iinp,QCData,end=100,err=100)
+ 100  continue
+
+ i = 0
+ do while(.true.)
+   read(iinp,"(a100)",err=1010,end=1010) ctmp
+   if(ctmp(1:1) == "!") cycle
+   i = i + 1
+   read(ctmp,*,err=1010,end=1010)Elem,XYZ(:,i)
+   call ElemZA(0,Elem,Elem,ZA(i))
+   if(i == NAtm) exit
+ end do
+ ! Ang to a.u.
+ call AScale(NAtm3,ang2au,XYZ,XYZ)
+
+ if(IfFXX) then
+ ! FFX is simulated by CZ * [E"(NRE) * E"(NRE)]^(1/2), which is positive definite.
+ ! CZ = 0.5/Max(ZA)
+   CZ = 0.5d0 / ArMax(NAtm,i,ZA)
+   call DDerNRE(NAtm,ZA,XYZ,FFx,S1(1),S1(6))
+   call MPACMF(FFx,FFx,S1,NAtm3,NAtm3,1)
+   call SqrtMp(Intact,1,NAtm3,S1,FFx,FFx,S2,S3,S4)
+   call AScale(NAtm3*NAtm3,CZ,FFx,FFx)
+ end if
+
+ return
+ 1010  call XError(Intact,"Please check Cartesian coordinates!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

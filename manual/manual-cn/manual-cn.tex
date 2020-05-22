@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper,openany,twoside,cap]{ctexbook}
+\documentclass[12pt,a4paper,openany,twoside,cap,UTF8]{ctexbook}
 \input{setup/package.tex}   %引用宏包所在位置
 \input{setup/format.tex}    %格式所在位置
 \begin{document}
@@ -8,7 +8,7 @@
 \title{
 \vspace{-3cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\
-\vspace{1cm} \zihao{3}（1.3.0版）\vspace{30 mm} \\
+\vspace{1cm} \zihao{3}（1.3.1版）\vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm}}
 
 \author{
@@ -45,6 +45,7 @@
 \item 分析结构的最高点群以及简正振动模式的不可约表示(\emph{irreps.})。（\emph{irreps.}：仅闭壳层分子。） \\
 对称性分析基于\textsc{Mopac} 7.1程序包中的对称性子程序，\textsc{Mopac} 7.1的源代码已经开放，不受版权限制（参见\href{http://openmopac.net/Downloads/Downloads.html}{openmopac.net} and \href{https://sourceforge.net/projects/mopac7/}{sourceforge.net}）。
 \item 使用最高点群做热化学计算，并打印 Gaussian风格的热化学计算结果（详细解释，参见： Foresman and Frisch, \emph{Exploring Chemistry With Electronic Structure Methods}, Ed.2, Gaussian Inc., Pittsburgh, PA, \textbf{1996}, p.66）。
+\item 广义子系统振动分析方法（generalized subsystem vibrational analysis, GSVA）用以计算内禀片段振动 (作者陶韵文；参见：\textit{J. Chem. Theory Comput.} 14(5), 2558-2569, 2018)。
 \item 保存\textsc{Molden}文件，用于动画显示振动模式。
 \item 设定同位素，温度，压强，频率换算因子或实验频率，等。
 \item 可作为量子化学程序（尤其是不支持非阿贝尔点群的程序）的第三方模块，用于频率和热化学计算。
@@ -162,6 +163,12 @@ make
 \bigskip{}
 \verb|IFExp|：（\verb|.True.|/\verb|.False.|）用实验振动频率校正Hessian矩阵，在\verb|$ExpFrq|输入组（参见第\ref{sec:inp-expfrq}节）之后提供。默认：\verb|.False.|
 
+\bigskip{}
+\verb|IFGSVA|：（\verb|.True.|/\verb|.False.|）针对整个分子体系内部的一个片段进行广义子系统振动分析（GSVA）计算。子系统的原子标号在\verb|$GSVA|输入组中提供（参见第\ref{sec:inp-gsva}节）。默认：\verb|.False.|
+
+%用实验振动频率校正Hessian矩阵，在\verb|$ExpFrq|输入组（参见第\ref{sec:inp-expfrq}节）之后提供。默认：\verb|.False.|
+
+
 \subsection{保存数据的关键词} \label{subsec:inp-qcdata-save}
 
 \bigskip{}
@@ -183,7 +190,7 @@ make
 一般不需要在\texttt{\$Contrl}中设置这些关键词。
 
 \bigskip{}
-\verb|QCProg="XYZ"|：仅用于调试。
+\verb|QCProg="XYZ"|：仅用于调试。如果\verb|QCProg="XYZINP"|，将在输入文件的\texttt{\$QCData}输入组之后直接提供直角坐标。
 
 \bigskip{}
 \verb|IFConc|：（\verb|.True.|/\verb|.False.|）控制是否简明频率输出。默认：\verb|.False.|
@@ -250,7 +257,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \item \textsc{Dmol3}：输出文件（通过\verb|FCHK|）。
 \item \textsc{Aces}：输出文件（通过\verb|FCHK|），但是建议使用\textsc{Molden}文件，可以得到更高的数字精度。 一些问题参见第\ref{part:problem}章。
 \item \textsc{UniMoVib}：ASCII数据文件（通过\verb|FCHK|），\textsc{UniMoVib}通过选项\verb|IFSAVE=.TRUE.|产生，也可以由用户手工编写（参见附录\ref{sec:almfmt}）。
-\item XYZ：标准的XYZ数据文件（通过\verb|FCHK|）。仅用于调试。
+\item XYZ：标准的XYZ数据文件（通过\verb|FCHK|）。若\verb|QCProg="XYZINP"|，直角坐标将在\texttt{\$QCData}输入组之后提供，不需要以上关键词。仅用于调试。
 \end{itemize}
 
 参见\verb|$UniMoVib/test|中的示例。
@@ -261,7 +268,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 \bigskip{}
 若\verb|Isotop = 1|，每行定义一个原子，包括原子序号及质量。程序连续读取，直到遇到空行或输入结束为止。例如，
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
 \begin{lstlisting}
  $IsoMas $End
@@ -272,7 +279,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 \bigskip{}
 若\verb|Isotop = 2|，全部N个原子的质量以自由格式提供。例如，
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
 \begin{lstlisting}
  $IsoMas $End
@@ -288,7 +295,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 \bigskip{}
 若\verb|MODE = 0|（默认），以自由格式定义所有的$N_{Vib}$个振动频率值，它们必须正确地排序，与频率计算值一致。例如：
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
 \begin{lstlisting}
  $ExpFrq $End
@@ -298,13 +305,27 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 
 若\verb|MODE = 1|，一系列理论频率值将用实验频率值替代。每行一个频率，包括频率的编号，及其实验值。程序连续读取，直到遇到空行或输入结束为止。例如，
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
 \begin{lstlisting}
  $ExpFrq MODE=1 $End
  3  926.0930
  5 2160.9759
 \end{lstlisting}\end{colorboxed}
+
+
+\section{\texttt{\$GSVA}输入组} \label{sec:inp-gsva}
+
+该输入组通过关键词\verb|subsystem|来定义子系统部分的原子标号。例如，
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
+\ttfamily
+\begin{lstlisting}
+ $GSVA
+ subsystem="4,5,1-3"
+ $End
+\end{lstlisting}\end{colorboxed}
+
+原子标号需要被引号括起来表示字符串输入。标号之间用逗号隔开且不能有空格。支持两种标号的输入模式：（1）提供单独的标号，（2）通过横线(-)来表示标号范围。子系统至少需要两个原子。
 
 \section{\texttt{\$Thermo}输入组} \label{sec:inp-thermo}
 
@@ -340,7 +361,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 在以上关键词中除了\verb|Eel|以外，都会影响Gibbs自由能的结果。
 
 输入组之后是额外提供的温度（若\verb|Temp| < 0）或压强（若\verb|Press| < 0）值，每行一个数值，连续多行，直到遇到空行或输入结束为止。例如，
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
 \begin{lstlisting}
  $Thermo Temp=-1 $End
@@ -350,7 +371,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \end{lstlisting}\end{colorboxed}
 这个输入例子表示除了标准温度298.15 K之外，还分别进行100，200，和400 K温度下的热化学计算。
 若同时提供温度和压强值（\verb|Temp| < 0，且\verb|Press| < 0），则每行两个数值，温度在前压强在后。例如，
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
 \begin{lstlisting}
  $Thermo Temp=-1 Press=-1 $End
@@ -376,7 +397,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 \section{原子热化学计算} \label{sec:exp1}
 
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily\footnotesize
 \begin{lstlisting}
 Atomic thermochemistry calculation (Ne atom)
@@ -396,7 +417,7 @@ The total energy was calculated at the HF/STO-3G level
 
 \section{来自\textsc{Gaussian}的频率计算数据} \label{sec:exp2}
 
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily\footnotesize
 \begin{lstlisting}
 a test job
@@ -414,7 +435,7 @@ a test job
 
 \textsc{Molpro}无法使用非阿贝尔群对称性，如 CH$_4$的$T_d$群。通过\textsc{UniMoVib}，你可以得到振动模式在最高点群下的不可约表示。
 
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily\footnotesize
 \begin{lstlisting}
 a test job
@@ -432,7 +453,7 @@ a test job
 
 我们可以从H$_2$O的实验频率，估算HDO的频率。
 
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily\footnotesize
 \begin{lstlisting}
 Step 1.
@@ -456,7 +477,7 @@ The normal modes should be calculated at high level of theory.
  3   3756   B2
 \end{lstlisting}\end{colorboxed}
 
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily\footnotesize
 \begin{lstlisting}
 Step 2.
@@ -476,6 +497,28 @@ genuine experimental frequencies:   1402  2727  3707 cm-1
 
  $IsoMas $End
  2  2.01410
+\end{lstlisting}\end{colorboxed}
+
+
+\section{用GSVA方法计算C$_{60}$足球烯中甲烷CH$_4$分子的内禀片段振动 } \label{sec:gsva-example}
+
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
+\ttfamily\footnotesize
+\begin{lstlisting}
+The CH4 molecule is defined by atoms 1-5 in this CH4@C60 complex.
+
+ $contrl
+   qcprog="gaussian"
+   ifgsva=.true.
+ $end
+
+ $gsva
+   subsystem="3,4,5,1-2"
+ $end
+
+ $qcdata
+   fchk="ch4-c60.fchk"
+ $end
 \end{lstlisting}\end{colorboxed}
 
 
@@ -521,7 +564,7 @@ genuine experimental frequencies:   1402  2727  3707 cm-1
 
 \textsc{UniMoVib}数据文件是纯文本自由格式。 \\
 1.0.3版(2020.02.10)
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
 \begin{lstlisting}
 （一个标题行）
@@ -551,7 +594,7 @@ GRD
 \begin{enumerate}
 \item[1] 读取或统计原子数（\verb|NAtm|）。虚原子不包含在内。该子例程 在\verb|subroutine RdNAtm1|中调用。例如：
 \end{enumerate}
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \begin{lstlisting}[language={[90]Fortran}]
 !-----------------------------------------------------------------------
 ! Read NAtm from XXXX output
@@ -567,7 +610,7 @@ end
 \begin{enumerate}
 \item[2] 读取原子单位的直角坐标（\verb|XYZ|），原子核电荷数（\verb|ZA|），原子单位的原子量或同位素质量（\verb|AMass|；可选），原子单位的直角坐标力常数矩阵（\verb|FFx|，必须是未做质量加权的对称方阵），原子单位的偶极矩梯度（即原子极化张量，\verb|APT|；可选），以及原子单位的极化率导数（\verb|DPol|；可选）。该子例程在\verb|subroutine RdData1|中调用。例如：
 \end{enumerate}
-\begin{colorboxed}[oval=false,boxcolor=green!75!black,bgcolor=green!5!white]
+\begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \begin{lstlisting}[language={[90]Fortran}]
 !-----------------------------------------------------------------------
 ! Read data from XXXX output

@@ -1,17 +1,20 @@
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+! GSVA
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine GSVA_engine(iout,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
-implicit real(kind=8) (a-h,o-z)
-dimension :: IOP(*),FFx(*),AMass_sub(*),XYZ_sub(*),AMass_sub_bak(NAtm_sub),ZA_sub(*)
-integer :: subsystem_idx(*)
-allocatable :: Scr1(:),Scr2(:),Scr3(:),Scr4(:),AL(:)
-allocatable :: FFx_inv(:),Scra(:),Scrb(:),Scrc(:),Scrd(:),prod(:),prod_inv(:)!,Rslt(:)
-real(kind=8), dimension (:, :), ALLOCATABLE :: VibSp,VibSp_t,VibSp_full,VibSp_full_t,compl_m1, &
-compl_m2,compl_inv,newHes_1,FFx_sub,Rslt
+ implicit real(kind=8) (a-h,o-z)
+ dimension :: IOP(*),FFx(*),AMass_sub(*),XYZ_sub(*),AMass_sub_bak(NAtm_sub),ZA_sub(*)
+ integer :: subsystem_idx(*)
+ allocatable :: Scr1(:),Scr2(:),Scr3(:),Scr4(:),AL(:)
+ allocatable :: FFx_inv(:),Scra(:),Scrb(:),Scrc(:),Scrd(:),prod(:),prod_inv(:)!,Rslt(:)
+ real(kind=8), dimension (:, :), ALLOCATABLE :: VibSp,VibSp_t,VibSp_full,VibSp_full_t,compl_m1, &
+ compl_m2,compl_inv,newHes_1,FFx_sub,Rslt
 
  NAtm3_sub = 3*NAtm_sub
  NSS_sub = NAtm3_sub*NAtm3_sub
  allocate(Scr2(NSS_sub),Scr1(NSS_sub),Scr3(NSS_sub))
 
-!It is required to use identical mass for all atoms
+ !It is required to use identical mass for all atoms
  call acopy(NAtm_sub,AMass_sub,AMass_sub_bak) 
  Do J=1,NAtm_sub 
    AMass_sub(J) = 1.0E0
@@ -35,7 +38,7 @@ compl_m2,compl_inv,newHes_1,FFx_sub,Rslt
  call Transp(3*NAtm_sub,NVib_sub,VibSp,VibSp_t) 
 
 
-!test print for matlab script - to replace b1,b2
+ !test print for matlab script - to replace b1,b2
  Do J=1,3
     !PRINT '(9E17.8)',(VibSp(i,J),i=1,9)
     !PRINT '(9E17.8)',(VibSp_t(J,i),i=1,9)
@@ -130,7 +133,7 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,Intact,IOP,Infre
  dimension :: IOP(*),AMass(*),ZA(*),XYZ(*),Grd(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),Scr1(*),Scr2(*),Scr3(*),Scr4(*),Work(*)
  character*4 :: PGNAME(2)
  character*100 :: ctmp
- logical :: Intact,IFAtom
+ logical :: Intact,IFAtom,IfSimu
 
  IFAtom = IOP(1) == -1
  NAtm3=3*NAtm
@@ -158,12 +161,11 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,Intact,IOP,Infre
  else
    ! generate m.w. vectors of vibrations by Gram-Schmidt orthogonalization
    call GSorth(Intact,.True.,NAtm3,NTR,AL,Scr3)
-        !PRINT '(18F7.2)',(AL(i),i=1+NAtm3*5,NAtm3+NAtm3*5)
    ! construct secular equation in pure. vib. subspace, do diagonalization, and renormalize the mass-unweighted eigenvectors
    if(IOP(12) == 0) then
      call VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
    else
-     write(iout,"(//,' IFSymtz=T : vibrational normal modes will be symmetrized and reordered.')")
+     write(iout,"(//,' IFSymtz=.T. : vibrational normal modes will be symmetrized and reordered.')")
      call VibSEqSymm(iout,ireo,Intact,NAtm,NAtm3,NVib,IOP(5),AMass,XYZ,FFx,AL,Scr1,Scr2,Scr3,Scr4,Work(1),Work(1+NSS),ctmp)
    end if
  end if
@@ -181,7 +183,8 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,Intact,IOP,Infre
  end if
 
  ! print normal modes results saved in Rslt
- call PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,(IOP(1)==-3),IOP(2),IOP(10),ZA,AL,Rslt,Scr2)
+ IfSimu = IOP(1) == -3 .or. IOP(1) == -4
+ call PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,IfSimu,IOP(2),IOP(10),ZA,AL,Rslt,Scr2)
 
  ! experimental frequencies
  if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Rslt,Scr2,Scr3,Scr4,Work,ctmp)
@@ -701,19 +704,21 @@ subroutine VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
  return
 end
 
-
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ! print results of normal modes for GSVA
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine PrtNFq_gsva(iout,NAtm,NAtm3,NVib,ZA,subsystem_idx,AL,Reslt)
-implicit real(kind=8) (a-h,o-z)
-parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0,au2ang4=0.52917720859d0**4)
-real(kind=8) :: AL(3,NAtm,*),Reslt(NAtm3,*),ZA(*)
-integer :: subsystem_idx(*)
+ implicit real(kind=8) (a-h,o-z)
+ parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0,au2ang4=0.52917720859d0**4)
+ real(kind=8) :: AL(3,NAtm,*),Reslt(NAtm3,*),ZA(*)
+ integer :: subsystem_idx(*)
 
-write(iout,"(//, 1x,65('*'),/, 1x,'***  Properties of Intrinsic Fragmental Vibrations from GSVA  ***',/, 1x,65('*'))")
+ write(iout,"(//, 1x,65('*'),/, 1x,'***  Properties of Intrinsic Fragmental Vibrations from GSVA  ***',/, 1x,65('*'))")
 
-write(iout,"(/, ' Results of vibrations:',/,' Normal frequencies (cm^-1), reduced masses (AMU), force constants (mDyn/A)')")
+ write(iout,"(/, ' Results of vibrations:',/,' Normal frequencies (cm^-1), reduced masses (AMU), force constants (mDyn/A)')")
+
+ !print *,subsystem_idx(1)
+ !print *,subsystem_idx(2)
 
  if(1 == 1)then
    NLine=(NVib-1)/3+1
@@ -746,14 +751,11 @@ write(iout,"(/, ' Results of vibrations:',/,' Normal frequencies (cm^-1), reduce
    end do
  end if
 
+ !PRINT '(3E17.8)',(Reslt(j,3)*au2wn,j=1,3) 
+ !PRINT '(3E17.8)',(ZA(j),j=1,3)
 
-
-!PRINT '(3E17.8)',(Reslt(j,3)*au2wn,j=1,3) 
-!PRINT '(3E17.8)',(ZA(j),j=1,3)
-
-return
+ return
 end
-
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !

@@ -1,88 +1,95 @@
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! read $GSVA
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdGSVA(iinp,iout,NAtm,flags,NAtm_sub)
-implicit real(kind=8) (a-h,o-z)
-character*1000 ::subsystem!,pair(2)
-character*1 ::hyphen
-character(20), allocatable :: strarray(:),pair(:)
-character(20) :: tmpstr,before,after
-integer,allocatable :: subsystem_idx(:)
-integer :: flags(*)
-namelist/GSVA/subsystem
+ implicit real(kind=8) (a-h,o-z)
+ character*1000 ::subsystem!,pair(2)
+ character*1 ::hyphen
+ character(20), allocatable :: strarray(:),pair(:)
+ character(20) :: tmpstr,before,after
+ integer,allocatable :: subsystem_idx(:)
+ integer :: flags(*)
+ namelist/GSVA/subsystem
 
-hyphen = '-'
+ hyphen = '-'
 
-Do I=1,NAtm
-   flags(I) = 0
-End Do
+ Do I=1,NAtm
+    flags(I) = 0
+ End Do
 
-rewind(iinp)
-read(iinp,GSVA,end=100,err=10)
-goto 100
-10    call XError(.True.,"$GSVA is wrong!")
+ rewind(iinp)
+ read(iinp,GSVA,end=100,err=10)
+ goto 100
+ 10    call XError(.True.,"$GSVA is wrong!")
 
-100   continue
+ 100   continue
 
-!debug
-!print *,trim(subsystem)
+ !debug
+ !print *,trim(subsystem)
 
-n = count(transfer(subsystem, 'a', len(subsystem)) == ",")
-allocate(strarray(n+1))
-read(subsystem, *) strarray(1:n+1)
-!print *, 'nvalues=', n+1
-!print '(a)', strarray(1:n+1)
+ n = count(transfer(subsystem, 'a', len(subsystem)) == ",")
+ allocate(strarray(n+1))
+ read(subsystem, *) strarray(1:n+1)
+ !print *, 'nvalues=', n+1
+ !print '(a)', strarray(1:n+1)
 
+ Do I=1,n+1
+    if(index(strarray(I),hyphen) == 0 )then
+      read (strarray(I),'(I10)') IAt
+      if ((IAt < 1) .or. (IAt > NAtm))then
+         call XError(.True.,"Invalid atom label for GSVA!")
+      end if
+      !print *,IAt
+      flags(IAt) = 1
+    else
+      !print *,strarray(I)
+      tmpstr = trim(strarray(I))
+      !print *,tmpstr
+      !print *,len(tmpstr)
+      Ihyph = index(tmpstr,hyphen)
+      before = tmpstr(1:Ihyph-1)
+      after  = tmpstr(Ihyph+1:len(tmpstr))
 
-Do I=1,n+1
-   if(index(strarray(I),hyphen) == 0 )then
-     read (strarray(I),'(I10)') IAt
-     if ((IAt < 1) .or. (IAt > NAtm))then
-        call XError(.True.,"Invalid atom label for GSVA!")
-     end if  
-     !print *,IAt  
-     flags(IAt) = 1 
-   else
-     !print *,strarray(I)
-     tmpstr = trim(strarray(I))
-     !print *,tmpstr
-     !print *,len(tmpstr)
-     Ihyph = index(tmpstr,hyphen)
-     before = tmpstr(1:Ihyph-1)
-     after  = tmpstr(Ihyph+1:len(tmpstr))
-     
-     read (before,'(I10)') IAt1     
-     read (after,'(I10)') IAt2
-     !print *,IAt1
-     !print *,IAt2
+      read (before,'(I10)') IAt1
+      read (after,'(I10)') IAt2
+      !print *,IAt1
+      !print *,IAt2
 
-     if ((IAt1 < 1) .or. (IAt1 > NAtm) .or. (IAt1 >= IAt2) )then
-        call XError(.True.,"Invalid atom label for GSVA!")
-     end if  
-     if ((IAt2 < 1) .or. (IAt2 > NAtm))then
-        call XError(.True.,"Invalid atom label for GSVA!")
-     end if  
+      if ((IAt1 < 1) .or. (IAt1 > NAtm) .or. (IAt1 >= IAt2) )then
+         call XError(.True.,"Invalid atom label for GSVA!")
+      end if
+      if ((IAt2 < 1) .or. (IAt2 > NAtm))then
+         call XError(.True.,"Invalid atom label for GSVA!")
+      end if
 
-     Do J=IAt1,IAt2
-        flags(J) = 1
-     End Do 
+      Do J=IAt1,IAt2
+         flags(J) = 1
+      End Do
 
+    end if
+ End Do
+
+ NAtm_sub=0
+ Do I=1,NAtm
+   if(flags(I) == 1)then
+      NAtm_sub=NAtm_sub+1
    end if
-End Do
+ End Do
 
-NAtm_sub=0
-Do I=1,NAtm
-  if(flags(I) == 1)then
-     NAtm_sub=NAtm_sub+1  
-  end if
-End Do
+ if(NAtm_sub < 2)then
+   call XError(.True.,"Subsystem for GSVA requires at least two atoms!")
+ end if
 
+ write(iout,"(//,' -- Generalized Subsystem Vibrational Analysis (GSVA) --',//,&
+ ' Subsystem has',1x,1I5,2x, 'atoms:')")(NAtm_sub)
 
-write(iout,"(//,' -- Generalized Subsystem Vibrational Analysis (GSVA) --',//,&
-' Subsystem has',1x,1I5,2x, 'atoms:')")(NAtm_sub)
+ !debug
+ !PRINT '(10I10)',(flags(j),j=1,NAtm)
 
-!debug
-!PRINT '(10I10)',(flags(j),j=1,NAtm)
-
-return 
-end 
+ return
+end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -221,7 +228,7 @@ end
 ! Read the $Contrl group.
 !
 ! QCProg = IOP(1) =
-!       XYZ (*)        -3,       UniMoVib (ALM) -2,       AtomCalc       -1,
+!       XYZINP (*)     -4,       XYZ (*)        -3,       UniMoVib (ALM) -2,       AtomCalc       -1,
 !       Gaussian        1,       GAMESS          2,       Firefly         3,       ORCA            4,       CFour           5,
 !       Molpro          6,       QChem           7,       NWChem          8,       GAMESSUK        9,       TURBOMOLE      10,
 !       deMon          11,       PQS            12,       MOPAC          13,       AMPAC/AMSOL    14,       Dalton         15,
@@ -281,6 +288,12 @@ else if(index(qcprog,'UNIMOVIB') /= 0 .or. index(qcprog,'ALM') /= 0) then
   IOP(1)=-2
   write(iout,"(/,' Data Format:',5x,'UniMoVib')")
   if(Intact) write(*,"(' Data Format:',5x,'UniMoVib')")
+
+!>>> XYZINP
+else if(index(qcprog,'XYZINP') /= 0) then
+  IOP(1)=-4
+  write(iout,"(/,' Data Format:',5x,'XYZ from input')")
+  if(Intact) write(*,"(' Data Format:',5x,'XYZ from input')")
 
 !>>> XYZ
 else if(index(qcprog,'XYZ') /= 0) then
@@ -521,6 +534,8 @@ namelist/QCData/fchk,hess,ddip,geom,bmat
 
 ! atomic calculation
 if(IOP(1) == -1) return
+! XYZ from input
+if(IOP(1) == -4) return
 
 fchk=' '
 hess=' '
@@ -533,6 +548,7 @@ goto 100
 10    call XError(Intact,"$QCData is wrong!")
 
 100   continue
+
 ! default name of $(fchk)
 if(LEN_TRIM(fchk) == 0) then
   if(IOP(1) == 3) then
