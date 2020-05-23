@@ -726,7 +726,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine pDiagSq(N,Indx,A,B)
 implicit real(kind=8) (a-h,o-z)
-parameter(eps=1.d-8)
+parameter(eps=1.d-12)
 real(kind=8) :: A(N,N),B(N)
 
 call AClear(N*N,A)
@@ -928,7 +928,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine DiagIv(N,A,B)
 implicit real(kind=8) (a-h,o-z)
-parameter(eps=1.d-8)
+parameter(eps=1.d-12)
 real(kind=8) :: A(N,N),B(N)
 
 call AClear(N*N,A)
