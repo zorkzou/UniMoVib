@@ -413,7 +413,7 @@ end if
   end if
 else
   ! define z-axis of a cubic system
-  call cubzaxis(Natom,CUBIC,symtol,ROT,XYZ,SC1,SC2)
+  call cubzaxis(Natom,CUBIC,symtol,ROT,XYZ,ICYC,SC2,SC1,SC1,SC2(4))
   if(.NOT. CUBIC) goto 100
   IELEM(19)=1
 end if
@@ -1167,9 +1167,9 @@ end
 ! define z-axis of a cubic system
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine cubzaxis(Natom,CUBIC,rtol,ROT,XYZ,IdxEq,SCR)
+subroutine cubzaxis(Natom,CUBIC,rtol,ROT,XYZ,ipoly,allr,IdxEq,tmp,SCR)
 implicit real(kind=8) (a-h,o-z)
-real(kind=8) :: XYZ(3,Natom),ROT(3,3),SCR(*),allr(3),tmp(3,3)
+real(kind=8) :: XYZ(3,Natom),ROT(3,3),allr(3),tmp(3,3),SCR(*)
 dimension :: ipoly(3),IdxEq(*)
 logical :: CUBIC,OK
 
@@ -1184,12 +1184,25 @@ end do
 Neq = 0
 do i = 1, Natom
   SCR(2) = sqrt( dotx(3,XYZ(1,i),XYZ(1,i)) )
+  if(SCR(2) < rtol) cycle
+  if (SCR(2) > SCR(1) + rtol) cycle
   if(abs(SCR(1)-SCR(2)) < rtol)then
     Neq = Neq + 1
     IdxEq(Neq) = i
-    idx0 = i
+  else
+    Neq = 0
   end if
+  idx0 = i
+  SCR(1) = SCR(2)
 end do
+
+if(Neq == 0) then
+  call XError(.false.,"Unreasonable cubic geometry (I).")
+else if(Neq == 1) then
+  CUBIC = .False.
+  return
+end if
+
 OK = (Neq == 4 ) .or. (Neq == 6 ) .or. (Neq == 8 ) .or. (Neq == 12) .or. (Neq == 20)
 
 if(OK) then
@@ -1215,77 +1228,79 @@ if(OK) then
   end do
   OK = (Neq ==  4 .and. Neb == 3) .or. (Neq ==  6 .and. Neb == 4) .or. (Neq ==  8 .and. Neb == 3) .or. &
        (Neq == 12 .and. Neb == 5) .or. (Neq == 20 .and. Neb == 3)
-  if(.NOT. OK) call XError(.false.,"Unreasonable cubic geometry (I).")
+  if(OK) then
+    ! z axis is defined by the first atom in the equivalent atom set
+    call acopy(3,XYZ(1,idx0),ROT(1,3))
+    go to 1000
+  end if
+end if
 
-  ! z axis is defined by the first atom in the equivalent atom set
-  call acopy(3,XYZ(1,idx0),ROT(1,3))
-
-else if(Neq == 60) then
-  ! The axis of symmetry lies goes through a regular polygon, either an equilateral triangle, a square, or a regular pentagon.
-
-  i1=IdxEq(1)
-  do i=1,3
-    SCR(1)=1.0d4
-    ipoly(i)=0
-    do j1=2,Neq
-      j=IdxEq(j1)
-      OK = .false.
-      do m=1,i-1
-        OK = OK .or. (ipoly(m) == j)
-      end do
-      if(.NOT. OK) then
-        SCR(2)=distance(XYZ(1,i1),XYZ(1,j))
-        if(SCR(1) > SCR(2))then
-           SCR(1)=SCR(2)
-           ipoly(i)=j
-           allr(i)=SCR(2)
-           if(SCR(1) < rtol) call XError(.false.,"Unreasonable cubic geometry (III).")
-        end if
-      end if
+i1=IdxEq(1)
+do i=1,3
+  SCR(1)=1.0d4
+  ipoly(i)=0
+  Loop1: do j1 = 2, Neq
+    j = IdxEq(j1)
+    do m = 1, i - 1
+      if (ipoly(m) /= j) cycle
+      cycle  Loop1
     end do
+    SCR(2)=distance(XYZ(1,i1),XYZ(1,j))
+    if (SCR(1) <= SCR(2)) cycle  Loop1
+    SCR(1) = SCR(2)
+    ipoly(i) = j
+    allr(i) = SCR(2)
+  end do Loop1
+end do
+!if(ipoly(1)*ipoly(2)*ipoly(3) == 0) then
+!  CUBIC = .False.
+!  return
+!end if
+
+! identify the two atoms in the regular polygon.
+Loop2: do i=1,2
+  do j=i+1,3
+    if(abs(allr(i)-allr(j)) >= rtol) cycle
+    exit Loop2
   end do
-  if(ipoly(1)*ipoly(2)*ipoly(3) == 0) call XError(.false.,"Unreasonable cubic geometry (IV).")
-
-  ! identify the two atoms in the regular polygon.
-  do i=1,2
-    do j=i+1,3
-      if(abs(allr(i)-allr(j)) < rtol) goto 110
-    end do
-  end do
-  110 do k=1,3
-     tmp(k,3)=XYZ(k,ipoly(i))
-     tmp(k,2)=XYZ(k,ipoly(j))
-     tmp(k,1)=XYZ(k,i1)
-  end do
-  i3=ipoly(i)
-  i2=ipoly(j)
-  ipoly(1)=i3
-  ipoly(2)=i2
-
-  angle = BAngle(tmp(1,3),tmp(1,1),tmp(1,2))
-
-  if(abs(angle-Pi/3.d0) < rtol)then
-    ! triangle
-    do i=1,3
-      ROT(i,3)=XYZ(i,i1)+XYZ(i,i2)+XYZ(i,i3)
-    end do
-  else if(abs(angle-Pi*0.5d0) < rtol)then
-    ! square
-    do i=1,3
-      ROT(i,3)=XYZ(i,i2)+XYZ(i,i3)
-    end do
-  else if(abs(angle-Pi*0.6d0) < rtol)then
-    ! pentagon
-    do i=1,3
-      ROT(i,3)=1.6180341d0*(XYZ(i,i2)+XYZ(i,i3))-XYZ(i,i1)
-    end do
-  endif
-
-else
+end do Loop2
+if(ipoly(i)*ipoly(j) == 0) then
   CUBIC = .False.
   return
 end if
+do k=1,3
+  tmp(k,3)=XYZ(k,ipoly(i))
+  tmp(k,2)=XYZ(k,ipoly(j))
+  tmp(k,1)=XYZ(k,i1)
+end do
+i3=ipoly(i)
+i2=ipoly(j)
+ipoly(1)=i3
+ipoly(2)=i2
 
+angle = BAngle(tmp(1,3),tmp(1,1),tmp(1,2))
+
+if(abs(angle-Pi/3.d0) < rtol)then
+  ! triangle
+  do i=1,3
+    ROT(i,3)=XYZ(i,i1)+XYZ(i,i2)+XYZ(i,i3)
+  end do
+else if(abs(angle-Pi*0.5d0) < rtol)then
+  ! square
+  do i=1,3
+    ROT(i,3)=XYZ(i,i2)+XYZ(i,i3)
+  end do
+else if(abs(angle-Pi*0.6d0) < rtol)then
+  ! pentagon
+  do i=1,3
+    ROT(i,3)=1.6180341d0*(XYZ(i,i2)+XYZ(i,i3))-XYZ(i,i1)
+  end do
+else
+  CUBIC = .False.
+  return
+endif
+
+1000  continue
 ! x axis, which makes that two atoms have equal y and z coordinates.
 if(abs(ROT(2,3)) <= abs(ROT(3,3)))then
   ROT(1,1) = ROT(3,3)
