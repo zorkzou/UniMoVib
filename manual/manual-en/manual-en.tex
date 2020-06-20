@@ -532,6 +532,7 @@ For example,
 
 The atom labels need to be enclosed by quotation marks as a string without space. The comma is used as delimiter. Two ways of selecting atoms are supported: (1) provide a single number and (2) provide a range with hyphen (-). At least two atoms are needed to define a subsystem.
 
+For the algorithm, see \textbf{J. Chem. Theory Comput.} 14, 2558 (2018).
 
 
 \subsection{\texttt{\$Thermo} group} \label{sec:inp-thermo}
@@ -550,11 +551,11 @@ This group controls the thermochemistry calculation. Keywords:
 
 \bigskip{}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Temp}}
-\verb|Temp|: temperature (in K). Default: 298.15. If \verb|Temp| < 0, a series of additional temperatures will also be provided after this group.
+\verb|Temp|: temperature (in K). Default: 298.15. If \verb|Temp| < 0, a series of additional temperatures will also be provided after this group (see the example below).
 
 \bigskip{}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Press}}
-\verb|Press|: pressure (in atm). Default: 1.0. If \verb|Press| < 0, a series of additional pressures will also be provided after this group.
+\verb|Press|: pressure (in atm). Default: 1.0. If \verb|Press| < 0, a series of additional pressures will also be provided after this group (see the example below).
 
 \bigskip{}
 \index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{Scale}}
@@ -752,8 +753,7 @@ The CH4 molecule is defined by atoms 1-5 in this CH4@C60 complex.
    fchk="ch4-c60.fchk"
  $end
 \end{Verbatim}
-
-
+For more examples see \\ \href{https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples} {https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples}
 
 
 \pagebreak{}

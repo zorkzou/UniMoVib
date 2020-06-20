@@ -327,6 +327,8 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 原子标号需要被引号括起来表示字符串输入。标号之间用逗号隔开且不能有空格。支持两种标号的输入模式：（1）提供单独的标号，（2）通过横线(-)来表示标号范围。子系统至少需要两个原子。
 
+计算方法参见\textbf{J. Chem. Theory Comput.} 14, 2558 (2018)。
+
 \section{\texttt{\$Thermo}输入组} \label{sec:inp-thermo}
 
 该输入组控制热化学计算。关键词有：
@@ -338,10 +340,10 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \verb|NDeg|：自旋-轨道态的简并度。默认：1。
 
 \bigskip{}
-\verb|Temp|：温度（单位：K）。默认：298.15。若\verb|Temp| < 0，表示除了默认温度以外，在\texttt{\$Thermo}输入组之后还提供多个额外的温度值。
+\verb|Temp|：温度（单位：K）。默认：298.15。若\verb|Temp| < 0，表示除了默认温度以外，在\texttt{\$Thermo}输入组之后还提供多个额外的温度值（见下面的例子）。
 
 \bigskip{}
-\verb|Press|：压强（单位：大气压atm）。默认：1.0。若\verb|Press| < 0，表示除了默认压强以外，在\texttt{\$Thermo}输入组之后还提供多个额外的压强值。
+\verb|Press|：压强（单位：大气压atm）。默认：1.0。若\verb|Press| < 0，表示除了默认压强以外，在\texttt{\$Thermo}输入组之后还提供多个额外的压强值（见下面的例子）。
 
 \bigskip{}
 \verb|Scale|：实频率的换算因子。默认：1.0。\texttt{\$ExpFrq}输入组中定义的实验频率不做换算。
@@ -520,7 +522,7 @@ The CH4 molecule is defined by atoms 1-5 in this CH4@C60 complex.
    fchk="ch4-c60.fchk"
  $end
 \end{lstlisting}\end{colorboxed}
-
+更多示例见\href{https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples}{https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples}。
 
 \chapter{已知问题} \label{part:problem}
 
