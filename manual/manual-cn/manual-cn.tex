@@ -8,7 +8,7 @@
 \title{
 \vspace{-3cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\
-\vspace{1cm} \zihao{3}（1.3.1版）\vspace{30 mm} \\
+\vspace{1cm} \zihao{3}（1.3.4版）\vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm}}
 
 \author{
@@ -564,8 +564,10 @@ The CH4 molecule is defined by atoms 1-5 in this CH4@C60 complex.
 
 \section{UniMoVib数据文件格式} \label{sec:almfmt}
 
-\textsc{UniMoVib}数据文件是纯文本自由格式。 \\
-1.0.3版(2020.02.10)
+\textsc{UniMoVib}数据文件是不区分大小写的纯文本自由格式，其中前三行的顺序是固定的，之后\verb|END|除外的数据区顺序任意。
+
+\noindent
+1.1.0版(2020.10.24)
 \begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
 \begin{lstlisting}
@@ -573,22 +575,24 @@ The CH4 molecule is defined by atoms 1-5 in this CH4@C60 complex.
 NATM
   （一个正整数）
 AMASS
-  （NATM个原子质量；若不提供原子质量，改用NOMASS）
+  （NATM个原子质量；若不提供原子质量，可以忽略这部分内容或改用NOMASS，
+  程序默认用最丰同位素质量）
 ZA
   （NATM个核电荷数）
 XYZ
   （3*NATM，原子单位的直角坐标；若单位为埃，改用 XYZANG）
+GRD
+  （3*NATM，直角坐标下的梯度数组；若不提供梯度，可以忽略这部分内容或改用 NOGRD）
 FFX
   （3NATM*3NATM，Hessian矩阵元；若为下三角矩阵数据，改用 FFXLT）
 APT
-  （3*3NATM，APT数据值；若不提供 APT数据，改用 NOAPT）
+  （3*3NATM，APT数据值；若不提供 APT数据，可以忽略这部分内容或改用 NOAPT）
 DPR
   （6*3NATM，极化率导数数据值；若以9*3NATM格式给出，改用DPRSQ；
-  若不提供 DPR数据，改用 NODPR）
-GRD
-  （3*NATM，直角坐标下的梯度数组；若不提供梯度，改用 NOGRD）
+  若不提供 DPR数据，可以忽略这部分内容或改用 NODPR）
+END  （可选的结束行）
 \end{lstlisting}\end{colorboxed}
-目前\verb|DPR|数据和拉曼强度仅支持\textsc{Gaussian}产生的fchk文件。\verb|GRD|数据仅用于某些外部程序（如\textsc{LModeA}）。
+目前\verb|GRD|数据仅用于某些外部程序。
 
 \section{开发人员：到其它量子化学程序的接口} \label{sec:interface}
 

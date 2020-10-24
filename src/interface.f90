@@ -1242,92 +1242,100 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
-! Read data from UniMoVib (ALM) data file
+! Read data from UniMoVib (ALM) data file (Ver. 1.1)
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdALMode(ifchk,iout,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr)
-implicit real(kind=8) (a-h,o-z)
-parameter(ang2au=1.d0/0.52917720859d0)
-real(kind=8) :: AMass(*),ZA(*),XYZ(*),Grd(*),FFx(*),APT(*),DPol(6,*),Scr(*)
-character*100 :: ctmp
-logical :: Intact
+ implicit real(kind=8) (a-h,o-z)
+ parameter(ang2au=1.d0/0.52917720859d0)
+ real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(NAtm*3),Grd(NAtm*3),FFx(NAtm*NAtm*9),APT(NAtm*9),DPol(6,NAtm*3),Scr(*)
+ character*100 :: ctmp
+ logical :: Intact
 
-NAtm3 = NAtm * 3
-NAtm9 = NAtm * 9
-NSS = NAtm3 * NAtm3
-NTT = NAtm3 * (NAtm3+1) / 2
+ NAtm3 = NAtm * 3
+ NAtm9 = NAtm * 9
+ NSS = NAtm3 * NAtm3
+ NTT = NAtm3 * (NAtm3+1) / 2
 
-rewind(ifchk)
+ AMass   = 0.d0
+ AMass(1)=-1.d0
+ ZA      = 0.d0
+ XYZ     = 0.d0
+ Grd     = 0.d0
+ FFX     = 0.d0
+ APT     = 0.d0
+ DPol    = 0.d0
 
-! read mass
-AMass(1)=-1.d0
-read(ifchk,"(///a100)",err=1010,end=1010)ctmp
-call charl2u(ctmp)
-if(index(ctmp,"NOMASS") == 0) read(ifchk,*,err=1010,end=1010)(AMass(i),i=1,NAtm)
+ rewind(ifchk)
+ read(ifchk,"(//)",err=2010,end=2010)
 
-! read IZ
-read(ifchk,*,err=1020,end=1020)
-read(ifchk,*,err=1020,end=1020)(ZA(i),i=1,NAtm)
+ do while(.true.)
+   read(ifchk,"(a100)",err=2020,end=1000) ctmp
+   call charl2u(ctmp)
 
-! read Cartesian coordinates in a.u. (XYZ) or in Ang. (XYZANG)
-read(ifchk,"(a100)",err=1030,end=1030)ctmp
-call charl2u(ctmp)
-Scr(1)=1.d0
-if(index(ctmp,"XYZANG") /= 0) Scr(1)=ang2au
-read(ifchk,*,err=1030,end=1030)(XYZ(i),i=1,NAtm3)
-! Ang --> a.u.
-call AScale(NAtm3,Scr(1),XYZ,XYZ)
+   ! read mass
+   if(index(ctmp,"MASS") > 0 .and. index(ctmp,"NOMASS") == 0) then
+     read(ifchk,*,err=2030,end=2030)(AMass(i),i=1,NAtm)
 
-! read square or L.T. FFX in a.u.
-read(ifchk,"(a100)",err=1050,end=1050)ctmp
-call charl2u(ctmp)
-if(index(ctmp,"FFXLT") == 0) then
-  read(ifchk,*,err=1050,end=1050)(FFX(i),i=1,NSS)
-else
-  read(ifchk,*,err=1051,end=1051)(Scr(i),i=1,NTT)
-  call LT2Sqr(NAtm3,Scr,FFx)
-end if
+   ! read IZ
+   else if(index(ctmp,"ZA") > 0 .and. index(ctmp,"XYZANG") == 0) then
+     read(ifchk,*,err=2040,end=2040)(ZA(i),i=1,NAtm)
 
-! read APT in a.u.
-read(ifchk,"(a100)",err=1060,end=1060)ctmp
-call charl2u(ctmp)
-if(index(ctmp,"NOAPT") == 0) then
-  Infred = 1
-  read(ifchk,*,err=1060,end=1060)(APT(i),i=1,NAtm9)
-end if
+   ! read Cartesian coordinates in a.u. (XYZ) or in Ang. (XYZANG)
+   else if(index(ctmp,"XYZ") > 0) then
+     Scr(1)=1.d0
+     if(index(ctmp,"XYZANG") > 0) Scr(1)=ang2au
+     read(ifchk,*,err=2050,end=2050)(XYZ(i),i=1,NAtm3)
+     ! Ang --> a.u.
+     call AScale(NAtm3,Scr(1),XYZ,XYZ)
 
-! read DPR in a.u.
-read(ifchk,"(a100)",err=1070,end=1070)ctmp
-call charl2u(ctmp)
-if(index(ctmp,"NODPR") == 0) then
-  IRaman = 1
-  if(index(ctmp,"DPRSQ") == 0 .and. index(ctmp,"DPR") /= 0) then
-    read(ifchk,*,err=1070,end=1070)((DPol(j,i),j=1,6),i=1,NAtm3)
-  else if(index(ctmp,"DPRSQ") /= 0) then
-    read(ifchk,*,err=1071,end=1071)(Scr(i),i=1,NAtm3*9)
-    call S9to6(NAtm3,Scr,DPol)
-  end if
-end if
+   ! read square or L.T. FFX in a.u.
+   else if(index(ctmp,"FFX") > 0) then
+     if(index(ctmp,"FFXLT") == 0) then
+       read(ifchk,*,err=2060,end=2060)(FFX(i),i=1,NSS)
+     else
+       read(ifchk,*,err=2060,end=2060)(Scr(i),i=1,NTT)
+       call LT2Sqr(NAtm3,Scr,FFx)
+     end if
 
-! read GRD in a.u.
-read(ifchk,"(a100)",err=1080,end=1080)ctmp
-call charl2u(ctmp)
-if(len_trim(ctmp) > 0 .and. index(ctmp,"NOGRD") == 0) then
-  IGrd = 1
-  read(ifchk,*,err=1080,end=1080)(Grd(i),i=1,NAtm3)
-end if
+   ! read APT in a.u.
+   else if(index(ctmp,"APT") > 0 .and. index(ctmp,"NOAPT") == 0) then
+     Infred = 1
+     read(ifchk,*,err=2070,end=2070)(APT(i),i=1,NAtm9)
 
-return
+   ! read DPR in a.u.
+   else if(index(ctmp,"DPR") > 0 .and. index(ctmp,"NODPR") == 0) then
+     IRaman = 1
+     if(index(ctmp,"DPRSQ") == 0) then
+       read(ifchk,*,err=2080,end=2080)((DPol(j,i),j=1,6),i=1,NAtm3)
+     else
+       read(ifchk,*,err=2080,end=2080)(Scr(i),i=1,NAtm3*9)
+       call S9to6(NAtm3,Scr,DPol)
+     end if
 
-1010  call XError(Intact,"Please check AMASS data!")
-1020  call XError(Intact,"Please check ZA data!")
-1030  call XError(Intact,"Please check XYZ data!")
-1050  call XError(Intact,"Please check FFX data!")
-1051  call XError(Intact,"Please check FFXLT data!")
-1060  call XError(Intact,"Please check APT data!")
-1070  call XError(Intact,"Please check DPR data!")
-1071  call XError(Intact,"Please check DPRSQ data!")
-1080  call XError(Intact,"Please check GRD data!")
+   ! read GRD in a.u.
+   else if(index(ctmp,"GRD") > 0 .and. index(ctmp,"NOGRD") == 0) then
+     IGrd = 1
+     read(ifchk,*,err=2090,end=2090)(Grd(i),i=1,NAtm3)
+
+   ! read END
+   else if(index(ctmp,"END") > 0) then
+     exit
+
+   end if
+ end do
+
+ 1000  return
+
+ 2010  call XError(Intact,"Please check NATM data!")
+ 2020  call XError(Intact,"Please check UniMoVib data file!")
+ 2030  call XError(Intact,"Please check MASS data!")
+ 2040  call XError(Intact,"Please check ZA data!")
+ 2050  call XError(Intact,"Please check XYZ data!")
+ 2060  call XError(Intact,"Please check FFX/FFXLT data!")
+ 2070  call XError(Intact,"Please check APT data!")
+ 2080  call XError(Intact,"Please check DPR/DPRSQ data!")
+ 2090  call XError(Intact,"Please check GRD data!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -10,6 +10,7 @@ EXE        = $(DIR)$(NAME)
 OBJ        = object
 
 FCOM       = gfortran
+#            For GCC 10, -fallow-argument-mismatch is needed.
 COMPFLAGS  = -O3
 #            Looking for .mod files here!
 COMPFLAGS += -I$(OBJ)
