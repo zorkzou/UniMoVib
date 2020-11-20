@@ -1,5 +1,5 @@
 #
-# Written by W. Zou <qcband@gmail.com>. Tue Jun 5 2019.
+# Written by W. Zou <qcband@gmail.com>. Fri Nov 20 2020.
 #
 
 #DIR        = ../win32/
@@ -12,8 +12,8 @@ OBJ        = object
 FCOM       = gfortran
 #            For GCC 10, -fallow-argument-mismatch is needed.
 COMPFLAGS  = -O3
-#            Looking for .mod files here!
-COMPFLAGS += -I$(OBJ)
+#            Looking for .o & .mod files here!
+COMPFLAGS += -I$(OBJ) -J$(OBJ)
 
 SRC90      = interface.f90  main.f90  rw.f90  symmetry.f90  thermo.f90  util.f90  vibfreq.f90
 SRC77      = BLAS.f  LAPACK.f
@@ -32,7 +32,7 @@ all: $(MODOBJ) $(F90OBJ) $(F77OBJ)
 
 $(MODOBJ): $(OBJ)/%.o: %.f90
 	$(FCOM) -c -o $@ $(COMPFLAGS) $*.f90
-	mv *.mod $(OBJ)
+#	mv *.mod $(OBJ)
 
 $(F90OBJ): $(OBJ)/%.o: %.f90
 	$(FCOM) -c -o $@ $(COMPFLAGS) $*.f90

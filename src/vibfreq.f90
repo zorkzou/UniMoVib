@@ -1,12 +1,12 @@
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ! GSVA
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine GSVA_engine(iout,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
+subroutine GSVA_engine(iout,isva,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
  implicit real(kind=8) (a-h,o-z)
  dimension :: IOP(*),FFx(*),AMass_sub(*),XYZ_sub(*),AMass_sub_bak(NAtm_sub),ZA_sub(*)
  integer :: subsystem_idx(*)
  allocatable :: Scr1(:),Scr2(:),Scr3(:),Scr4(:),AL(:)
- allocatable :: FFx_inv(:),Scra(:),Scrb(:),Scrc(:),Scrd(:),prod(:),prod_inv(:)!,Rslt(:)
+ allocatable :: FFx_inv(:),Scra(:),Scrb(:),Scrc(:),Scrd(:),prod(:),prod_inv(:),FFx_subV(:)!,Rslt(:)
  real(kind=8), dimension (:, :), ALLOCATABLE :: VibSp,VibSp_t,VibSp_full,VibSp_full_t,compl_m1, &
  compl_m2,compl_inv,newHes_1,FFx_sub,Rslt
 
@@ -15,9 +15,9 @@ subroutine GSVA_engine(iout,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA
  allocate(Scr2(NSS_sub),Scr1(NSS_sub),Scr3(NSS_sub))
 
  !It is required to use identical mass for all atoms
- call acopy(NAtm_sub,AMass_sub,AMass_sub_bak) 
+ call acopy(NAtm_sub,AMass_sub,AMass_sub_bak)
  Do J=1,NAtm_sub 
-   AMass_sub(J) = 1.0E0
+   AMass_sub(J) = 1.0d0
  End Do
 
  call MassCent(NAtm_sub,AMass_sub,XYZ_sub,Scr1,Scr2) 
@@ -98,7 +98,9 @@ subroutine GSVA_engine(iout,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA
  call MMpyMF(3*NAtm_sub,NVib_sub,NVib_sub,VibSp,compl_inv,newHes_1)
  ! newHes_1(3*NAtm_sub,NVib_sub) * VibSp_t(NVib_sub,3*NAtm_sub) -> FFx_sub(3*NAtm_sub,3*NAtm_sub)
  allocate(FFx_sub(3*NAtm_sub,3*NAtm_sub))
+ allocate(FFx_subV(3*NAtm_sub*3*NAtm_sub))
  call MMpyMF(3*NAtm_sub,NVib_sub,3*NAtm_sub,newHes_1,VibSp_t,FFx_sub) 
+ call acopy(3*NAtm_sub*3*NAtm_sub,FFx_sub,FFx_subV)
  Do J=1,3
      !PRINT '(9E17.8)',(FFx_sub(i,J),i=1,9)
  End Do
@@ -120,6 +122,30 @@ subroutine GSVA_engine(iout,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA
 
  call PrtNFq_gsva(iout,NAtm_sub,NAtm3_sub,NVib_sub,ZA_sub,subsystem_idx,AL,Rslt)
  !PRINT '(9E17.8)',(Rslt(i),i=1,3)
+
+ 
+ !save ALMODE file for the subsystem as preparation to do local mode analysis with LModeA program 
+ open(isva,file='gsva.almode',status='replace') 
+ write(isva,"(' ALMODE DATA FILE (THIS TITLE CAN BE MODIFIED)')")
+
+ write(isva,"('NATM')")
+ write(isva,"(i5)")NAtm_sub
+
+ write(isva,"('AMASS')")
+ write(isva,"(5d20.10)")(AMass_sub(i),i=1,NAtm_sub)
+
+ write(isva,"('ZA')")
+ write(isva,"(5d20.10)")(ZA_sub(i),i=1,NAtm_sub)
+
+ write(isva,"('XYZ')")
+ write(isva,"(5d20.10)")(XYZ_sub(i),i=1,NAtm3_sub)
+
+ write(isva,"('FFX')")
+ write(isva,"(5d20.10)")(FFX_subV(i),i=1,NSS_sub)
+
+ write(isva,"('NOAPT')")
+ write(isva,"(/)")
+ 
 end 
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
