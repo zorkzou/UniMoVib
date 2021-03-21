@@ -224,10 +224,10 @@ select case(IOP(1))
     if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
   case(2,3)  ! Gamess,Firefly
-    call RdGAMES(idt0,idt1,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
+    call RdGAMES(idt0,idt1,tag,ctmp,Intact,Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol)
 
   case(4)  ! ORCA
-    call RdORCA(idt0,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
+    call RdORCA(idt0,ctmp,Intact,Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr1)
 
   case(5)  ! CFour
     call RdCFour(idt0,idt1,tag,ctmp,Intact,IfFXX,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,Scr4)
@@ -1512,10 +1512,10 @@ end
 ! Read data from *.dat + *.out of Gamess or PUNCH + *.out of Firefly
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdGAMES(ifchk,iout,tmp,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
+subroutine RdGAMES(ifchk,iout,tmp,ctmp,Intact,Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol)
 implicit real(kind=8) (a-h,o-z)
 parameter(an2br=0.52917720859d0,au2deb=2.541746d0)
-real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
+real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*),DPol(6,*)
 character*100 :: ctmp
 character*56 :: tmp
 logical :: Intact
@@ -1544,9 +1544,9 @@ do i=1,NAtm3
   read(ifchk,"(5x,5e15.8)",err=210,end=210)(FFx(j,i),j=1,NAtm3)
 end do
 
-! read APT (a.u.)
+! read APT (a.u.), optional
 ! rewind(ifchk)
-301   read(ifchk,"(a7)",end=401)ctmp
+301   read(ifchk,"(a7)",end=501)ctmp
 if(index(ctmp,' $DIPDR')==0)goto 301
 read(ifchk,"(1x,3e15.8)")((APT(j,i),j=1,3),i=1,NAtm3)
 ! Deb/Ang --> a.u.
@@ -1554,19 +1554,31 @@ factor=an2br/au2deb
 call AScale(NAtm3*3,factor,APT,APT)
 Infred= 1
 
+! read DPolar (a.u.), optional
+!---------------------------------------------------------------------------------------------------------------------------------
+! NOTE. Gamess/Firefly doesn't print Hessian in Raman calculation, so you have to copy the Hessian from the old *.dat/PUNCH file
+! and paste it into the new one.
+!---------------------------------------------------------------------------------------------------------------------------------
+! rewind(ifchk)
+401   read(ifchk,"(a7)",end=501)ctmp
+if(index(ctmp,' $ALPDR')==0)goto 401
+read(ifchk,"(///)")
+read(ifchk,"(6e13.6)")((DPol(j,i),j=1,6),i=1,NAtm3)
+IRaman= 1
+
 ! read atomic masses
-401   rewind(ifchk)
+501   rewind(ifchk)
 do while(.true.)
-  read(ifchk,"(a13)",end=410)ctmp
+  read(ifchk,"(a13)",end=510)ctmp
   if(index(ctmp,'ATOMIC MASSES')/=0) exit
 end do
-read(ifchk,*,err=410,end=410)(AMass(i),i=1,NAtm)
+read(ifchk,*,err=510,end=510)(AMass(i),i=1,NAtm)
 
 return
 110   call XError(Intact,"No Cartesian coordinates found!")
 120   call XError(Intact,"Cartesian coordinates are wrong!")
-210   call XError(Intact,"No Cartesian force constants found!")
-410   call XError(Intact,"No atomic masses found!")
+210   call XError(Intact,"No Cartesian force constants found! In the case of RUNTYP=RAMAN you have to provide $HESS manually.")
+510   call XError(Intact,"No atomic masses found!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1574,52 +1586,95 @@ end
 ! Read data from ORCA *.hess
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdORCA(ifchk,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
-implicit real(kind=8) (a-h,o-z)
-real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*)
-character*100 :: ctmp
-logical :: Intact
+subroutine RdORCA(ifchk,ctmp,Intact,Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr)
+ implicit real(kind=8) (a-h,o-z)
+ real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(NAtm*3,*),APT(3,*), DPol(6,*), Scr(6)
+ character*100 :: ctmp
+ logical :: Intact, OldVerion
 
-NAtm3 = NAtm * 3
-Infred= 0
+ ! Orca 3.x or 4.x
+ OldVerion = .False.
 
-! read nuclear charges, atomic masses, and Cartesian coordinates in standard orientation (a.u.)
-rewind(ifchk)
-001   read(ifchk,"(a6)",end=010)ctmp
-if(index(ctmp,"$atoms")==0)goto 001
-read(ifchk,*)
-do i=1,NAtm
-  read(ifchk,"(1x,a3,f10.4,1x,3f13.6)")ctmp,AMass(i),(XYZ(j,i),j=1,3)
-  call ElemZA(0,ctmp,ctmp,ZA(i))
-end do
+ NAtm3 = NAtm * 3
+ Infred= 0
 
-! read FFx (a.u.)
-rewind(ifchk)
-101   read(ifchk,"(a8)",end=110)ctmp
-if(index(ctmp,"$hessian")==0)goto 101
-read(ifchk,*)
-NBlock=(NAtm3-1)/6+1
-do i=1,NBlock
-  iv1=(i-1)*6+1
-  iv2=min(i*6,NAtm3)
-  read(ifchk,*)
-  do j=1,NAtm3
-    read(ifchk,"(11x,6f11.6)")(FFx(k,j),k=iv1,iv2)
-  end do
-end do
+ ! read nuclear charges, atomic masses, and Cartesian coordinates in standard orientation (a.u.)
+ rewind(ifchk)
+ 001   read(ifchk,"(a6)",end=010)ctmp
+ if(index(ctmp,"$atoms")==0)goto 001
+ read(ifchk,*)
+ if(OldVerion) then
+   do i=1,NAtm
+     read(ifchk,"(1x,a3,f10.4,1x,3f13.6)")ctmp,AMass(i),(XYZ(j,i),j=1,3)
+     call ElemZA(0,ctmp,ctmp,ZA(i))
+   end do
+ else
+   do i=1,NAtm
+     read(ifchk,"(1x,a3,f11.5,1x,3f19.12)")ctmp,AMass(i),(XYZ(j,i),j=1,3)
+     call ElemZA(0,ctmp,ctmp,ZA(i))
+   end do
+ end if
 
-! read APT (a.u.)
-rewind(ifchk)
-201   read(ifchk,"(a19)",end=900)ctmp
-if(index(ctmp,"$dipole_derivatives")==0)goto 201
-read(ifchk,*)
-read(ifchk,"(3f13.6)")((APT(j,i),j=1,3),i=1,NAtm3)
-Infred= 1
+ ! read FFx (a.u.)
+ rewind(ifchk)
+ 101   read(ifchk,"(a8)",end=110)ctmp
+ if(index(ctmp,"$hessian")==0)goto 101
+ read(ifchk,*)
+ if(OldVerion) then
+   NBlock=(NAtm3-1)/6+1
+   do i=1,NBlock
+     iv1=(i-1)*6+1
+     iv2=min(i*6,NAtm3)
+     read(ifchk,*)
+     do j=1,NAtm3
+       read(ifchk,"(11x,6f11.6)")(FFx(k,j),k=iv1,iv2)
+     end do
+   end do
+ else
+   NBlock=(NAtm3-1)/5+1
+   do i=1,NBlock
+     iv1=(i-1)*5+1
+     iv2=min(i*5,NAtm3)
+     read(ifchk,*)
+     do j=1,NAtm3
+       if(i == 1) then
+         read(ifchk,"(8x,5f19.10)")(FFx(k,j),k=iv1,iv2)
+       else
+         read(ifchk,"(9x,5f19.10)")(FFx(k,j),k=iv1,iv2)
+       end if
+     end do
+   end do
+ end if
 
-900  continue
-return
-010  call XError(Intact,"No $atoms found!")
-110  call XError(Intact,"No $hessian found!")
+ ! read APT (a.u.)
+ !rewind(ifchk)
+ 201   read(ifchk,"(a19)",end=900)ctmp
+ if(index(ctmp,"$dipole_derivatives")==0)goto 201
+ read(ifchk,*)
+ ! read(ifchk,"(3f13.6)")((APT(j,i),j=1,3),i=1,NAtm3)  ! for Orca 3.x
+ read(ifchk,*)((APT(j,i),j=1,3),i=1,NAtm3)
+ Infred= 1
+
+ ! read DPol (a.u.), optional
+ !rewind(ifchk)
+ 301   read(ifchk,"(a27)",end=900)ctmp
+ if(index(ctmp,"$polarizability_derivatives")==0)goto 301
+ read(ifchk,*)
+ do i=1,NAtm3
+   read(ifchk,*) (Scr(j),j=1,6)
+   DPol(1,i) = Scr(1)
+   DPol(2,i) = Scr(4)
+   DPol(3,i) = Scr(2)
+   DPol(4,i) = Scr(5)
+   DPol(5,i) = Scr(6)
+   DPol(6,i) = Scr(3)
+ end do
+ IRaman= 1
+
+ 900  continue
+ return
+ 010  call XError(Intact,"No $atoms found!")
+ 110  call XError(Intact,"No $hessian found!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

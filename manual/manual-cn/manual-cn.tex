@@ -8,7 +8,7 @@
 \title{
 \vspace{-3cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\
-\vspace{1cm} \zihao{3}（1.3.4版）\vspace{30 mm} \\
+\vspace{1cm} \zihao{3}（1.4.0版）\vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm}}
 
 \author{
@@ -34,18 +34,18 @@
 \chapter{关于\textsc{UniMoVib}}
 \label{part:about}
 
-\textsc{UniMoVib}是进行分子振动频率计算的统一接口。程序最初是我于2014至2015年在德州达拉斯市的南方卫理会大学期间用 FORTRAN 77编写，用作\href{https://sites.smu.edu/dedman/catco/}{CATCO小组}的分子局域模式程序\textsc{LocalMode}（现在叫\href{https://github.com/catco-smu}{\textsc{LModeA}}）的前端接口。本项工作得到美国NSF项目CHE 1152357和CHE 1464906的支持，并得到已故 的Dieter Cremer教授的鼎力支持和指导。
+\textsc{UniMoVib}是进行分子振动频率计算的统一接口。程序最初是我于2014至2015年在德州达拉斯市的南方卫理会大学期间用 FORTRAN 77编写，用作\href{https://sites.smu.edu/dedman/catco/}{CATCO小组}的分子局域模式程序\textsc{LocalMode}（现在叫\href{https://sites.smu.edu/dedman/catco/}{\textsc{LModeA}}）的前端接口。本项工作得到美国NSF项目CHE 1152357和CHE 1464906的支持，并得到已故 的Dieter Cremer教授的鼎力支持和指导。
 从2017年春天开始，\textsc{UniMoVib}用Fortran 90重新改写，作为独立程序发布。
 
 \section{功能} \label{sec:feature}
 
 \begin{itemize}
-\item 从 Hessian、坐标等数据计算谐振频率和（可选的）红外强度，这些数据可以由量子化学程序产生，或者由用户手工编写。 \\
+\item 从 Hessian、坐标等数据计算谐振频率和（可选的）红外强度及拉曼活性，这些数据可以由量子化学程序产生，或者由用户手工编写。 \\
 目前已经支持近30个量子化学程序（参见第\ref{sec:inp-contrl}节），尽管有些程序可能自己做得更好。
 \item 分析结构的最高点群以及简正振动模式的不可约表示(\emph{irreps.})。（\emph{irreps.}：仅闭壳层分子。） \\
 对称性分析基于\textsc{Mopac} 7.1程序包中的对称性子程序，\textsc{Mopac} 7.1的源代码已经开放，不受版权限制（参见\href{http://openmopac.net/Downloads/Downloads.html}{openmopac.net} and \href{https://sourceforge.net/projects/mopac7/}{sourceforge.net}）。
 \item 使用最高点群做热化学计算，并打印 Gaussian风格的热化学计算结果（详细解释，参见： Foresman and Frisch, \emph{Exploring Chemistry With Electronic Structure Methods}, Ed.2, Gaussian Inc., Pittsburgh, PA, \textbf{1996}, p.66）。
-\item 广义子系统振动分析方法（generalized subsystem vibrational analysis, GSVA）用以计算内禀片段振动 (作者陶韵文；参见：\textit{J. Chem. Theory Comput.} 14(5), 2558-2569, 2018)。
+\item 广义子系统振动分析方法（generalized subsystem vibrational analysis, GSVA）用以计算内禀片段振动 (作者陶韵文；参见：\textit{J. Chem. Theory Comput.} 14(5), 2558-2569, 2018以及\textit{Theor. Chem. Acc.} 140, 31, 2021)。
 \item 保存\textsc{Molden}文件，用于动画显示振动模式。
 \item 设定同位素，温度，压强，频率换算因子或实验频率，等。
 \item 可作为量子化学程序（尤其是不支持非阿贝尔点群的程序）的第三方模块，用于频率和热化学计算。
@@ -111,7 +111,7 @@ make
 
 \chapter{输入说明} \label{part:input}
 
-输入选项按照namelist分组，每一组结束用\verb|$END|。这些组的输入顺序任意。注意：每个\verb|$|符号之前，至少要有一个空格。
+输入选项按照namelist分组，每一组结束用\verb|$END|。这些组的输入顺序任意。注意：某些Fortran编译器要求在每个\verb|$|符号之前，至少要有一个空格。
 
 输入内容不区分大小写，但\verb|$QCData|输入组中的数据文件名除外（参见第\ref{sec:inp-qcdata}节）。
 
@@ -119,7 +119,7 @@ make
 
 该输入组指定计算类型。关键词：
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|QCProg="XXXX"|: \verb|XXXX|是产生 Hessian和振动频率的量子化学程序名或数据格式。支持以下程序/格式：
 \begin{itemize}
 \item \verb|Gaussian| （默认）。
@@ -152,7 +152,7 @@ make
 \end{itemize}
 \verb|     |此外，\verb|QCProg="AtomCalc"|可用于做原子热化学计算（参见第\ref{sec:inp-atom}节）。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|Isotop|：设定同位素质量。
 \begin{description}
 \item[ ]\verb|  = 0|：（默认）从频率计算的数据文件读入全部原子量；若不存在，原子量从程序的数据库读取（除个别程序外，都使用最丰同位素质量）。
@@ -160,28 +160,27 @@ make
 \item[ ]\verb|  = 2|：所有的原子质量都在\verb|$IsoMas|输入组（参见第\ref{sec:inp-isomas}节）之后提供。
 \end{description}
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|IFExp|：（\verb|.True.|/\verb|.False.|）用实验振动频率校正Hessian矩阵，在\verb|$ExpFrq|输入组（参见第\ref{sec:inp-expfrq}节）之后提供。默认：\verb|.False.|
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|IFGSVA|：（\verb|.True.|/\verb|.False.|）针对整个分子体系内部的一个片段进行广义子系统振动分析（GSVA）计算。子系统的原子标号在\verb|$GSVA|输入组中提供（参见第\ref{sec:inp-gsva}节）。默认：\verb|.False.|
-
-%用实验振动频率校正Hessian矩阵，在\verb|$ExpFrq|输入组（参见第\ref{sec:inp-expfrq}节）之后提供。默认：\verb|.False.|
 
 
 \subsection{保存数据的关键词} \label{subsec:inp-qcdata-save}
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|IFSAVE|：（\verb|.True.|/\verb|.False.|）把原子质量（受\verb|Isotop|影响），直角坐标，Hessian矩阵（受\verb|IFExp|影响），APT矩阵保存到纯文本数据文件*.umv中。该关键词不能与\verb|QCProg="AtomCalc"|或\verb|"UniMoVib"|同时用。默认：\verb|.False.|。关于数据格式，参见附录\ref{sec:almfmt}。
 
-\bigskip{}
-\verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|之外，保存\textsc{Molden}文件，它可以用\href{http://www.cmbi.ru.nl/molden/molden.html}{\textsc{Molden}}或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|
+\bigskip{}\noindent
+\verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|之外，保存\textsc{Molden}文件，它可以用\href{http://www.cmbi.ru.nl/molden/molden.html}{\textsc{Molden}} 或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|
 
-\bigskip{}
-\verb|IFLOCAL|：（\verb|.True.|/\verb|.False.|）保存数据文件，用于\textsc{LModeA}程序的局域模式分析（主页：\href{https://sites.smu.edu/dedman/catco/}{https://sites.smu.edu/dedman/catco/}）。
+\bigskip{}\noindent
+\verb|IFLOCAL|：（\verb|.True.|/\verb|.False.|）保存数据文件，用于\textsc{LModeA}程序的局域模式分析（主页：\\
+\href{https://sites.smu.edu/dedman/catco/}{https://sites.smu.edu/dedman/catco/}）。
 该关键词不能用于\verb|QCProg="AtomCalc"|。默认：\verb|.False.|。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|IFGauTS|：（\verb|.True.|/\verb|.False.|）把结构和Hessian矩阵存为\textsc{Gaussian}的输入文件模板，用于过渡态优化计算。该关键词不能用于
 \verb|QCProg="AtomCalc"|。默认：\verb|.False.|。注意：此输入对于ONIOM计算类型无效，因为\textsc{Gaussian}此时只能使用默认的冗余内坐标进行优化。
 
@@ -189,22 +188,22 @@ make
 
 一般不需要在\texttt{\$Contrl}中设置这些关键词。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|QCProg="XYZ"|：仅用于调试。如果\verb|QCProg="XYZINP"|，将在输入文件的\texttt{\$QCData}输入组之后直接提供直角坐标。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|IFConc|：（\verb|.True.|/\verb|.False.|）控制是否简明频率输出。默认：\verb|.False.|
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|ISyTol = MN|：判断对称性的精度阈值$M*10^{N-3}$，其中M总为正数，正负号只分配给N。于是，\verb|ISyTol = 21|表示0.02，而\verb|-21|表示0.0002。默认：10，即0.001。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|IFRdNM|：（\verb|.True.|/\verb|.False.|）是否从\texttt{\$QCData}输入组指定的数据文件直接读取简正模式，避免做对角化，从而节省内存并加快计算速度。若设定该关键词，不能同时用\verb|Isotop|设定同位素质量，或者用\verb|IFExp=.True.|进行振动频率校正。该关键词目前仅支持\verb|QCProg="Gaussian"|。默认：\verb|.False.|。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|IFSymtz|：（\verb|.True.|/\verb|.False.|）由于Jahn-Teller效应（开壳层体系）或者数值噪声，有时无法判断简正振动模式的不可约表示符号。该关键词可以把简正振动模式做对称化处理。该关键词不能与\verb|IFRdNM=.True.|同时使用。默认：\verb|.False.|。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|IFApprx|：（\verb|.True.|/\verb|.False.|）是否从外部文件读取内坐标力常数（伸缩：mDyn/\AA，角度：mDyn$\cdot$\AA/Rad$^2$）和Wilson B矩阵，并构造近似的Hessian矩阵进行简正振动频率计算。数据文件在\texttt{\$QCData}输入组指定。该关键词不能与\verb|IFRdNM=.True.|同时使用。默认：\verb|.False.|。
 
 %\newpage
@@ -266,7 +265,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 \verb|Isotop = 1|或\verb|2|时需要该输入组。输入组不需要选项。输入组之后，提供同位素质量。
 
-\bigskip{}
+\bigskip{}\noindent
 若\verb|Isotop = 1|，每行定义一个原子，包括原子序号及质量。程序连续读取，直到遇到空行或输入结束为止。例如，
 \begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
@@ -277,7 +276,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \end{lstlisting}\end{colorboxed}
 这里指定第二和第五个原子的质量分别为15.99491和2.01410。
 
-\bigskip{}
+\bigskip{}\noindent
 若\verb|Isotop = 2|，全部N个原子的质量以自由格式提供。例如，
 \begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
@@ -293,7 +292,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 \verb|IFExp=.True.|时需要该输入组。该输入组只有一个选项\verb|MODE|。在该选项组之后，提供频率实验值。
 
-\bigskip{}
+\bigskip{}\noindent
 若\verb|MODE = 0|（默认），以自由格式定义所有的$N_{Vib}$个振动频率值，它们必须正确地排序，与频率计算值一致。例如：
 \begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
@@ -303,7 +302,7 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
  2160.9759
 \end{lstlisting}\end{colorboxed}
 
-
+\noindent
 若\verb|MODE = 1|，一系列理论频率值将用实验频率值替代。每行一个频率，包括频率的编号，及其实验值。程序连续读取，直到遇到空行或输入结束为止。例如，
 \begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
@@ -327,31 +326,31 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 原子标号需要被引号括起来表示字符串输入。标号之间用逗号隔开且不能有空格。支持两种标号的输入模式：（1）提供单独的标号，（2）通过横线(-)来表示标号范围。子系统至少需要两个原子。
 
-计算方法参见\textbf{J. Chem. Theory Comput.} 14, 2558 (2018)和\textbf{Theor. Chem. Acc.} 140, 31 (2021)。
+计算方法参见\textit{J. Chem. Theory Comput.} 14, 2558 (2018)和\textit{Theor. Chem. Acc.} 140, 31 (2021)。
 
 \section{\texttt{\$Thermo}输入组} \label{sec:inp-thermo}
 
 该输入组控制热化学计算。关键词有：
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|Eel|：来自量子化学计算的总能量（单位：Hartree）。默认：0。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|NDeg|：自旋-轨道态的简并度。默认：1。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|Temp|：温度（单位：K）。默认：298.15。若\verb|Temp| < 0，表示除了默认温度以外，在\texttt{\$Thermo}输入组之后还提供多个额外的温度值（见下面的例子）。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|Press|：压强（单位：大气压atm）。默认：1.0。若\verb|Press| < 0，表示除了默认压强以外，在\texttt{\$Thermo}输入组之后还提供多个额外的压强值（见下面的例子）。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|Scale|：实频率的换算因子。默认：1.0。\texttt{\$ExpFrq}输入组中定义的实验频率不做换算。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|ScTol|：换算因子的阈值（单位：cm$^{-1}$）。此值以下的低频不做换算。默认除实验频率和虚频以外的全部频率都做换算。
 
-\bigskip{}
+\bigskip{}\noindent
 \verb|PG|：用于计算转动熵的点群名。它影响熵和 Gibbs自由能的结果，因此必须指定正确的点群。
 \begin{description}
 \item[ ]\verb|  = 0|：（默认）2。
@@ -522,7 +521,11 @@ The CH4 molecule is defined by atoms 1-5 in this CH4@C60 complex.
    fchk="ch4-c60.fchk"
  $end
 \end{lstlisting}\end{colorboxed}
-更多示例见\href{https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples}{https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples}。
+
+\section{更多GSVA输入示例 } \label{sec:gsva-more}
+
+关于GSVA的更多输入示例，见： \\
+\href{https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples} {https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples}
 
 \chapter{已知问题} \label{part:problem}
 
