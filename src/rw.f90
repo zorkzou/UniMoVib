@@ -242,8 +242,8 @@ subroutine RdContrl(iinp,iout,iudt,imdn,iloc,igau,Intact,NOp,IOP,qcprog,cname)
 implicit real(kind=8) (a-h,o-z)
 parameter(NProg=26)
 dimension :: IOP(NOp)
-logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva
-namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva
+logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms
+namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms
 character*200 :: qcprog, cname
 character*9,allocatable  :: DATFMT(:)
 
@@ -263,6 +263,7 @@ ifapprx  = .false.
 ifgauts  = .false.
 ifsymtz  = .false.
 ifgsva   = .false.
+ifpyvibms= .false.
 
 rewind(iinp)
 read(iinp,Contrl,end=100,err=10)
@@ -517,6 +518,9 @@ end if
 !GSVA
 if(ifgsva) IOP(15) = 1
 
+!PyVibMS
+if(ifpyvibms) IOP(16) = 1
+
 return
 end
 
@@ -692,7 +696,7 @@ end
 ! print geometry and probably atomic IR charges
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine PrtCoord(iout,Infred,NAtm,AMass,ZA,XYZ,APT)
+subroutine PrtCoord(iout,Infred,NAtm,AMass,ZA,XYZ,APT,ipyvibms,ixyz)
 implicit real(kind=8) (a-h,o-z)
 parameter(au2ang=0.52917720859d0)
 real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),APT(3,3,*), ip(3)
@@ -724,6 +728,18 @@ else
 
   write(iout,"(1x,108('-'),/,' Reference of IR charge:',/, &
     ' A. Milani, M. Tommasini, C. Castiglioni, Theor. Chem. Acc. 131, 1139 (2012).')")
+end if
+
+!export xyz file for pyvibms 
+if(ipyvibms == 1) then
+   open(ixyz,file='system.xyz',status='replace')
+   write(ixyz,"(i6)") NAtm
+   write(ixyz,"('TITLE')")
+   do i=1,NAtm
+      iza = nint(ZA(i))
+      call ElemZA(1,Elm,iza,Elm)
+      write(ixyz,"(a3,8x,3f14.8)") Elm,(XYZ(j,i)*au2ang,j=1,3)
+   end do
 end if
 
 return

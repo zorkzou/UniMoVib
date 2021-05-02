@@ -1,5 +1,7 @@
 #
-# Written by W. Zou <qcband@gmail.com>. Fri Nov 20 2020.
+# This Makefile may be used for gfortran under Linux or Windows-MinGW.
+#
+# Written by W. Zou <qcband@gmail.com>. May 02 2020.
 #
 
 #DIR        = ../win32/
@@ -11,7 +13,7 @@ OBJ        = object
 
 FCOM       = gfortran
 #            For GCC 10, -fallow-argument-mismatch is needed.
-COMPFLAGS  = -O3
+COMPFLAGS  = -O3 -w -fPIC
 #            Looking for .o & .mod files here!
 COMPFLAGS += -I$(OBJ) -J$(OBJ)
 

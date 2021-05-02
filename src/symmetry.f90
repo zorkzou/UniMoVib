@@ -724,7 +724,7 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 logical function SYMDEC(n1, ielem)
  implicit real(kind=8) (a-h,o-z)
- dimension ielem(20)
+ dimension :: ielem(20)
 
  in1 = n1
  do i = 1, 20
@@ -779,7 +779,7 @@ end
 subroutine pgsini(ntab,nallg,nallop,allrep)
  implicit real(kind=8) (a-h,o-z)
  character*4 :: allrep(*)
- dimension ntab(*),nallg(*),nallop(*)
+ dimension :: ntab(*), nallg(*), nallop(*)
 
  ! IG11
  ntab(1) = 1

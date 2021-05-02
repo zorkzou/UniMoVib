@@ -4,7 +4,12 @@ A unified interface for molecular harmonic vibrational frequency calculations.
 The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas, Texas, within the framework of the LocalMode (now LModeA) program of the Computational and Theoretical Chemistry Group (CATCO) of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
 
 ## Latest Version
-Version 1.4.0 (Mar/22/2020).
+Version 1.4.1 (May/02/2021).
+
+1. [PyVibMS](https://github.com/smutao/PyVibMS) has been supported (by Y. Tao).
+2. The latest version of ifort with MKL may be used in Makefile.
+
+Version 1.4.0 (Mar/22/2021).
 
 1. Raman scattering activities and depolarization ratios may be calculated for the data files saved by Gaussian, Gamess, Firefly, and Orca.
 2. The Hessian file saved by the latest version of Orca may be read correctly.

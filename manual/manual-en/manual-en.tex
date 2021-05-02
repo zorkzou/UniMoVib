@@ -52,21 +52,23 @@
 \begin{document}
 
 \title{User's Guide of the Program \textsc{UniMoVib} \\
-\vspace{10 mm} (Ver. 1.4.0) \vspace{30 mm} \\
+\vspace{10 mm} (Ver. 1.4.1) \vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm} }
 
 \date{\today}
 
-\author{Wenli Zou \\ \vspace{5mm}
-\href{mailto:qcband@gmail.com}{qcband@gmail.com} \\ \vspace{10mm}}
+\author{Wenli Zou \\
+\textit{Institute of Modern Physics, Northwest University, Xi'an, Shaanxi, China} \\
+\href{mailto:qcband@gmail.com}{qcband@gmail.com}
+\\ \\
+Yunwen Tao \\
+\textit{Department of Chemistry, Southern Methodist University, Dallas, TX, USA} \\
+\href{mailto:ywtao.smu@gmail.com}{ywtao.smu@gmail.com}
+}
 
 \maketitle
 \setcounter{page}{0}
 \thispagestyle{empty}
-
-\begin{center}
-\emph{Institute of Modern Physics, Northwest University, Xi'an, Shaanxi, China}
-\end{center}
 
 \pagebreak{}
 
@@ -93,7 +95,7 @@ supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late 
     Symmetry analysis is based on the symmetry subroutines from \textsc{Mopac} 7.1, which is fully in the public domain (at \href{http://openmopac.net/Downloads/Downloads.html}{openmopac.net} and \href{https://sourceforge.net/projects/mopac7/}{sourceforge.net}).
 \item Thermochemistry calculation uses the point group in full symmetry, and the results are printed in Gaussian-style (for detailed explanations, see Foresman and Frisch, \emph{Exploring Chemistry With Electronic Structure Methods}, Ed.2, Gaussian Inc., Pittsburgh, PA, \textbf{1996}, p.66).
 \item Generalized subsystem vibrational analysis (GSVA) to calculate intrinsic fragmental vibrations (by Y. Tao; see \textit{J. Chem. Theory Comput.} 14(5), 2558-2569, 2018 and \textit{Theor. Chem. Acc.} 140, 31, 2021).
-\item Save a \textsc{Molden} file for animation of normal modes.
+\item Save a \textsc{Molden} or \textsc{PyVibMS} data file for animation of normal modes.
 \item Set up isotopic masses, temperature, pressure, scale factor and/or experimental frequencies, and so on.
 \item Can be used as a third party module for frequency and thermochemistry calculations in a quantum chemistry program, especially when non-Abelian group is not supported therein.
 \end{itemize}
@@ -134,7 +136,7 @@ Two point groups will be printed by the program, \emph{i.e.} the molecular point
 \verb|$ make |
 
 A Fortran90 compiler is required, which is defined in \verb|Makefile|.
-
+For ifort using MKL, replace \verb|Makefile| by \verb|Makefile-ifort_mkl|.
 
 \subsection{Running the program} \label{sec:run}
 \index{{Running}@{Running}}
@@ -283,7 +285,13 @@ doesn't work with \verb|QCProg="AtomCalc"| or \verb|"UniMoVib"|. Default: \verb|
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFMOLDEN}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!MOLDEN}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Gabedit}
-\verb|IFMOLDEN|: (\verb|.True.|/\verb|.False.|) Save a \textsc{Molden} file except for \verb|QCProg="AtomCalc"|, which may be opened by the \textsc{Molden} or \textsc{Gabedit} program to view geometry and normal vibration modes. Default: \verb|.False.|
+\verb|IFMOLDEN|: (\verb|.True.|/\verb|.False.|) Save a \textsc{Molden} file except for \verb|QCProg="AtomCalc"|, which may be opened by the \href{http://www.cmbi.ru.nl/molden/molden.html}{\textsc{Molden}} or \href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}} program to view geometry and normal modes. Default: \verb|.False.|
+
+\bigskip{}\bigskip{}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFPYVIBMS}}
+\index{{Quantum chemistry program}@{Quantum chemistry program}!PyMOL}
+\index{{Quantum chemistry program}@{Quantum chemistry program}!PyVibMS}
+\verb|IFPYVIBMS|: (\verb|.True.|/\verb|.False.|) Save \textsc{PyVibMS} data files which may be used by the \href{https://pymol.org/}{\textsc{PyMOL}} plugin \href{https://github.com/smutao/PyVibMS}{\textsc{PyVibMS}} to view geometry and normal modes. Default: \verb|.False.|
 
 \bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFLOCAL}}
@@ -669,7 +677,7 @@ a test job
 \index{{Example}@{Example}!{Molpro}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Molpro}
 
-\textsc{Molpro} cannot handle non-Abelian point group symmetries, like $T_d$ in CH$_4$. Using \textsc{UniMoVib}, you can get \emph{irreps.} of normal vibrational modes in full symmetry.
+\textsc{Molpro} cannot handle non-Abelian point group symmetries, like $T_d$ in CH$_4$. Using \textsc{UniMoVib}, you can get \emph{irreps.} of normal modes in full symmetry.
 
 \begin{Verbatim}[frame=single,label=example,labelposition=topline,numbers=left,rulecolor=\color{blue},fontsize=\footnotesize,baselinestretch=1.0]
 a test job

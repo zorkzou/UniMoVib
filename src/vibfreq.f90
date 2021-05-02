@@ -1,7 +1,7 @@
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ! GSVA
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine GSVA_engine(iout,isva,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
+subroutine GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
  implicit real(kind=8) (a-h,o-z)
  dimension :: IOP(*),FFx(*),AMass_sub(*),XYZ_sub(*),AMass_sub_bak(NAtm_sub),ZA_sub(*)
  integer :: subsystem_idx(*)
@@ -120,9 +120,8 @@ subroutine GSVA_engine(iout,isva,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_s
  IRaman = 0 
  call NormFq(iout,Infred,IRaman,NAtm_sub,NAtm3_sub,NVib_sub,IOP(2),AMass_sub,Scra,FFx_sub,Scra,Scra,AL,Rslt,Scr1,Scr2) 
 
- call PrtNFq_gsva(iout,NAtm_sub,NAtm3_sub,NVib_sub,ZA_sub,subsystem_idx,AL,Rslt)
+ call PrtNFq_gsva(iout,NAtm_sub,NAtm3_sub,NVib_sub,IOP(2),ZA_sub,subsystem_idx,AL,Rslt,IOP(16),imds,NAtm)
  !PRINT '(9E17.8)',(Rslt(i),i=1,3)
-
  
  !save ALMODE file for the subsystem as preparation to do local mode analysis with LModeA program 
  open(isva,file='gsva.almode',status='replace') 
@@ -153,8 +152,8 @@ end
 ! Solve Secular equation in Cartesian coordinates
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,Intact,IOP,Infred,IRaman,IGrd,NAtm,NVib,ctmp,AMass,ZA,XYZ,Grd,  &
-  FFx,APT,DPol,AL,Rslt,Scr1,Scr2,Scr3,Scr4,Work)
+subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,Infred,IRaman,IGrd,NAtm,NVib,ctmp,AMass, &
+                   ZA,XYZ,Grd,FFx,APT,DPol,AL,Rslt,Scr1,Scr2,Scr3,Scr4,Work)
  implicit real(kind=8) (a-h,o-z)
  dimension :: IOP(*),AMass(*),ZA(*),XYZ(*),Grd(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),Scr1(*),Scr2(*),Scr3(*),Scr4(*),Work(*)
  character*4 :: PGNAME(2)
@@ -210,7 +209,7 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,Intact,IOP,Infre
 
  ! print normal modes results saved in Rslt
  IfSimu = IOP(1) == -3 .or. IOP(1) == -4
- call PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,IfSimu,IOP(2),IOP(10),ZA,AL,Rslt,Scr2)
+ call PrtNFq(iout,irep,imdf,Infred,IRaman,NAtm,NAtm3,NVib,IfSimu,IOP(2),IOP(10),IOP(16),ZA,AL,Rslt,Scr2)
 
  ! experimental frequencies
  if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Rslt,Scr2,Scr3,Scr4,Work,ctmp)
@@ -733,11 +732,11 @@ end
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ! print results of normal modes for GSVA
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine PrtNFq_gsva(iout,NAtm,NAtm3,NVib,ZA,subsystem_idx,AL,Reslt)
+subroutine PrtNFq_gsva(iout,NAtm,NAtm3,NVib,IPrint,ZA,subsystem_idx,AL,Reslt,Ipyvibms,imds,NAtm_full)
  implicit real(kind=8) (a-h,o-z)
  parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0,au2ang4=0.52917720859d0**4)
  real(kind=8) :: AL(3,NAtm,*),Reslt(NAtm3,*),ZA(*)
- integer :: subsystem_idx(*)
+ integer :: subsystem_idx(NAtm)
 
  write(iout,"(//, 1x,65('*'),/, 1x,'***  Properties of Intrinsic Fragmental Vibrations from GSVA  ***',/, 1x,65('*'))")
 
@@ -746,7 +745,7 @@ subroutine PrtNFq_gsva(iout,NAtm,NAtm3,NVib,ZA,subsystem_idx,AL,Reslt)
  !print *,subsystem_idx(1)
  !print *,subsystem_idx(2)
 
- if(1 == 1)then
+ if(IPrint == 1)then
    NLine=(NVib-1)/3+1
    do i=1,NLine
      iv1=(i-1)*3+1
@@ -775,8 +774,51 @@ subroutine PrtNFq_gsva(iout,NAtm,NAtm3,NVib,ZA,subsystem_idx,AL,Reslt)
        write(iout,"(8x,2i4,2x,3(4x,3f10.5))")subsystem_idx(ia),nint(ZA(ia)),((AL(ix,ia,j),ix=1,3),j=iv1,iv2)
      end do
    end do
+
+ else
+   NLine=(NVib-1)/10+1
+   do i=1,NLine
+     iv1=(i-1)*10+1
+     iv2=min(i*10,Nvib)
+     ncol=iv2-iv1+1
+     write(iout,"(/,20x,10i10)")(j,j=iv1,iv2)
+     ! write(iout,"('          Irreps',4x,10(6x,a4))")(trim(IRNAME(j)),j=iv1,iv2)
+     write(iout,"('     Frequencies',4x,10f10.2)")(Reslt(j,3)*au2wn,j=iv1,iv2)
+     ! write(iout,"('  Reduced masses',4x,10f10.4)")(Reslt(j,2),j=iv1,iv2)
+     write(iout,"(' Force constants',4x,10f10.4)")(Reslt(j,1)*au2dy,j=iv1,iv2)
+   end do
  end if
 
+ if(Ipyvibms == 1)then
+     open(imds,file='pyvibms_mode_subsys.txt',status='replace')
+     write(imds,"(i5,3x,i5)") NAtm_full,NVib
+     write(imds,'(A)') " "
+     do i=1,NVib
+        write(imds,"('N',1x,f11.4,1x,'0',1x,i5)") Reslt(i,3)*au2wn,i
+        ia = 0
+        do j=1,NAtm_full
+          !ia = 0
+          if(ANY(subsystem_idx==j))then
+            ia=ia+1
+            do k=1,3
+              write(imds,"(f11.5)") AL(k,ia,i)
+            end do
+          else       
+            do k=1,3
+              write(imds,"(f11.5)") 0.0D0
+            end do
+          end if
+        end do  
+
+        if(i == NVib)then
+          write(imds,'(A)') "END"    
+        else
+          write(imds,'(A)') " "      
+        end if
+
+     end do
+
+ end if
  !PRINT '(3E17.8)',(Reslt(j,3)*au2wn,j=1,3) 
  !PRINT '(3E17.8)',(ZA(j),j=1,3)
 
@@ -788,7 +830,7 @@ end
 ! print results of normal modes
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,IfSim,IPrint,IApprox,ZA,AL,Reslt,IRNAME)
+subroutine PrtNFq(iout,irep,imdf,Infred,IRaman,NAtm,NAtm3,NVib,IfSim,IPrint,IApprox,Ipyvibms,ZA,AL,Reslt,IRNAME)
  implicit real(kind=8) (a-h,o-z)
  parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0,au2ang4=0.52917720859d0**4)
  real(kind=8) :: ZA(*),AL(3,NAtm,*),Reslt(NAtm3,*)
@@ -897,6 +939,28 @@ subroutine PrtNFq(iout,irep,Infred,IRaman,NAtm,NAtm3,NVib,IfSim,IPrint,IApprox,Z
        write(iout,"(' Depolar. ratios',4x,10f10.4)")(Reslt(j,8),j=iv1,iv2)
      end if
    end do
+ end if
+
+ !save pyvibms mode file 
+ if(Ipyvibms == 1)then
+   open(imdf,file='pyvibms_mode_full.txt',status='replace')
+   write(imdf,"(i5,3x,i5)") NAtm,NVib
+   write(imdf,'(A)') " "
+   do i=1,NVib
+      write(imdf,"('N',1x,f11.4,1x,a4,1x,i5)") Reslt(i,3)*au2wn,trim(IRNAME(i)),i
+      do j=1,NAtm
+        do k=1,3
+          write(imdf,"(f11.5)") AL(k,j,i)
+        end do   
+      end do  
+
+      if(i == NVib)then
+        write(imdf,'(A)') "END"    
+      else
+        write(imdf,'(A)') " "      
+      end if
+   end do
+   !write(imdf,"(i5,3x,i5)") NAtm,NVib
  end if
 
  return
