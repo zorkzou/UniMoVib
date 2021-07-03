@@ -30,8 +30,8 @@ program UniMoVib
   integer, allocatable   :: subsystem_idx(:),flags(:)
   allocatable   :: AMass_sub(:), XYZ_sub(:), ZA_sub(:)   
 
-  ver="1.4.1"
-  dat="May 02, 2021"
+  ver="1.4.2"
+  dat="Jul 03, 2021"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O

@@ -164,6 +164,9 @@ select case(IOP(1))
   case(26) ! ACES
     call RdNAtmACES(idt0,Intact,NAtm,tag,ctmp)
 
+  case(27) ! xTB, same as xyz
+    call RdNAtmXYZ(idt0,NAtm,ctmp)
+
   case default
     call XError(Intact,"N.Y.I. in RdNAtm1!")
 
@@ -204,23 +207,23 @@ select case(IOP(1))
     return
 
   case(-2) ! UniMoVib (ALM); the size of Scr4 should be 9*NAtm3 at least
-    call RdALMode(idt0,iout,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr4)
-!   the most abundant isotopic masses are assumed
+    call RdALMode(idt0,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr4)
+    ! the most abundant isotopic masses are assumed
     if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
   case(-3) ! xyz
-    call RdXYZ(idt0,iout,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
-!   the most abundant isotopic masses are used
+    call RdXYZ(idt0,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    ! the most abundant isotopic masses are used
     call MasLib(0,NAtm,AMass,ZA)
 
   case(-4) ! xyz from input
-    call RdINP(iinp,iout,Intact,IfFXX,NAtm,tag,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
-!   the most abundant isotopic masses are used
+    call RdINP(iinp,Intact,IfFXX,NAtm,tag,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    ! the most abundant isotopic masses are used
     call MasLib(0,NAtm,AMass,ZA)
 
   case(1)  ! Gaussian
-    call RdGauss(idt0,iout,tag,ctmp,Intact,IOP(4),Infred,IRaman,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr1)
-!   the most abundant isotopic masses are assumed
+    call RdGauss(idt0,tag,ctmp,Intact,IOP(4),Infred,IRaman,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr1)
+    ! the most abundant isotopic masses are assumed
     if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
   case(2,3)  ! Gamess,Firefly
@@ -237,7 +240,7 @@ select case(IOP(1))
 
   case(7)  ! QChem
     call RdQChem(idt0,tag,ctmp,Intact,IOP(4),NAtm,AMass,ZA,XYZ,FFx,APT,Scr1)
-!   the most abundant isotopic masses are assumed
+    ! the most abundant isotopic masses are assumed
     if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
   case(8)  ! NWChem
@@ -257,16 +260,16 @@ select case(IOP(1))
 
   case(13) ! MOPAC
     call RdMopac(idt0,tag,ctmp,Intact,NAtm,ZA,XYZ,FFx)
-!   the most abundant isotopic masses are assumed
-!   call MasLib(0,NAtm,AMass,ZA)
-!   the averaged isotopic masses (default in MOPAC)
+    ! the most abundant isotopic masses are assumed
+    ! call MasLib(0,NAtm,AMass,ZA)
+    ! the averaged isotopic masses (default in MOPAC)
     call MasLib(1,NAtm,AMass,ZA)
 
   case(14) ! AMPAC/AMSOL
     call RdAMPAC(idt0,tag,ctmp,Intact,NAtm,ZA,XYZ,FFx)
-!   the most abundant isotopic masses are assumed
-!   call MasLib(0,NAtm,AMass,ZA)
-!   the averaged isotopic masses (default in AMPAC)
+    ! the most abundant isotopic masses are assumed
+    ! call MasLib(0,NAtm,AMass,ZA)
+    ! the averaged isotopic masses (default in AMPAC)
     call MasLib(1,NAtm,AMass,ZA)
 
   case(15) ! Dalton
@@ -296,7 +299,7 @@ select case(IOP(1))
 
   case(23) ! Spartan
     call RdSptn(idt0,tag,ctmp,Intact,Infred,NAtm,ZA,XYZ,FFx,APT,Scr1)
-!   the most abundant isotopic masses are assumed
+    ! the most abundant isotopic masses are assumed
     call MasLib(0,NAtm,AMass,ZA)
 
   case(24) ! PSI
@@ -307,6 +310,11 @@ select case(IOP(1))
 
   case(26) ! ACES
     call RdACES(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+
+  case(27) ! xTB
+    call RdXTB(idt0,idt1,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx)
+    ! the most abundant isotopic masses are used
+    call MasLib(0,NAtm,AMass,ZA)
 
   case default
     call XError(Intact,"N.Y.I. in RdData1!")
@@ -1245,7 +1253,7 @@ end
 ! Read data from UniMoVib (ALM) data file (Ver. 1.1)
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdALMode(ifchk,iout,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr)
+subroutine RdALMode(ifchk,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr)
  implicit real(kind=8) (a-h,o-z)
  parameter(ang2au=1.d0/0.52917720859d0)
  real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(NAtm*3),Grd(NAtm*3),FFx(NAtm*NAtm*9),APT(NAtm*9),DPol(6,NAtm*3),Scr(*)
@@ -1343,7 +1351,7 @@ end
 ! Read data from XYZ data file
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdXYZ(ifchk,iout,Intact,IfFXX,NAtm,Elem,ZA,XYZ,FFx,S1,S2,S3,S4)
+subroutine RdXYZ(ifchk,Intact,IfFXX,NAtm,Elem,ZA,XYZ,FFx,S1,S2,S3,S4)
 implicit real(kind=8) (a-h,o-z)
 parameter(ang2au=1.d0/0.52917720859d0)
 real(kind=8) :: ZA(*),XYZ(3,*),FFx(*),S1(*),S2(*),S3(*),S4(*)
@@ -1374,7 +1382,7 @@ if(IfFXX) then
 end if
 
 return
-1010  call XError(Intact,"Please check XYZ file!")
+1010  call XError(Intact,"Please check the XYZ file!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1382,7 +1390,7 @@ end
 ! Read XYZ data from input file
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdINP(iinp,iout,Intact,IfFXX,NAtm,Elem,ctmp,ZA,XYZ,FFx,S1,S2,S3,S4)
+subroutine RdINP(iinp,Intact,IfFXX,NAtm,Elem,ctmp,ZA,XYZ,FFx,S1,S2,S3,S4)
  implicit real(kind=8) (a-h,o-z)
  parameter(ang2au=1.d0/0.52917720859d0)
  real(kind=8) :: ZA(*),XYZ(3,*),FFx(*),S1(*),S2(*),S3(*),S4(*)
@@ -1428,7 +1436,7 @@ end
 ! Read data from Gaussian fchk
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdGauss(ifchk,iout,tag,ctmp,Intact,IRdMas,Infred,IRaman,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr)
+subroutine RdGauss(ifchk,tag,ctmp,Intact,IRdMas,Infred,IRaman,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact
 
@@ -2780,7 +2788,7 @@ return
 0110  call XError(Intact,"No Cartesian coordinates found!")
 1010  call XError(Intact,"No Cartesian force constants found!")
 1020  call XError(Intact,"Please check Force Constant matrix!")
-1110  call XError(Intact,"Please check APT!")
+1110  call XError(Intact,"Please check APT matrix!")
 1210  call XError(Intact,"Please check Isotopic Masses!")
 end
 
@@ -4064,6 +4072,42 @@ return
 1050  call XError(Intact,"Failed to read frequencies.")
 1060  call XError(Intact,"No normal modes found!")
 1070  call XError(Intact,"Failed to read normal modes.")
+end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read data from XTB data files
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdXTB(ifchk,ihess,Intact,IfFXX,NAtm,Elem,ZA,XYZ,FFx)
+implicit real(kind=8) (a-h,o-z)
+parameter(ang2au=1.d0/0.52917720859d0)
+real(kind=8) :: ZA(*),XYZ(3,*),FFx(*)
+character*3 :: Elem
+logical :: Intact,IfFXX
+
+NAtm3 = NAtm * 3
+
+rewind(ifchk)
+
+read(ifchk,"(/)",err=1010,end=1010)
+do i=1,NAtm
+  read(ifchk,*,err=1010,end=1010) Elem, XYZ(:,i)
+  call ElemZA(0,Elem,Elem,ZA(i))
+end do
+
+! Ang to a.u.
+call AScale(NAtm3,ang2au,XYZ,XYZ)
+
+if(IfFXX) then
+  rewind(ihess)
+  read(ihess,*,err=1020,end=1020)
+  read(ihess,*,err=1020,end=1020) (FFx(i),i=1,NAtm3*NAtm3)
+end if
+
+return
+1010  call XError(Intact,"Please check the XYZ file!")
+1020  call XError(Intact,"Please check the HESS file!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -234,13 +234,13 @@ end
 !       deMon          11,       PQS            12,       MOPAC          13,       AMPAC/AMSOL    14,       Dalton         15,
 !       FHI-AIMS       16,       CP2k           17,       ADF            18,       HyperChem      19,       Jaguar         20,
 !       MOLDEN         21,       Crystal        22,       Spartan        23,       PSI4           24,       DMol3          25,
-!       ACES           26
+!       ACES           26,       XTB            27
 !
 ! (*) For debugging only.
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdContrl(iinp,iout,iudt,imdn,iloc,igau,Intact,NOp,IOP,qcprog,cname)
 implicit real(kind=8) (a-h,o-z)
-parameter(NProg=26)
+parameter(NProg=27)
 dimension :: IOP(NOp)
 logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms
 namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms
@@ -406,6 +406,10 @@ else if(index(qcprog,'DMOL') /= 0) then
 else if(index(qcprog,'ACES') /= 0) then
   IOP(1)=26
 
+!>>> XTB
+else if(index(qcprog,'XTB') /= 0) then
+  IOP(1)=27
+
 !>>> Unknown
 else
   call XError(Intact,"Unknown quantum chemistry program or data format!")
@@ -418,7 +422,7 @@ if (IOP(1) > 0) then
                     "deMon2K  ","PQS      ","MOPAC    ","AMSOL    ","DALTON   ",&
                     "FHI-AIMS ","CP2K     ","ADF      ","HyperChem","Jaguar   ",&
                     "MOLDEN   ","CRYSTAL  ","SPARTAN  ","PSI4     ","Dmol3    ",&
-                    "ACES     "/)
+                    "ACES     ","xTB      "/)
   write(iout,"(/,' QC Program:',6x,a)") trim( DATFMT(IOP(1)) )
   if(Intact) write(*,"(' QC Program:',6x,a)") trim( DATFMT(IOP(1)) )
 	deallocate(DATFMT)
@@ -561,6 +565,8 @@ if(LEN_TRIM(fchk) == 0) then
     fchk='aoforce.out'
   else if(IOP(1) == 11) then
     fchk='deMon.out'
+  else if(IOP(1) == 27) then
+    fchk='xtbopt.xyz'
   end if
 end if
 
@@ -579,20 +585,23 @@ else if(IOP(1) == 5) then
 
 ! NWChem, PQS, FHI-AIMS: open $(hess) and optional $(ddip)
 else if(IOP(1) == 8 .or. IOP(1) == 12 .or. IOP(1) == 16) then
-! open $(hess)
   call DFOpen(iout,idt1,Intact,.True.,'HESS',hess)
-! open $(ddip)
   call DFOpen(iout,idt2,Intact,.False.,'DDIP',ddip)
 
 ! Turbomole: open optional $(ddip)
 else if(IOP(1) == 10) then
   if(LEN_TRIM(ddip) == 0) ddip='dipgrad'
-! open $(ddip)
   call DFOpen(iout,idt1,Intact,.False.,'DDIP',ddip)
 
 ! IApprox: open $(bmat)
 else if(IOP(10) /= 0) then
   call DFOpen(iout,ibmt,Intact,.True.,'BMAT',bmat)
+
+! xTB: open $(hess)
+else if(IOP(1) == 27) then
+  if(LEN_TRIM(hess) == 0) hess='hessian'
+  call DFOpen(iout,idt1,Intact,.True.,'HESS',hess)
+
 end if
 
 return
