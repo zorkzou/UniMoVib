@@ -4,6 +4,10 @@ A unified interface for molecular harmonic vibrational frequency calculations.
 The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas, Texas, within the framework of the LocalMode (now LModeA) program of the Computational and Theoretical Chemistry Group (CATCO) of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
 
 ## Latest Version
+Version 1.4.3 (Jul/19/2021).
+
+1. The most abundant or the longest lived isotopic masses of the elements Rb-Np, Hs, Rg, and Og have been updated.
+
 Version 1.4.2 (Jul/03/2021).
 
 1. [xTB](https://github.com/grimme-lab/xtb/) has been supported.

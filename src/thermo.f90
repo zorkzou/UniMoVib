@@ -218,6 +218,7 @@ do while(.true.)
   ! electronic contribution
   !energy(4) = Eel
   entropy(4)=Rval*log(dble(NDeg))
+  !write(iout,"(4f22.6)")entropy*temp*H2kcal
 
   ! ZPE
   zpe=0.d0
