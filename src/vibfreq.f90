@@ -144,7 +144,7 @@ subroutine GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,
 
  write(isva,"('NOAPT')")
  write(isva,"(/)")
- 
+
 end 
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -153,12 +153,14 @@ end
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,Infred,IRaman,IGrd,NAtm,NVib,ctmp,AMass, &
-                   ZA,XYZ,Grd,FFx,APT,DPol,AL,Rslt,Scr1,Scr2,Scr3,Scr4,Work)
+                   ZA,XYZ,Grd,FFx,APT,DPol,AL,Rslt,LScr,IScr,Irname,Scr1,Scr2,Scr3,Scr4,Work)
  implicit real(kind=8) (a-h,o-z)
- dimension :: IOP(*),AMass(*),ZA(*),XYZ(*),Grd(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),Scr1(*),Scr2(*),Scr3(*),Scr4(*),Work(*)
- character*4 :: PGNAME(2)
+ dimension :: IOP(*),AMass(*),ZA(*),XYZ(*),Grd(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),IScr(*),Scr1(*),Scr2(*)
+ ! NOTE. Scr3, Scr4, and Work are not available if IOP(9) = 1.
+ dimension :: Scr3(*),Scr4(*),Work(*)
+ character*4 :: PGNAME(2),Irname(NAtm*3)
  character*100 :: ctmp
- logical :: Intact,IFAtom,IfSimu
+ logical :: Intact,IFAtom,IfSimu,LScr(*)
 
  IFAtom = IOP(1) == -1
  NAtm3=3*NAtm
@@ -191,7 +193,7 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,
      call VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
    else
      write(iout,"(//,' IFSymtz=.T. : vibrational normal modes will be symmetrized and reordered.')")
-     call VibSEqSymm(iout,ireo,Intact,NAtm,NAtm3,NVib,IOP(5),AMass,XYZ,FFx,AL,Scr1,Scr2,Scr3,Scr4,Work(1),Work(1+NSS),ctmp)
+     call VibSEqSymm(iout,ireo,Intact,NAtm,NAtm3,NVib,IOP(5),AMass,XYZ,FFx,AL,Scr1,Scr2,IScr,Scr3,Scr4,Work,ctmp)
    end if
  end if
  call RmNoise(NSS,1.0d-8,AL)
@@ -209,10 +211,10 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,
 
  ! print normal modes results saved in Rslt
  IfSimu = IOP(1) == -3 .or. IOP(1) == -4
- call PrtNFq(iout,irep,imdf,Infred,IRaman,NAtm,NAtm3,NVib,IfSimu,IOP(2),IOP(10),IOP(16),ZA,AL,Rslt,Scr2)
+ call PrtNFq(iout,irep,imdf,Infred,IRaman,NAtm,NAtm3,NVib,IfSimu,IOP(2),IOP(10),IOP(16),ZA,AL,Rslt,Irname)
 
  ! experimental frequencies
- if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Rslt,Scr2,Scr3,Scr4,Work,ctmp)
+ if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Rslt,Scr2,Irname,LScr,Work,ctmp)
 
  ! save plain UniMoVib (ALM) data file and/or localmode.dat (part I)
  if(IOP(6) == 1 .or. IOP(8) == 1) call SavALM((IOP(6) == 1),(IOP(8) == 1),iudt,iloc,Infred,IRaman,IGrd,NAtm,NAtm3,NVib,AMass, &

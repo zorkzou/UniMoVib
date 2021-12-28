@@ -25,13 +25,16 @@ program UniMoVib
   character*12  :: dat
   character*200 :: ctmp, cname, tag
   logical       :: Intact, ifopen
-  allocatable   :: AMass(:), ZA(:), XYZ(:), Grd(:), FFx(:), APT(:), DPol(:), AL(:), Rslt(:), Scr1(:), Scr2(:), Scr3(:),  &
-                   Scr4(:), Work(:)
+  allocatable   :: AMass(:), ZA(:), XYZ(:), Grd(:), FFx(:), APT(:), DPol(:), AL(:), Rslt(:)
+  allocatable   :: Scr1(:), Scr2(:), Scr3(:), Scr4(:), Work(:)
+  logical, allocatable   :: LScr(:)
+  integer, allocatable   :: IScr(:)
+  character*1, allocatable :: CScr(:)
   integer, allocatable   :: subsystem_idx(:),flags(:)
   allocatable   :: AMass_sub(:), XYZ_sub(:), ZA_sub(:)   
 
-  ver="1.4.3"
-  dat="Jul 29, 2021"
+  ver="1.4.4"
+  dat="Dec 28, 2021"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O
@@ -89,7 +92,7 @@ program UniMoVib
   NWK=2*NSS
   allocate(AMass(NAtm), ZA(NAtm), XYZ(NAtm3), Grd(NAtm3), FFx(NSS), APT(NAtm3*3), DPol(NAtm3*6), AL(NSS), stat=ierr)
     if(ierr /= 0) call XError(Intact,"Insufficient Memory (1)!")
-  allocate(Rslt(NAtm3*Nrslt), Scr1(NSS), Scr2(NSS), stat=ierr)
+  allocate(Rslt(NAtm3*Nrslt), Scr1(NSS), Scr2(NSS), LScr(NAtm3), IScr(9*NAtm), CScr(12*NAtm), stat=ierr)
     if(ierr /= 0) call XError(Intact,"Insufficient Memory (2)!")
   if(IOP(9) /= 1) allocate(Scr3(NSS), Scr4(NSS), Work(NWK), stat=ierr)
     if(ierr /= 0) call XError(Intact,"Insufficient Memory (3)!")
@@ -113,7 +116,7 @@ program UniMoVib
 !    Symmetry is also analyzed therein.
 !-----------------------------------------------------------------------
   call SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,Infred,IRaman,IGrd,NAtm,NVib,ctmp,AMass,ZA,XYZ, &
-    Grd,FFx,APT,DPol,AL,Rslt,Scr1,Scr2,Scr3,Scr4,Work)
+    Grd,FFx,APT,DPol,AL,Rslt,LScr,IScr,CScr,Scr1,Scr2,Scr3,Scr4,Work)
 
 !-----------------------------------------------------------------------
 ! 8. GSVA - Generalized Subsystem Vibrational Analysis
@@ -137,7 +140,7 @@ program UniMoVib
 !-----------------------------------------------------------------------
 ! 99. the last step
 !-----------------------------------------------------------------------
-  deallocate(AMass, ZA, XYZ, Grd, FFx, APT, DPol, AL, Rslt, Scr1, Scr2)
+  deallocate(AMass, ZA, XYZ, Grd, FFx, APT, DPol, AL, Rslt, Scr1, Scr2, LScr, IScr, CScr)
   if(IOP(9) /= 1) deallocate(Scr3, Scr4, Work)
 
   call fdate(ctmp)

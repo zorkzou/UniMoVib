@@ -188,11 +188,12 @@ end
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine RdData1(iinp,iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,IGrd,NAtm,tag,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,  &
-  Scr1,Scr2,Scr3,Scr4)
+  Scr1,Scr2,Scr3,ScrD)
 implicit real(kind=8) (a-h,o-z)
 logical :: Intact, IfFXX
 dimension :: IOP(*)
-real(kind=8) :: AMass(*), ZA(*), XYZ(*), Grd(*), FFx(*), APT(*), DPol(*), Scr1(*), Scr2(*), Scr3(*), Scr4(*)
+real(kind=8) :: AMass(*), ZA(*), XYZ(*), Grd(*), FFx(*), APT(*), DPol(*)
+real(kind=8) :: Scr1(*), Scr2(*), Scr3(*), ScrD(*)  ! Scr1,2,3(NSS) and ScrD(2*NSS)
 character*100 :: tag,ctmp
 
 NAtm3=3*NAtm
@@ -206,18 +207,18 @@ select case(IOP(1))
   case(-1) ! atom
     return
 
-  case(-2) ! UniMoVib (ALM); the size of Scr4 should be 9*NAtm3 at least
-    call RdALMode(idt0,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,Scr4)
+  case(-2) ! UniMoVib (ALM); the size of ScrD should be 9*NAtm3 at least
+    call RdALMode(idt0,Intact,Infred,IRaman,IGrd,NAtm,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol,ScrD)
     ! the most abundant isotopic masses are assumed
     if(AMass(1) < 0.d0) call MasLib(0,NAtm,AMass,ZA)
 
   case(-3) ! xyz
-    call RdXYZ(idt0,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdXYZ(idt0,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,ScrD)
     ! the most abundant isotopic masses are used
     call MasLib(0,NAtm,AMass,ZA)
 
   case(-4) ! xyz from input
-    call RdINP(iinp,Intact,IfFXX,NAtm,tag,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdINP(iinp,Intact,IfFXX,NAtm,tag,ctmp,ZA,XYZ,FFx,Scr1,Scr2,Scr3,ScrD)
     ! the most abundant isotopic masses are used
     call MasLib(0,NAtm,AMass,ZA)
 
@@ -233,7 +234,7 @@ select case(IOP(1))
     call RdORCA(idt0,ctmp,Intact,Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr1)
 
   case(5)  ! CFour
-    call RdCFour(idt0,idt1,tag,ctmp,Intact,IfFXX,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,Scr4)
+    call RdCFour(idt0,idt1,tag,ctmp,Intact,IfFXX,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,ScrD)
 
   case(6)  ! Molpro
     call RdMolp(idt0,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
@@ -283,19 +284,19 @@ select case(IOP(1))
 
   case(18) ! ADF
     NWK=2*max(NAtm3,2)*NAtm3
-    call RdADF(idt0,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,Scr3,NWK,Scr4)
+    call RdADF(idt0,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,Scr1,Scr2,NWK,ScrD)
 
   case(19) ! Hyperchem
-    call RdHyper(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdHyper(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,ScrD)
 
   case(20) ! Jaguar
-    call RdJaguar(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdJaguar(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,ScrD)
 
   case(21) ! MOLDEN
-    call RdMOLDEN(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdMOLDEN(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,ScrD)
 
   case(22) ! Crystal
-    call RdCry(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdCry(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,ScrD)
 
   case(23) ! Spartan
     call RdSptn(idt0,tag,ctmp,Intact,Infred,NAtm,ZA,XYZ,FFx,APT,Scr1)
@@ -306,10 +307,10 @@ select case(IOP(1))
     call RdPSI(idt0,tag,ctmp,Intact,NAtm,AMass,ZA,XYZ,FFx)
 
   case(25) ! DMOL3
-    call RdDMol(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdDMol(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,ScrD)
 
   case(26) ! ACES
-    call RdACES(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
+    call RdACES(idt0,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,ScrD)
 
   case(27) ! xTB
     call RdXTB(idt0,idt1,Intact,IfFXX,NAtm,ctmp,ZA,XYZ,FFx)
@@ -1365,7 +1366,8 @@ rewind(ifchk)
 read(ifchk,"(/)",err=1010,end=1010)
 do i=1,NAtm
   read(ifchk,*,err=1010,end=1010)Elem,XYZ(:,i)
-  call ElemZA(0,Elem,Elem,ZA(i))
+  call ElemZA(0,Elem,itmp)
+  ZA(i) = dble(itmp)
 end do
 
 ! Ang to a.u.
@@ -1411,7 +1413,8 @@ subroutine RdINP(iinp,Intact,IfFXX,NAtm,Elem,ctmp,ZA,XYZ,FFx,S1,S2,S3,S4)
    if(ctmp(1:1) == "!") cycle
    i = i + 1
    read(ctmp,*,err=1010,end=1010)Elem,XYZ(:,i)
-   call ElemZA(0,Elem,Elem,ZA(i))
+   call ElemZA(0,Elem,itmp)
+   ZA(i) = dble(itmp)
    if(i == NAtm) exit
  end do
  ! Ang to a.u.
@@ -1614,12 +1617,14 @@ subroutine RdORCA(ifchk,ctmp,Intact,Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol
  if(OldVerion) then
    do i=1,NAtm
      read(ifchk,"(1x,a3,f10.4,1x,3f13.6)")ctmp,AMass(i),(XYZ(j,i),j=1,3)
-     call ElemZA(0,ctmp,ctmp,ZA(i))
+     call ElemZA(0,ctmp,itmp)
+     ZA(i) = dble(itmp)
    end do
  else
    do i=1,NAtm
      read(ifchk,"(1x,a3,f11.5,1x,3f19.12)")ctmp,AMass(i),(XYZ(j,i),j=1,3)
-     call ElemZA(0,ctmp,ctmp,ZA(i))
+     call ElemZA(0,ctmp,itmp)
+     ZA(i) = dble(itmp)
    end do
  end if
 
@@ -2098,7 +2103,8 @@ read(ifchk,*)
 do i=1,NAtm
   read(ifchk,"(7x,a3,7x,3f15.9)",end=030)ctmp,(XYZ(j,i),j=1,3)
   call rmnumb(3,ctmp)
-  call ElemZA(0,ctmp,ctmp,ZA(i))
+  call ElemZA(0,ctmp,itmp)
+  ZA(i) = dble(itmp)
 end do
 
 ! read FFx (a.u.)
@@ -2235,7 +2241,8 @@ if(index(ctmp,tag)==0)goto 001
 read(ifchk,*)
 do i=1,NAtm
   read(ifchk,"(4x,a3,7x,4d15.6)",end=020)ctmp,(XYZ(j,i),j=1,3),AMass(i)
-  call ElemZA(0,ctmp,ctmp,ZA(i))
+  call ElemZA(0,ctmp,itmp)
+  ZA(i) = dble(itmp)
 end do
 
 ! read FFx (a.u.)
@@ -2288,7 +2295,8 @@ do i=1,NAtm
     ctmp(2:2)=' '
   end if
   ctmp(3:3)=' '
-  call ElemZA(0,ctmp,ctmp,ZA(i))
+  call ElemZA(0,ctmp,itmp)
+  ZA(i) = dble(itmp)
 end do
 ! ang --> a.u.
 call AScale(NAtm3,ang2au,XYZ,XYZ)
@@ -2518,7 +2526,8 @@ rewind(ifchk)
 if(index(ctmp,tag)==0)goto 001
 do i=1,NAtm
   read(ifchk,*,end=020)ctmp,(XYZ(j,i),j=1,3),Zval,AMass(i)
-  call ElemZA(0,ctmp,ctmp,ZA(i))
+  call ElemZA(0,ctmp,itmp)
+  ZA(i) = dble(itmp)
 end do
 
 ! read FFx (a.u.)
@@ -2589,7 +2598,8 @@ do i=1,NAtm
   005  if(IFV70) goto 020
   call rmnumb(3,ctmp)
   ctmp(1:3) = adjustl(ctmp(1:3))
-  call ElemZA(0,ctmp,ctmp,ZA(i))
+  call ElemZA(0,ctmp,itmp)
+  ZA(i) = dble(itmp)
   read(ctmp(4:100),*,err=020,end=020)(XYZ(j,i),j=1,3)
 end do
 ! Ang --> a.u.
@@ -2781,7 +2791,8 @@ do i=1,NAtm
   read(ifchk,"(a100)",end=1210)ctmp
   read(ctmp(38:),*,err=1210)AMass(i)
   ipo=nonspace(ctmp)
-  call ElemZA(0,ctmp(ipo:),ctmp(ipo:),ZA(i))
+  call ElemZA(0,ctmp(ipo:),itmp)
+  ZA(i) = dble(itmp)
 end do
 
 return
@@ -2811,7 +2822,8 @@ rewind(ifchk)
 ! read IZ, mass, and Cartesian coordinates in Angstrom
 do i=1,NAtm
   read(ifchk,*,err=110)AMass(i),(XYZ(j,i),j=1,3),ctmp
-  call ElemZA(0,ctmp,ctmp,ZA(i))
+  call ElemZA(0,ctmp,itmp)
+  ZA(i) = dble(itmp)
 end do
 ! Ang --> a.u.
 call AScale(NAtm3,ang2au,XYZ,XYZ)
@@ -2905,236 +2917,240 @@ end
 ! Read data from ADF tape21 or tape13.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdADF(ifchk,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,DAT1,IDAT,SCR,NWork,SCRFFX)
-implicit real(kind=8) (a-h,o-z)
-! we assume #atomtypes < NAtm3, which should be safe
-real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),APT(*),DAT1(NAtm*3,*),SCR(*),SCRFFX(NWork)
-dimension :: IDAT(NAtm*3,*)
-character*100 :: ctmp
-character*28 :: tag(2)
-logical :: Intact,anafc
+subroutine RdADF(ifchk,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT,DAT1,SCR,NWork,SCRFFX)
+ implicit real(kind=8) (a-h,o-z)
+ ! we assume #atomtypes < NAtm3, which should be safe
+ real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),FFx(*),APT(*),DAT1(NAtm*3,*),SCR(*),SCRFFX(NWork)
+ allocatable :: IDAT(:,:)
+ character*100 :: ctmp
+ character*28 :: tag(2)
+ logical :: Intact,anafc
 
-NAtm3 = NAtm * 3
-Infred= 0
+ NAtm3 = NAtm * 3
+ Infred= 0
 
-! #atomtypes (including dummy atoms)
-i=0
-tag(1)='Geometry'
-tag(2)='nr of atomtypes'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=100,err=100)ctmp
-  if(ctmp(1:8) == tag(1)(1:8))then
-    read(ifchk,"(a100)",end=100,err=100)ctmp
-    if(ctmp(1:15) == tag(2)(1:15))then
-      read(ifchk,"(/,a100)",end=100,err=100)ctmp
-      read(ctmp,*,end=100,err=100)i
-      goto 100
-    end if
-  end if
-end do
-100   NTyp=i
-if(NTyp < 1)call XError(Intact,"nr of atomtypes < 1!")
-if(NTyp > NAtm3)call XError(Intact,"nr of atomtypes > NAtm3!")
+ ! #atomtypes (including dummy atoms)
+ i=0
+ tag(1)='Geometry'
+ tag(2)='nr of atomtypes'
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=100,err=100)ctmp
+   if(ctmp(1:8) == tag(1)(1:8))then
+     read(ifchk,"(a100)",end=100,err=100)ctmp
+     if(ctmp(1:15) == tag(2)(1:15))then
+       read(ifchk,"(/,a100)",end=100,err=100)ctmp
+       read(ctmp,*,end=100,err=100)i
+       goto 100
+     end if
+   end if
+ end do
+ 100   NTyp=i
+ if(NTyp < 1)call XError(Intact,"nr of atomtypes < 1!")
+ if(NTyp > NAtm3)call XError(Intact,"nr of atomtypes > NAtm3!")
 
-! read atomic mass --> DAT1(:,1)
-tag(2)='mass'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=210,err=210)ctmp
-  if(ctmp(1:8) == tag(1)(1:8))then
-    read(ifchk,"(a100)",end=210,err=210)ctmp
-    if(ctmp(1:4) == tag(2)(1:4))then
-      read(ifchk,*,end=210,err=210)
-      read(ifchk,*,end=210,err=210)(DAT1(i,1),i=1,NTyp)
-      goto 200
-    end if
-  end if
-end do
-200   continue
+ ! read atomic mass --> DAT1(:,1)
+ tag(2)='mass'
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=210,err=210)ctmp
+   if(ctmp(1:8) == tag(1)(1:8))then
+     read(ifchk,"(a100)",end=210,err=210)ctmp
+     if(ctmp(1:4) == tag(2)(1:4))then
+       read(ifchk,*,end=210,err=210)
+       read(ifchk,*,end=210,err=210)(DAT1(i,1),i=1,NTyp)
+       goto 200
+     end if
+   end if
+ end do
+ 200   continue
 
-! read IZ --> DAT1(:,2)
-tag(2)='atomtype total charge'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=310,err=310)ctmp
-  if(ctmp(1:8) == tag(1)(1:8))then
-    read(ifchk,"(a100)",end=310,err=310)ctmp
-    if(ctmp(1:21) == tag(2)(1:21))then
-      read(ifchk,*,end=310,err=310)
-      read(ifchk,*,end=310,err=310)(DAT1(i,2),i=1,NTyp)
-      goto 300
-    end if
-  end if
-end do
-300   continue
+ ! read IZ --> DAT1(:,2)
+ tag(2)='atomtype total charge'
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=310,err=310)ctmp
+   if(ctmp(1:8) == tag(1)(1:8))then
+     read(ifchk,"(a100)",end=310,err=310)ctmp
+     if(ctmp(1:21) == tag(2)(1:21))then
+       read(ifchk,*,end=310,err=310)
+       read(ifchk,*,end=310,err=310)(DAT1(i,2),i=1,NTyp)
+       goto 300
+     end if
+   end if
+ end do
+ 300   continue
 
-! read atom order index --> IDAT(:,1)
-tag(2)='atom order index'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=410,err=410)ctmp
-  if(ctmp(1:8) == tag(1)(1:8))then
-    read(ifchk,"(a100)",end=410,err=410)ctmp
-    if(ctmp(1:16) == tag(2)(1:16))then
-      read(ifchk,*,end=410,err=410)NVal
-!     Note: only the first half part of IDAT(:,1) will be used
-      read(ifchk,*,end=410,err=410)(IDAT(i,1),i=1,NVal)
-      goto 400
-    end if
-  end if
-end do
-400   continue
+ ! read atom order index --> IDAT(:,1)
+ tag(2)='atom order index'
+ allocate( IDAT(NAtm3,2) )
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=410,err=410)ctmp
+   if(ctmp(1:8) == tag(1)(1:8))then
+     read(ifchk,"(a100)",end=410,err=410)ctmp
+     if(ctmp(1:16) == tag(2)(1:16))then
+       read(ifchk,*,end=410,err=410)NVal
+       ! Note: only the first half part of IDAT(:,1) will be used
+       read(ifchk,*,end=410,err=410)(IDAT(i,1),i=1,NVal)
+       goto 400
+     end if
+   end if
+ end do
+ 400   continue
 
-! read atomtype index --> IDAT(:,2)
-tag(2)='fragment and atomtype index'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=460,err=460)ctmp
-  if(ctmp(1:8) == tag(1)(1:8))then
-    read(ifchk,"(a100)",end=460,err=460)ctmp
-    if(ctmp(1:27) == tag(2)(1:27))then
-      read(ifchk,*,end=460,err=460)NVal
-!     Note: only the second half part of IDAT(:,2) will be used
-      read(ifchk,*,end=460,err=460)(IDAT(i,2),i=1,NVal)
-      goto 450
-    end if
-  end if
-end do
-450   NAtm0 = NVal/2    ! NAtm0 contains dummy atoms
+ ! read atomtype index --> IDAT(:,2)
+ tag(2)='fragment and atomtype index'
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=460,err=460)ctmp
+   if(ctmp(1:8) == tag(1)(1:8))then
+     read(ifchk,"(a100)",end=460,err=460)ctmp
+     if(ctmp(1:27) == tag(2)(1:27))then
+       read(ifchk,*,end=460,err=460)NVal
+       ! Note: only the second half part of IDAT(:,2) will be used
+       read(ifchk,*,end=460,err=460)(IDAT(i,2),i=1,NVal)
+       goto 450
+     end if
+   end if
+ end do
+ 450   NAtm0 = NVal/2    ! NAtm0 contains dummy atoms
 
-! Read Cartesian coordinates in the Geometry part (in a.u.)
-! Because of some bugs, Freq%xyz may be the initial geometry before the optimization, so Geometry%xyz should be used instead.
-ia=0
-! tag(1)='Freq'
-tag(2)='xyz'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=510,err=510)ctmp
-! if(ctmp(1:4) == tag(1)(1:4))then
-  if(ctmp(1:8) == tag(1)(1:8))then
-    read(ifchk,"(a100)",end=510,err=510)ctmp
-    if(ctmp(1:3) == tag(2)(1:3) .and. len_trim(ctmp(1:9)) == 3) then   ! skip Geometry % xyz InputOrder
-      read(ifchk,*,end=510,err=510)NVal
-      if(NAtm0 * 3 /= NVal) call XError(Intact,"NAtm0*3 /= NVal in Freq % xyz!")
-      do i=1,NAtm0
-        read(ifchk,"(a100)",end=510,err=510)ctmp
-        ityp=IDAT(NAtm0+i,2)
-!       skip dummy atoms
-        if(DAT1(ityp,1) < 0.8d0 .or. DAT1(ityp,2) < 0.8d0) cycle
-        ia=ia+1
-        read(ctmp,*,end=100,err=100)(XYZ(j,ia),j=1,3)
-        AMass(ia)=DAT1(ityp,1)
-        ZA(ia)=DAT1(ityp,2)
-      end do
-      goto 500
-    end if
-  end if
-end do
-500   if(ia /= NAtm) call XError(Intact,"Wrong NAtm in Freq % xyz!")
+ ! Read Cartesian coordinates in the Geometry part (in a.u.)
+ ! Because of some bugs, Freq%xyz may be the initial geometry before the optimization,
+ ! so Geometry%xyz should be used instead.
+ ia=0
+ ! tag(1)='Freq'
+ tag(2)='xyz'
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=510,err=510)ctmp
+ ! if(ctmp(1:4) == tag(1)(1:4))then
+   if(ctmp(1:8) == tag(1)(1:8))then
+     read(ifchk,"(a100)",end=510,err=510)ctmp
+     if(ctmp(1:3) == tag(2)(1:3) .and. len_trim(ctmp(1:9)) == 3) then   ! skip Geometry % xyz InputOrder
+       read(ifchk,*,end=510,err=510)NVal
+       if(NAtm0 * 3 /= NVal) call XError(Intact,"NAtm0*3 /= NVal in Freq % xyz!")
+       do i=1,NAtm0
+         read(ifchk,"(a100)",end=510,err=510)ctmp
+         ityp=IDAT(NAtm0+i,2)
+         ! skip dummy atoms
+         if(DAT1(ityp,1) < 0.8d0 .or. DAT1(ityp,2) < 0.8d0) cycle
+         ia=ia+1
+         read(ctmp,*,end=100,err=100)(XYZ(j,ia),j=1,3)
+         AMass(ia)=DAT1(ityp,1)
+         ZA(ia)=DAT1(ityp,2)
+       end do
+       goto 500
+     end if
+   end if
+ end do
+ 500   if(ia /= NAtm) call XError(Intact,"Wrong NAtm in Freq % xyz!")
 
-! read analytic FFx (in a.u.)
-anafc = .true.
-tag(1)='Hessian'
-tag(2)='Analytical Hessian'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=650,err=610)ctmp
-  if(ctmp(1:7) == tag(1)(1:7))then
-    read(ifchk,"(a100)",end=650,err=610)ctmp
-    if(ctmp(1:18) == tag(2)(1:18))then
-      read(ifchk,*,end=610,err=610)NVal
-      if(NAtm3*NAtm3 /= NVal) call XError(Intact,"NAtm3*NAtm3 /= NVal in Hessian % Analytical Hessian!")
-      read(ifchk,*,end=610,err=610)(FFX(i),i=1,NVal)
-      goto 680
-    end if
-  end if
-end do
-650   anafc = .false.
+ ! read analytic FFx (in a.u.)
+ anafc = .true.
+ tag(1)='Hessian'
+ tag(2)='Analytical Hessian'
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=650,err=610)ctmp
+   if(ctmp(1:7) == tag(1)(1:7))then
+     read(ifchk,"(a100)",end=650,err=610)ctmp
+     if(ctmp(1:18) == tag(2)(1:18))then
+       read(ifchk,*,end=610,err=610)NVal
+       if(NAtm3*NAtm3 /= NVal) call XError(Intact,"NAtm3*NAtm3 /= NVal in Hessian % Analytical Hessian!")
+       read(ifchk,*,end=610,err=610)(FFX(i),i=1,NVal)
+       goto 680
+     end if
+   end if
+ end do
+ 650   anafc = .false.
 
-tag(1)='GeoOpt'
-tag(2)='Hessian_CART'
-rewind(ifchk)
-do while(.true.)
-  read(ifchk,"(a100)",end=621,err=621)ctmp
-  if(ctmp(1:6) == tag(1)(1:6))then
-    read(ifchk,"(a100)",end=621,err=621)ctmp
-    if(ctmp(1:12) == tag(2)(1:12))then
-      read(ifchk,*,end=621,err=621)NVal
-      if(NWork < NVal) call XError(Intact,"NWK in sub. RdData1 is too small!")
-      read(ifchk,*,end=621,err=621)(SCRFFX(i),i=1,NVal)
-      if(NAtm0 == NAtm)then
-!       no dummy atom
-        if(NAtm3*NAtm3 /= NVal) call XError(Intact,"NAtm3*NAtm3 /= NVal in GeoOpt % Hessian_CART!")
-        call ACopy(NVal,SCRFFX,FFX)
-      else
-!       remove the blocks of dummy atoms
-        if(NAtm0*NAtm0*9 /= NVal) call XError(Intact,"NAtm0*NAtm0*9 /= NVal in GeoOpt % Hessian_CART!")
-        call RmDummyFFX(NAtm0,NAtm0*3,IDAT(1,1),IDAT(NAtm0+1,2),DAT1(1,1),DAT1(1,2),SCRFFX,FFX)
-      end if
-      goto 680
-    end if
-  end if
-end do
-680   continue
+ tag(1)='GeoOpt'
+ tag(2)='Hessian_CART'
+ rewind(ifchk)
+ do while(.true.)
+   read(ifchk,"(a100)",end=621,err=621)ctmp
+   if(ctmp(1:6) == tag(1)(1:6))then
+     read(ifchk,"(a100)",end=621,err=621)ctmp
+     if(ctmp(1:12) == tag(2)(1:12))then
+       read(ifchk,*,end=621,err=621)NVal
+       if(NWork < NVal) call XError(Intact,"NWK in sub. RdData1 is too small!")
+       read(ifchk,*,end=621,err=621)(SCRFFX(i),i=1,NVal)
+       if(NAtm0 == NAtm)then
+         ! no dummy atom
+         if(NAtm3*NAtm3 /= NVal) call XError(Intact,"NAtm3*NAtm3 /= NVal in GeoOpt % Hessian_CART!")
+         call ACopy(NVal,SCRFFX,FFX)
+       else
+         ! remove the blocks of dummy atoms
+         if(NAtm0*NAtm0*9 /= NVal) call XError(Intact,"NAtm0*NAtm0*9 /= NVal in GeoOpt % Hessian_CART!")
+         call RmDummyFFX(NAtm0,NAtm0*3,IDAT(1,1),IDAT(NAtm0+1,2),DAT1(1,1),DAT1(1,2),SCRFFX,FFX)
+       end if
+       goto 680
+     end if
+   end if
+ end do
+ 680   continue
 
-if(anafc) then
-! read analytic APT (in a.u.)
-  tag(1)='Hessian'
-  tag(2)='Analytical Dipole Derivative'
-  rewind(ifchk)
-  do while(.true.)
-    read(ifchk,"(a100)",end=710,err=710)ctmp
-    if(ctmp(1:7) == tag(1)(1:7))then
-      read(ifchk,"(a100)",end=710,err=710)ctmp
-      if(ctmp(1:28) == tag(2)(1:28))then
-        read(ifchk,*,end=710,err=710)NVal
-        if(NAtm3*3 /= NVal) call XError(Intact,"NAtm3*3 /= NVal in Hessian % Ana. Dipole Der.!")
-        read(ifchk,*,end=710,err=710)(APT(i),i=1,NVal)
-        Infred= 1
-        goto 750
-      end if
-    end if
-  end do
-else
-! read numerical APT (in a.u.)
-! if symmetry is used with equivalent atoms, some APT elements will be zero!!!
-  write(*,"(/,' <<< Note >>>',/, &
-     ' For numerical Hessian, if ADF uses symmetry and if there are symmetry-',/, &
-     ' equivalent atoms, the normal and adiabatic IR intensities cannot be',/, &
-     ' calculated correctly. Please check normal IR intensities first!')")
+ if(anafc) then
+   ! read analytic APT (in a.u.)
+   tag(1)='Hessian'
+   tag(2)='Analytical Dipole Derivative'
+   rewind(ifchk)
+   do while(.true.)
+     read(ifchk,"(a100)",end=710,err=710)ctmp
+     if(ctmp(1:7) == tag(1)(1:7))then
+       read(ifchk,"(a100)",end=710,err=710)ctmp
+       if(ctmp(1:28) == tag(2)(1:28))then
+         read(ifchk,*,end=710,err=710)NVal
+         if(NAtm3*3 /= NVal) call XError(Intact,"NAtm3*3 /= NVal in Hessian % Ana. Dipole Der.!")
+         read(ifchk,*,end=710,err=710)(APT(i),i=1,NVal)
+         Infred= 1
+         goto 750
+       end if
+     end if
+   end do
+ else
+   ! read numerical APT (in a.u.)
+   ! if symmetry is used with equivalent atoms, some APT elements will be zero!!!
+   write(*,"(/,' <<< Note >>>',/, &
+      ' For numerical Hessian, if ADF uses symmetry and if there are symmetry-',/, &
+      ' equivalent atoms, the normal and adiabatic IR intensities cannot be',/, &
+      ' calculated correctly. Please check normal IR intensities first!')")
 
-  tag(1)='Freq'
-  tag(2)='Dipole derivatives'
-  rewind(ifchk)
-  do while(.true.)
-    read(ifchk,"(a100)",end=720,err=720)ctmp
-    if(ctmp(1:4) == tag(1)(1:4))then
-      read(ifchk,"(a100)",end=720,err=720)ctmp
-      if(ctmp(1:18) == tag(2)(1:18))then
-        read(ifchk,*,end=720,err=720)NVal
-        if(NAtm3*3 /= NVal) call XError(Intact,"NAtm3*3 /= NVal in Freq % Dipole derivatives!")
-        read(ifchk,*,end=720,err=720)(SCR(i),i=1,NVal)
-        goto 700
-      end if
-    end if
-  end do
-! actually the APT^T was read above
-  700  call Transp(NAtm3,3,SCR,APT)
-  Infred= 1
-end if
-750   continue
+   tag(1)='Freq'
+   tag(2)='Dipole derivatives'
+   rewind(ifchk)
+   do while(.true.)
+     read(ifchk,"(a100)",end=720,err=720)ctmp
+     if(ctmp(1:4) == tag(1)(1:4))then
+       read(ifchk,"(a100)",end=720,err=720)ctmp
+       if(ctmp(1:18) == tag(2)(1:18))then
+         read(ifchk,*,end=720,err=720)NVal
+         if(NAtm3*3 /= NVal) call XError(Intact,"NAtm3*3 /= NVal in Freq % Dipole derivatives!")
+         read(ifchk,*,end=720,err=720)(SCR(i),i=1,NVal)
+         goto 700
+       end if
+     end if
+   end do
+   ! actually the APT^T was read above
+   700  call Transp(NAtm3,3,SCR,APT)
+   Infred= 1
+ end if
+ 750   continue
 
-return
-210   call XError(Intact,"Please check Geometry % mass!")
-310   call XError(Intact,"Please check Geometry % atomtype total charge!")
-410   call XError(Intact,"Please check Geometry % atom order index!")
-460   call XError(Intact,"Please check Geometry % atomtype index!")
-510   call XError(Intact,"Please check Freq % xyz!")
-610   call XError(Intact,"Please check Hessian % Analytical Hessian!")
-621   call XError(Intact,"Please check GeoOpt % Hessian_CART!")
-710   call XError(Intact,"Please check Hessian % Ana. Dipole Der.!")
-720   call XError(Intact,"Please check Freq % Dipole derivatives!")
+ deallocate(IDAT)
+
+ return
+ 210   call XError(Intact,"Please check Geometry % mass!")
+ 310   call XError(Intact,"Please check Geometry % atomtype total charge!")
+ 410   call XError(Intact,"Please check Geometry % atom order index!")
+ 460   call XError(Intact,"Please check Geometry % atomtype index!")
+ 510   call XError(Intact,"Please check Freq % xyz!")
+ 610   call XError(Intact,"Please check Hessian % Analytical Hessian!")
+ 621   call XError(Intact,"Please check GeoOpt % Hessian_CART!")
+ 710   call XError(Intact,"Please check Hessian % Ana. Dipole Der.!")
+ 720   call XError(Intact,"Please check Freq % Dipole derivatives!")
 end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3283,7 +3299,8 @@ do i=1,NAtm
   call rmnumb(15,tag)
   call CClear(15,ctmp)
   read(tag,*,end=110,err=110)ctmp
-  call ElemZA(0,ctmp,ctmp,ZA(i))
+  call ElemZA(0,ctmp,itmp)
+  ZA(i) = dble(itmp)
 end do
 ! Ang --> a.u.
 call AScale(NAtm3,ang2au,XYZ,XYZ)
@@ -3410,7 +3427,8 @@ do i=1,NAtm
   call rmnumb(15,tag)
   call CClear(15,ctmp)
   read(tag,*,end=160,err=160)ctmp
-  call ElemZA(0,ctmp,ctmp,ZA(i))
+  call ElemZA(0,ctmp,itmp)
+  ZA(i) = dble(itmp)
 end do
 
 ! atomic masses: the most abundant isotopic masses are assumed, and they must have been used in your frequency calculation, otherwise the
@@ -3746,7 +3764,8 @@ subroutine RdPSIAna(ifchk,tag,ctmp,Elem,Intact,NAtm,AMass,ZA,XYZ,FFx)
  do i=1,NAtm
    read(ifchk,"(a100)",end=1020,err=1020)ctmp
    read(ctmp,*,end=1020,err=1020) Elem, XYZ(:,i), AMass(i)
-   call ElemZA(0,Elem,Elem,ZA(i))
+   call ElemZA(0,Elem,itmp)
+   ZA(i) = dble(itmp)
  end do
 
  ! read FFx (a.u.)
@@ -3815,7 +3834,8 @@ read(ifchk,*,end=1040,err=1040)
 do i=1,NAtm
   read(ifchk,"(a100)",end=1040,err=1040)ctmp
   read(ctmp,*,end=1040,err=1040)Elem
-  call ElemZA(0,Elem,Elem,ZA(i))
+  call ElemZA(0,Elem,itmp)
+  ZA(i) = dble(itmp)
 end do
 
 ! read FFx (a.u.)
@@ -3883,7 +3903,8 @@ do while(.true.)
     found=.true.
     do i=1,NAtm
       read(ifchk,*,err=1020,end=1020)Elem,XYZ(:,i)
-      call ElemZA(0,Elem,Elem,ZA(i))
+      call ElemZA(0,Elem,itmp)
+      ZA(i) = dble(itmp)
     end do
   end if
 end do
@@ -4093,7 +4114,8 @@ rewind(ifchk)
 read(ifchk,"(/)",err=1010,end=1010)
 do i=1,NAtm
   read(ifchk,*,err=1010,end=1010) Elem, XYZ(:,i)
-  call ElemZA(0,Elem,Elem,ZA(i))
+  call ElemZA(0,Elem,itmp)
+  ZA(i) = dble(itmp)
 end do
 
 ! Ang to a.u.
@@ -4134,6 +4156,7 @@ subroutine SavALM(ifalm,ifloc,ialm,iloc,Infred,IRaman,IGrad,NAtm,NAtm3,NVib,AMas
  implicit real(kind=8) (a-h,o-z)
  logical :: ifalm,ifloc
  real(kind=8) :: AMass(*),ZA(*),XYZ(*),Grd(*),FFX(*),APT(*),DPol(*),AL(*),Freq(NAtm3,*), SC1(*),SC2(*),WORK(*),EIG(*)
+ ! NOTE. SC2, WORK, and EIG are not available if IExpt .ne. 0
 
  NAtm9 = NAtm * 9
  NSS = NAtm3 * NAtm3
@@ -4293,7 +4316,7 @@ write(imdn,"('[Molden Format]')")
 write(imdn,"('[Atoms] Angs')")
 do i=1,NAtm
   iza = nint(ZA(i))
-  call ElemZA(1,Elm,iza,Elm)
+  call ElemZA(1,Elm,iza)
   write(imdn,"(a3,2x,2i6,2x,3f20.10)") Elm,i,iza,(XYZ(j,i)*au2ang,j=1,3)
 end do
 write(imdn,"('[GTO]',//)")
@@ -4310,7 +4333,7 @@ end do
 write(imdn,"('[FR-COORD]')")
 do i=1,NAtm
   iza = nint(ZA(i))
-  call ElemZA(1,Elm,iza,Elm)
+  call ElemZA(1,Elm,iza)
   write(imdn,"(a3,2x,3f20.10)")Elm,(XYZ(j,i),j=1,3)
 end do
 write(imdn,"('[FR-NORM-COORD]')")
@@ -4354,7 +4377,7 @@ character*3 :: Elm
 
 ! print Cartesian coordinates
  do i=1,NAtm
-   call ElemZA(1,Elm,nint(ZA(i)),Elm)
+   call ElemZA(1,Elm,nint(ZA(i)))
    write(igau,"(1x,a3,4x,3f14.8)") Elm,(XYZ(j,i)*au2ang,j=1,3)
  end do
  write(igau,*)
@@ -4370,7 +4393,7 @@ character*3 :: Elm
  write(igau,"(8f10.6)")Scr2(1:NTT)
 
 ! print basis set
- call ElemZA(1,Elm,nint(amaxz),Elm)
+ call ElemZA(1,Elm,nint(amaxz))
  write(igau,"(a3,' 0',/,'sdd',/,'****',//,a3,' 0',/,'sdd',////)")Elm,Elm
 
 return

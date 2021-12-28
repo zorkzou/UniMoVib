@@ -25,7 +25,9 @@ subroutine symdrv(iout,irep,Natom,ITol,IFModel,IFVMOD,coord,za,amass,vmod,PGNAME
  parameter(NOper=20,NGPS=57,NTBS=38)
  character*4 :: PGNAME(2)
  logical :: IFModel,IFVMOD
- real(kind=8),allocatable :: CORE(:)
+ real(kind=8),allocatable :: AScr(:)
+ character*1,allocatable :: CScr(:)
+ integer,allocatable :: IScr(:)
 
  N = MOD(ITol,10)
  N = SIGN(N,ITol)
@@ -35,40 +37,84 @@ subroutine symdrv(iout,irep,Natom,ITol,IFModel,IFVMOD,coord,za,amass,vmod,PGNAME
  NATM3 = Natom*3
  NS    = max(9,NATM3)
 
+! IZ    = 1
+! IAM   = IZ    + Natom
+! IXYZ  = IAM   + Natom
+! IIEM  = IXYZ  + NATM3
+! IELM  = IIEM  + intwsp(NOper)
+! IICY  = IELM  + NOper*9
+! ICUB  = IICY  + intwsp(6)
+! IROT  = ICUB  + 9
+! IEIG  = IROT  + 9
+! IEND  = IEIG  + 3
+
  IZ    = 1
  IAM   = IZ    + Natom
  IXYZ  = IAM   + Natom
- IIEM  = IXYZ  + NATM3
- IELM  = IIEM  + intwsp(NOper)
- IICY  = IELM  + NOper*9
- ICUB  = IICY  + intwsp(6)
+ IELM  = IXYZ  + NATM3
+ ICUB  = IELM  + NOper*9
  IROT  = ICUB  + 9
  IEIG  = IROT  + 9
- IEND  = IEIG  + 3
+ IENA  = IEIG  + 3
 
- NOPE  = IEND
- NREP  = NOPE  + intwsp(NGPS)
- NTAB  = NREP  + intwsp(NGPS)
- NALG  = NTAB  + intwsp(NTBS)
- NALO  = NALG  + intwsp(764)
- IARP  = NALO  + intwsp(348)
- IEND  = IARP  + ichawsp(4*406)
+ IIEM  = 1
+ IICY  = IIEM  + NOper
+ IENI  = IICY  + 6
 
- ! for vib. mode analysis
- IJEM  = IEND
- ICMT  = IJEM  + intwsp(NOper*Natom)
+ IENC  = 1
+
+! NOPE  = IEND
+! NREP  = NOPE  + intwsp(NGPS)
+! NTAB  = NREP  + intwsp(NGPS)
+! NALG  = NTAB  + intwsp(NTBS)
+! NALO  = NALG  + intwsp(764)
+! IARP  = NALO  + intwsp(348)
+! IEND  = IARP  + ichawsp(4*406)
+
+ NOPE  = IENI
+ NREP  = NOPE  + NGPS
+ NTAB  = NREP  + NGPS
+ NALG  = NTAB  + NTBS
+ NALO  = NALG  + 764
+ IENI  = NALO  + 348
+
+ IARP  = IENC
+ IENC  = IARP  + 4*406
+
+! for vib. mode analysis
+
+! IJEM  = IEND
+! ICMT  = IJEM  + intwsp(NOper*Natom)
+! ITCH  = ICMT  + NOper*NATM3
+! IGRP  = ITCH  + NOper
+! IJX   = IGRP  + NOper*5
+! IJY   = IJX   + ichawsp(NOper*4)
+! IRRP  = IJY   + intwsp(6)
+! IEND  = IRRP  + ichawsp(NATM3*4)
+
+ ICMT  = IENA
  ITCH  = ICMT  + NOper*NATM3
  IGRP  = ITCH  + NOper
- IJX   = IGRP  + NOper*5
- IJY   = IJX   + ichawsp(NOper*4)
- IRRP  = IJY   + intwsp(6)
- IEND  = IRRP  + ichawsp(NATM3*4)
+ IENA  = IGRP  + NOper*5
 
- ISC1  = IEND
+ IJEM  = IENI
+ IJY   = IJEM  + NOper*Natom
+ IENI  = IJY   + 6
+
+ IJX   = IENC
+ IRRP  = IJX   + NOper*4
+ IENC  = IRRP  + NATM3*4
+
+! scratch
+
+ ITMP  = IENI
+ IENI  = ITMP  + Natom
+
+ ISC1  = IENA
  ISC2  = ISC1  + NS
- IEND  = ISC2  + NS
+ IENA  = ISC2  + NS
 
- allocate(CORE(IEND))
+ allocate(AScr(IENA),IScr(IENI),CScr(IENC))
 
  i1=1
  if(IFModel) i1=2
@@ -78,19 +124,22 @@ subroutine symdrv(iout,irep,Natom,ITol,IFModel,IFVMOD,coord,za,amass,vmod,PGNAME
    !    this point group symmetry is used for electronic states and orbitals
    ! 2: Point group for Cartesian coordinates + ZA + M
    !    this point group symmetry is used for vib. modes
-   call AClear(IEND-IZ,CORE(IZ))
-   call ACopy(Natom,za,CORE(IZ))
+   AScr = 0.0d0
+   IScr = 0
+   CScr = ' '
+
+   call ACopy(Natom,za,AScr(IZ))
    if(igp == 1) then
-     call ACopy(Natom,CORE(IZ),CORE(IAM))
+     call ACopy(Natom,AScr(IZ),AScr(IAM))
    else
-     call ACopy(Natom,amass,CORE(IAM))
+     call ACopy(Natom,amass,AScr(IAM))
    end if
-   call ACopy(NATM3,coord,CORE(IXYZ))
-   call symini(Natom,NOper,PGNAME(igp),CORE(IRRP),CORE(IIEM),CORE(IELM),CORE(IJEM),CORE(ICUB))
-   call pgsini(CORE(NTAB),CORE(NALG),CORE(NALO),CORE(IARP))
-   call symgrp(Natom,NOper,tol,CORE(IZ),CORE(IAM),CORE(IXYZ),CORE(IIEM),CORE(IELM),CORE(IJEM),CORE(ICUB), &
-    CORE(IROT),CORE(IICY),CORE(IEIG),CORE(NOPE),CORE(NREP),CORE(NTAB),CORE(NALG),CORE(NALO),CORE(IARP), &
-    nclass,nirred,PGNAME(igp),CORE(IJX),CORE(IJY),CORE(IGRP),CORE(ISC1),CORE(ISC2))
+   call ACopy(NATM3,coord,AScr(IXYZ))
+   call symini(Natom,NOper,PGNAME(igp),CScr(IRRP),IScr(IIEM),AScr(IELM),IScr(IJEM),AScr(ICUB))
+   call pgsini(IScr(NTAB),IScr(NALG),IScr(NALO),CScr(IARP))
+   call symgrp(Natom,NOper,tol,AScr(IZ),AScr(IAM),AScr(IXYZ),IScr(IIEM),AScr(IELM),IScr(IJEM),AScr(ICUB), &
+    AScr(IROT),IScr(IICY),AScr(IEIG),IScr(NOPE),IScr(NREP),IScr(NTAB),IScr(NALG),IScr(NALO),CScr(IARP),   &
+    nclass,nirred,PGNAME(igp),CScr(IJX),IScr(IJY),AScr(IGRP),IScr(ITMP),AScr(ISC1),AScr(ISC2))
 
    if(IFModel) then
      if(PGNAME(igp) == "****") then
@@ -112,10 +161,10 @@ subroutine symdrv(iout,irep,Natom,ITol,IFModel,IFVMOD,coord,za,amass,vmod,PGNAME
 
  ! analyze the irreps of vib. mode for the point group PGNAME(2).
  ! the irrep. symbols will be saved in file irep.
- call virrep(iout,irep,Natom,NOper,vmod,CORE(IZ),CORE(IAM),CORE(IXYZ),CORE(IIEM),CORE(IELM),CORE(IJEM),CORE(ICUB), &
-   CORE(IROT),nclass,nirred,CORE(IJX),CORE(IJY),CORE(IGRP),CORE(ICMT),CORE(ITCH),CORE(IRRP),CORE(ISC1),CORE(ISC2))
+ call virrep(iout,irep,Natom,NOper,vmod,AScr(IZ),AScr(IAM),AScr(IXYZ),IScr(IIEM),AScr(IELM),IScr(IJEM),AScr(ICUB), &
+   AScr(IROT),nclass,nirred,CScr(IJX),IScr(IJY),AScr(IGRP),AScr(ICMT),AScr(ITCH),CScr(IRRP),AScr(ISC1),AScr(ISC2))
 
- deallocate(CORE)
+ deallocate(AScr,IScr,CScr)
 
  return
 end
@@ -130,10 +179,10 @@ end
 subroutine virrep(iout,irep,Natom,NOper,vmod,ZA,AMS,XYZ,IELEM,ELEM,JELEM,CUB,ROT,  nclass,nirred,JX,JY,group,carmat,tchar, &
   IRNAME,SC1,SC2)
  implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: vmod(3*Natom,*),ZA(Natom),AMS(Natom),XYZ(3,Natom),ELEM(3,3,*),CUB(3,3),ROT(3,3),JX(*),JY(*),group(*),carmat(*), &
-   tchar(*),SC1(*),SC2(*)
- dimension :: IELEM(*),JELEM(Natom,*)
- character*4 :: IRNAME(Natom*3)
+ real(kind=8) :: vmod(3*Natom,*),ZA(Natom),AMS(Natom),XYZ(3,Natom),ELEM(3,3,*),CUB(3,3),ROT(3,3),group(*),carmat(*),tchar(*), &
+   SC1(*),SC2(*)
+ dimension :: IELEM(*),JELEM(Natom,*),JY(*)
+ character*4 :: IRNAME(Natom*3),JX(*)
  logical :: Intact
 
  ! make the symmetry-operations for a given Point-Group
@@ -346,11 +395,11 @@ end
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine symgrp(Natom,NOper,tol,ZA,AMS,XYZ,IELEM,ELEM,JELEM,CUB,ROT,ICYC,EIG,  NOPE,NREP,NTAB,NALLG,NALLOP,ALLREP, &
-  nclass,nirred,PGNAME,JX,JY,GROUP, SC1,SC2)
+  nclass,nirred,PGNAME,JX,JY,GROUP, Itmp,SC1,SC2)
  implicit real(kind=8) (a-h,o-z)
- Dimension :: IELEM(NOper),JELEM(Natom,*),ICYC(6),NOPE(*),NREP(*),NTAB(*),NALLG(*),NALLOP(*),JX(*),JY(*)
- real(kind=8) :: ZA(Natom),AMS(Natom),XYZ(3,Natom),ELEM(3,3,NOper),CUB(3,3),ROT(3,3),EIG(3),ALLREP(*),GROUP(NOper,5),SC1(*),SC2(*)
- character*4 :: PGNAME
+ Dimension :: IELEM(NOper),JELEM(Natom,*),ICYC(6),NOPE(*),NREP(*),NTAB(*),NALLG(*),NALLOP(*),JY(*),Itmp(*)
+ real(kind=8) :: ZA(Natom),AMS(Natom),XYZ(3,Natom),ELEM(3,3,NOper),CUB(3,3),ROT(3,3),EIG(3),GROUP(NOper,5),SC1(*),SC2(*)
+ character*4 :: PGNAME,JX(*),ALLREP(*)
  LOGICAL :: ATOM,LINEAR,CUBIC,DEGEN
 
  pi=acos(-1.0d0)
@@ -413,7 +462,7 @@ subroutine symgrp(Natom,NOper,tol,ZA,AMS,XYZ,IELEM,ELEM,JELEM,CUB,ROT,ICYC,EIG, 
    end if
  else
    ! define z-axis of a cubic system
-   call cubzaxis(Natom,CUBIC,symtol,ROT,XYZ,ICYC,SC2,SC1,SC1,SC2(4))
+   call cubzaxis(Natom,CUBIC,symtol,ROT,XYZ,ICYC,SC2,Itmp,SC1,SC2(4))
    if(.NOT. CUBIC) goto 100
    IELEM(19)=1
  end if

@@ -46,11 +46,11 @@ end
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
-! Mode = 0 : returns nuclear charge zchar for an element symbol "el"; iza is not used.
-!     /= 0 : returns element symbol "el" for nuclear charge iza; zchar is not used.
+! Mode = 0 : returns nuclear charge iza for an element symbol "el".
+!     /= 0 : returns element symbol "el" for nuclear charge iza.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine ElemZA(Mode,el,iza,zchar)
+subroutine ElemZA(Mode,el,iza)
  implicit real(kind=8) (a-h,o-z)
  parameter (maxza=120)
  character*3 :: el,atomlib(maxza)
@@ -66,10 +66,10 @@ subroutine ElemZA(Mode,el,iza,zchar)
  if (Mode == 0) then
 
    call charl2u(el)
-   zchar = 0.d0
+   iza = 0
    do i=1,maxza
      if(index(el,atomlib(i)) /= 0)then
-       zchar = dble(i)
+       iza = i
        exit
      end if
    end do
@@ -1449,38 +1449,38 @@ subroutine rotopr(Natom,mode,ROT,XYZ,SCR)
  return
 end
 
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! work space of N integers
-! Since -cpp cannot be recognized by very old gfortran compilers, integer(kind=8) is always assumed.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function intwsp(N)
- implicit real(kind=8) (a-h,o-z)
+!xxx!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!xxx!
+!xxx! work space of N integers
+!xxx! Since -cpp cannot be recognized by very old gfortran compilers, integer(kind=8) is always assumed.
+!xxx!
+!xxx!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!xxxfunction intwsp(N)
+!xxx implicit real(kind=8) (a-h,o-z)
+!xxx
+!xxx! compile with "-cpp -D_I8_" (ifort -i8) or "-cpp"
+!xxx!#ifdef _I8_
+!xxx! intwsp = N
+!xxx!#else
+!xxx! intwsp = (N + 1) / 2
+!xxx!#endif
+!xxx intwsp = N
+!xxx
+!xxx return
+!xxxend
 
-! compile with "-cpp -D_I8_" (ifort -i8) or "-cpp"
-!#ifdef _I8_
-! intwsp = N
-!#else
-! intwsp = (N + 1) / 2
-!#endif
- intwsp = N
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! work space of N characters
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function ichawsp(N)
- implicit real(kind=8) (a-h,o-z)
-
- ichawsp = (N - 1) / 8 + 1
-
- return
-end
+!xxx!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!xxx!
+!xxx! work space of N characters
+!xxx!
+!xxx!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!xxxfunction ichawsp(N)
+!xxx implicit real(kind=8) (a-h,o-z)
+!xxx
+!xxx ichawsp = (N - 1) / 8 + 1
+!xxx
+!xxx return
+!xxxend
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !

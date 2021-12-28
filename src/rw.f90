@@ -243,8 +243,8 @@ implicit real(kind=8) (a-h,o-z)
 parameter(NProg=27)
 dimension :: IOP(NOp)
 logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms
-namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms
 character*200 :: qcprog, cname
+namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms
 character*9,allocatable  :: DATFMT(:)
 
 IOP=0
@@ -487,22 +487,10 @@ if(iflocal)then
 end if
 
 !>>>  ifrdnm --> IOP(9) = 0 (ifrdnm=.false.) or 1 (ifrdnm=.true.)
-if(ifrdnm) then
-! Compatibility: IFExp
-  if(IOP(3) /= 0) call XError(Intact,"IFRdNM is incompatible with IFExp=.True.!")
-! Compatibility: Isotop
-  if(IOP(4) /= 0) call XError(Intact,"IFRdNM is incompatible with Isotop!")
-! Compatibility: QCProg
-  if(IOP(1) /= 1) call XError(Intact,"At present, IFRdNM supports QCProg=Gaussian only!")
-  IOP(9) = 1
-end if
+if(ifrdnm) IOP(9) = 1
 
 !>>>  ifapprx --> IOP(10) = 0 (ifapprx=.false.) or 1 (ifapprx=.true.)
-if(ifapprx) then
-! Compatibility: ifrdnm
-  if(IOP(9) /= 0) call XError(Intact,"IFApprx is incompatible with IFRdNM!")
-  IOP(10) = 1
-end if
+if(ifapprx) IOP(10) = 1
 
 !>>>  ifgauts --> IOP(11) = 0 (ifgauts=.false.) or 1 (ifgauts=.true.)
 if(ifgauts) then
@@ -513,10 +501,16 @@ if(ifgauts) then
 end if
 
 !>>>  ifsymtz --> IOP(12) = 0 (ifsymtz=.false.) or 1 (ifsymtz=.true.)
-if(ifsymtz) then
-! Compatibility: ifrdnm
-  if(IOP(9) /= 0) call XError(Intact,"IFSymtz is incompatible with IFRdNM!")
-  IOP(12) = 1
+if(ifsymtz) IOP(12) = 1
+
+!>>> check compatibility of IFRdNM
+if(IOP(9) /= 0) then
+  if(IOP(1) /= 1) call XError(Intact,"At present, IFRdNM supports QCProg=Gaussian only!")
+  if(IOP(3) == 1) call XError(Intact,"IFExp is incompatible with IFRdNM!")
+  if(IOP(4) /= 0) call XError(Intact,"Isotop is incompatible with IFRdNM!")
+  if(IOP(10) == 1) call XError(Intact,"IFApprx is incompatible with IFRdNM!")
+  if(IOP(11) == 1) call XError(Intact,"IFGauts is incompatible with IFRdNM!")
+  if(IOP(12) == 1) call XError(Intact,"IFSymtz is incompatible with IFRdNM!")
 end if
 
 !GSVA
@@ -719,7 +713,7 @@ if(Infred == 0 .or. sum(ip) == 0) then
 
   do i=1,NAtm
     iza = nint(ZA(i))
-    call ElemZA(1,Elm,iza,Elm)
+    call ElemZA(1,Elm,iza)
     write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8,8x,f14.8)") i,Elm,iza,(XYZ(j,i)*au2ang,j=1,3),AMass(i)
   end do
 
@@ -731,7 +725,7 @@ else
   do i=1,NAtm
     iza = nint(ZA(i))
     Charge = AIRCrg(ip,APT(1,1,i))
-    call ElemZA(1,Elm,iza,Elm)
+    call ElemZA(1,Elm,iza)
     write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8,8x,f14.8,9x,f9.4)") i,Elm,iza,(XYZ(j,i)*au2ang,j=1,3),AMass(i),Charge
   end do
 
@@ -746,7 +740,7 @@ if(ipyvibms == 1) then
    write(ixyz,"('TITLE')")
    do i=1,NAtm
       iza = nint(ZA(i))
-      call ElemZA(1,Elm,iza,Elm)
+      call ElemZA(1,Elm,iza)
       write(ixyz,"(a3,8x,3f14.8)") Elm,(XYZ(j,i)*au2ang,j=1,3)
    end do
 end if
