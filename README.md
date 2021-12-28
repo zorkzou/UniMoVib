@@ -59,7 +59,7 @@ Version 1.3.0 (Apr/29/2020).
 2. Calculate atomic IR charges of planar and linear molecules. Reference: Theor. Chem. Acc. 131, 1139 (2012).
 3. Analyze point group of geometry and irreducible representations of normal modes in full symmetry.
 4. Thermochemistry calculation uses the point group in full symmetry, and the results are printed in Gaussian-style.
-5. Save data files for animation of normal modes using [Gabedit](http://gabedit.sourceforge.net/), [Molden](https://www3.cmbi.umcn.nl/molden/), or [PyVibMS](https://github.com/smutao/PyVibMS).
+5. Save data files for animation of normal modes using [Gabedit](http://gabedit.sourceforge.net/), [Molden](https://www.theochem.ru.nl/molden/), or [PyVibMS](https://github.com/smutao/PyVibMS).
 6. Set up isotopic masses, temperature, pressure, scale factor and/or experimental frequencies, and so on.
 7. Can be used as a third party module for frequency and thermochemistry calculations in a quantum chemistry program, for example, [BDF](http://182.92.69.169:7226/).
 8. Interface to [LModeA](https://sites.smu.edu/dedman/catco/) for the local mode analysis (e.g. force constants of chemical bonds, bond angles, and so on).
@@ -89,7 +89,7 @@ Version 1.3.0 (Apr/29/2020).
 * [Hyperchem](http://www.hyper.com/)
 * [Jaguar](http://www.schrodinger.com/)
 * [Molcas](http://www.molcas.org/) and [OpenMolcas](https://gitlab.com/Molcas/OpenMolcas)
-* [Molden](https://www3.cmbi.umcn.nl/molden/)
+* [Molden](https://www.theochem.ru.nl/molden/)
 * [Molpro](http://www.molpro.net/)
 * [Mopac](http://openmopac.net/). See also Mo-g in [Scigress](http://www.scigress.com/)
 * [NWChem](http://www.nwchem-sw.org/index.php/Main_Page)

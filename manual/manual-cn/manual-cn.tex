@@ -8,7 +8,7 @@
 \title{
 \vspace{-3cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\
-\vspace{1cm} \zihao{3}（1.4.2版）\vspace{20 mm} \\
+\vspace{1cm} \zihao{3}（1.4.4版）\vspace{20 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{10 mm}}
 
 \author{
@@ -46,8 +46,11 @@
 \begin{itemize}
 \item 从 Hessian、坐标等数据计算谐振频率和（可选的）红外强度及拉曼活性，这些数据可以由量子化学程序产生，或者由用户手工编写。 \\
 目前已经支持近30个量子化学程序（参见第\ref{sec:inp-contrl}节），尽管有些程序可能自己做得更好。
-\item 分析结构的最高点群以及简正振动模式的不可约表示(\emph{irreps.})。（\emph{irreps.}：仅闭壳层分子。） \\
-对称性分析基于\textsc{Mopac} 7.1程序包中的对称性子程序，\textsc{Mopac} 7.1的源代码已经开放，不受版权限制（参见\href{http://openmopac.net/Downloads/Downloads.html}{openmopac.net} and \href{https://sourceforge.net/projects/mopac7/}{sourceforge.net}）。
+\item 分析结构的最高点群以及简正振动模式的不可约表示(\emph{irreps.})。开壳层分子的不可约表示，参见\verb|IFSymtz|关键词。 \\
+对称性分析基于\textsc{MOPAC} 7.1程序包中的对称性子程序，\textsc{MOPAC} 7.1以及\textsc{OpenMOPAC}（2021年以后）的源代码已经开放，不受版权限制。参见 \\
+\url{https://github.com/openmopac} \\
+\url{http://openmopac.net/Downloads/Downloads.html} \\
+\url{https://sourceforge.net/projects/mopac7/}
 \item 使用最高点群做热化学计算，并打印 Gaussian风格的热化学计算结果（详细解释，参见： Foresman and Frisch, \emph{Exploring Chemistry With Electronic Structure Methods}, Ed.2, Gaussian Inc., Pittsburgh, PA, \textbf{1996}, p.66）。
 \item 广义子系统振动分析方法（generalized subsystem vibrational analysis, GSVA）用以计算内禀片段振动 (作者陶韵文；参见：\textit{J. Chem. Theory Comput.} 14(5), 2558-2569, 2018以及\textit{Theor. Chem. Acc.} 140, 31, 2021)。
 \item 保存\textsc{Molden}或\textsc{PyVibMS}数据文件，用于动画显示振动模式。
@@ -178,7 +181,7 @@ make
 \verb|IFSAVE|：（\verb|.True.|/\verb|.False.|）把原子质量（受\verb|Isotop|影响），直角坐标，Hessian矩阵（受\verb|IFExp|影响），APT矩阵保存到纯文本数据文件*.umv中。该关键词不能与\verb|QCProg="AtomCalc"|或\verb|"UniMoVib"|同时用。默认：\verb|.False.|。关于数据格式，参见附录\ref{sec:almfmt}。
 
 \bigskip{}\noindent
-\verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|之外，保存\textsc{Molden}文件，它可以用\href{https://www3.cmbi.umcn.nl/molden/}{\textsc{Molden}} 或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|
+\verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|之外，保存\textsc{Molden}文件，它可以用\href{https://www.theochem.ru.nl/molden/}{\textsc{Molden}} 或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|
 
 \bigskip{}\noindent
 \verb|IFPYVIBMS|：（\verb|.True.|/\verb|.False.|）保存\textsc{PyVibMS}数据文件，可以用\href{https://pymol.org/}{\textsc{PyMOL}}
