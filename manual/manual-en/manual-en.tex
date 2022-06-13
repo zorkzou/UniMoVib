@@ -394,7 +394,7 @@ neglected if you are not interested in the IR intensities.
 \item \textsc{CFour}
   \begin{description}
   \item For analytical frequency (\texttt{VIB=ANALYTIC}): *.out file (by \verb|FCHK|) + GRD
-  (by \verb|GEOM|).
+  (by \verb|GEOM|). \textbf{Not suggested for Hartree-Fock calculations!}
   \index{{Quantum chemistry program}@{Quantum chemistry program}!MOLDEN}
   \item For both numerical frequency (\texttt{VIB=FINDIF}) and analytical frequency: Use the \textsc{Molden} file. However, no IR intensities.
   See also \texttt{MOLDEN} below.
@@ -815,12 +815,17 @@ in your frequency calculation (this is default in \textsc{Aces}) to generate a \
 \index{{Quantum chemistry program}@{Quantum chemistry program}!CFour}
 \item \textsc{CFour}
 
-If only a single *.out file is specified by \verb|FCHK|, \textsc{UniMoVib} tries to construct the Hessian matrix. However this may do not work well due to some defects and errors in the printed normal modes by \textsc{CFour},
-  \begin{enumerate}
-    \item If the molecule has a high symmetry, the atoms therein may be reordered in the frequency output, and therefore the atom orderings in the geometry and frequency parts will be different.
-    \item For linear polyatomic molecules, one normal mode can be missing.
-    \item Due to very low accuracy of the printed normal mode data (3 significant digits for the first column and 4 for the others), some low frequencies cannot be well reproduced by \textsc{UniMoVib}.
-  \end{enumerate}
+\begin{enumerate}
+  \item In the case of analytical frequency by Hartree-Fock, the Hessian matrix and APT matrix printed in the *.out file can be wrong.
+
+  \item If only a single *.out file is specified by \verb|FCHK|, \textsc{UniMoVib} tries to construct the Hessian matrix. However this may do not work well due to some defects and errors in the printed normal modes by \textsc{CFour},
+  \begin{itemize}
+    \item[(a)] If the molecule has a high symmetry, the atoms therein may be reordered in the frequency output, and therefore the atom orderings in the geometry and frequency parts will be different.
+    \item[(b)] For linear polyatomic molecules, one normal mode can be missing.
+    \item[(c)] Due to very low accuracy of the printed normal mode data (3 significant digits for the first column and 4 for the others), some low frequencies cannot be well reproduced by \textsc{UniMoVib}.
+  \end{itemize}
+\end{enumerate}
+
 
 \end{itemize}
 

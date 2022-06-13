@@ -1,7 +1,7 @@
 #
 # This Makefile may be used for gfortran under Linux or Windows-MinGW.
 #
-# Written by W. Zou <qcband@gmail.com>. May 02 2020.
+# Written by W. Zou <qcband@gmail.com>. June 13 2022.
 #
 
 #DIR        = ../win32/
@@ -26,7 +26,7 @@ MODOBJ     = $(addprefix $(OBJ)/, $(MODS:.f90=.o))
 
 all: $(MODOBJ) $(F90OBJ) $(F77OBJ)
 	@echo
-	$(FCOM) $(COMPFLAGS) $(OBJ)/*.o -o $(EXE)
+	$(FCOM) $(OBJ)/*.o $(COMPFLAGS) -o $(EXE)
 	@echo
 	@echo "  --- $(NAME) has been compiled successfully!"
 	@echo

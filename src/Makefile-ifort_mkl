@@ -1,7 +1,7 @@
 #
 # This Makefile may be used for ifort + mkl under Linux.
 #
-# Written by W. Zou <qcband@gmail.com>. May 02 2021.
+# Written by W. Zou <qcband@gmail.com>. June 13 2022.
 #
 
 DIR        = ../
@@ -27,7 +27,7 @@ MODOBJ     = $(addprefix $(OBJ)/, $(MODS:.f90=.o))
 
 all: $(MODOBJ) $(F90OBJ)
 	@echo
-	$(FCOM) $(COMPFLAGS) $(OBJ)/*.o -o $(EXE)
+	$(FCOM) $(OBJ)/*.o $(COMPFLAGS) -o $(EXE)
 	@echo
 	@echo "  <<< $(NAME) has been compiled successfully! >>>"
 	@echo

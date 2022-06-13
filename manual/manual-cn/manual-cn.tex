@@ -240,7 +240,7 @@ make
 *.hess （通过\verb|HESS|），其中\verb|DDIP|是可选的，若对红外强度不感兴趣可以忽略。
 \item \textsc{CFour}
   \begin{description}
-  \item 解析频率计算（\texttt{VIB=ANALYTIC}）：*.out文件（通过\verb|FCHK|） + GRD（通过\verb|GEOM|）。
+  \item 解析频率计算（\texttt{VIB=ANALYTIC}）：*.out文件（通过\verb|FCHK|） + GRD（通过\verb|GEOM|）。\textbf{不要用于Hartree-Fock级别计算！}
   \item 数值频率（\texttt{VIB=FINDIF}）和解析频率计算：使用\textsc{Molden}文件。但是无红外强度。参见下面的\texttt{MOLDEN}。
   \item 如果没有GRD文件或\textsc{Molden}文件，或者由于某些原因导致\textsc{Molden}文件缺少频率数据，也可以仅指定*.out文件（通过\verb|FCHK|），
   \textsc{UniMoVib}将尝试从*.out中打印的原子量，振动频率，和简正模式构造Hessian矩阵。但是，由于\textsc{CFour}打印的简正模式存在一些缺陷和
@@ -445,6 +445,7 @@ a test job
  $end
 \end{lstlisting}\end{colorboxed}
 
+\newpage
 \section{来自\textsc{Molpro}的频率计算数据} \label{sec:exp3}
 
 \textsc{Molpro}无法使用非阿贝尔群对称性，如 CH$_4$的$T_d$群。通过\textsc{UniMoVib}，你可以得到振动模式在最高点群下的不可约表示。
@@ -565,12 +566,16 @@ The CH4 molecule is defined by atoms 1-5 in this CH4@C60 complex.
 
 \item \textsc{CFour}
 
-在只有单个*.out文件使用的情况下（通过\verb|FCHK|），\textsc{UniMoVib}尝试构造Hessian矩阵。但是由于\textsc{CFour}打印的简正模式
-存在缺陷和错误，结果可能有问题：
 \begin{enumerate}
-  \item 对于高对称分子，在频率输出部分可能会重新排列原子，导致原子顺序在几何结构部分和频率部分不一致。
-  \item 对于线形多原子分子，可能会少打印一个简正模式。
-  \item 由于打印的简正模式数据精度很低（第一列只有3个有效数字，其余列4个），一些低频可能无法被\textsc{UniMoVib}复现。
+\item 在Hartree-Fock级别解析频率的情况下，*.out文件中打印的Hessian矩阵、APT矩阵可能有问题，导致错误的结果。
+
+\item 在只有单个*.out文件使用的情况下（通过\verb|FCHK|），\textsc{UniMoVib}尝试构造Hessian矩阵。但是由于\textsc{CFour}打印的简正模式
+存在缺陷和错误，结果可能有问题：
+  \begin{itemize}
+    \item[(a)] 对于高对称分子，在频率输出部分可能会重新排列原子，导致原子顺序在几何结构部分和频率部分不一致。
+    \item[(b)] 对于线形多原子分子，可能会少打印一个简正模式。
+    \item[(c)] 由于打印的简正模式数据精度很低（第一列只有3个有效数字，其余列4个），一些低频可能无法被\textsc{UniMoVib}复现。
+  \end{itemize}
 \end{enumerate}
 
 \end{itemize}
