@@ -8,7 +8,7 @@
 \title{
 \vspace{-3cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\
-\vspace{1cm} \zihao{3}（1.4.4版）\vspace{20 mm} \\
+\vspace{1cm} \zihao{3}（1.5.0版）\vspace{20 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{10 mm}}
 
 \author{
@@ -585,19 +585,20 @@ The CH4 molecule is defined by atoms 1-5 in this CH4@C60 complex.
 
 \section{UniMoVib数据文件格式} \label{sec:almfmt}
 
-\textsc{UniMoVib}数据文件是不区分大小写的纯文本自由格式，其中前三行的顺序是固定的，之后\verb|END|除外的数据区顺序任意。
+\textsc{UniMoVib}数据文件是不区分大小写的纯文本自由格式，其中第一行为标题行，之后关键词\verb|END|除外的数据区顺序任意。
+所有的关键词必须从第一列开始。注释行以空格或“!”打头，但不能出现在\{关键词$\ldots$数据\}之内。
 
-\noindent
-1.1.0版(2020.10.24)
+\vskip 0.5em \noindent
+1.2.0版（2023.01.19）
 \begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \ttfamily
 \begin{lstlisting}
-（一个标题行）
+（一个标题行；如果续行，则其余标题行的第一列必须是空格或“!”）
 NATM
   （一个正整数）
 AMASS
-  （NATM个原子质量；若不提供原子质量，可以忽略这部分内容或改用NOMASS，
-  程序默认用最丰同位素质量）
+  （NATM个原子质量；若不提供原子质量，可以忽略这部分内容或改用NOMASS，程序将使用
+  最丰同位素质量）
 ZA
   （NATM个核电荷数）
 XYZ
@@ -607,13 +608,13 @@ GRD
 FFX
   （3NATM*3NATM，Hessian矩阵元；若为下三角矩阵数据，改用 FFXLT）
 APT
-  （3*3NATM，APT数据值；若不提供 APT数据，可以忽略这部分内容或改用 NOAPT）
+  （3*3NATM，APT数据值用于计算红外强度；若不提供 APT数据，可以忽略这部分内容
+  或改用 NOAPT）
 DPR
-  （6*3NATM，极化率导数数据值；若以9*3NATM格式给出，改用DPRSQ；
+  （6*3NATM，极化率导数数据值用于计算拉曼活性；若以9*3NATM格式给出，改用DPRSQ；
   若不提供 DPR数据，可以忽略这部分内容或改用 NODPR）
 END  （可选的结束行）
 \end{lstlisting}\end{colorboxed}
-目前\verb|GRD|数据仅用于某些外部程序。
 
 \section{开发人员：到其它量子化学程序的接口} \label{sec:interface}
 
@@ -627,29 +628,33 @@ END  （可选的结束行）
 ! Read NAtm from XXXX output
 !-----------------------------------------------------------------------
 subroutine RdNAtmXXXX(ifchk,NAtm,tag,ctmp)
-implicit real(kind=8) (a-h,o-z)
-character*100 :: ctmp
-character*100 :: tag
-(...)
-return
+ implicit real(kind=8) (a-h,o-z)
+ character*100 :: ctmp
+ character*100 :: tag
+ (...)
+ return
 end
 \end{lstlisting}\end{colorboxed}
 \begin{enumerate}
-\item[2] 读取原子单位的直角坐标（\verb|XYZ|），原子核电荷数（\verb|ZA|），原子单位的原子量或同位素质量（\verb|AMass|；可选），原子单位的直角坐标力常数矩阵（\verb|FFx|，必须是未做质量加权的对称方阵），原子单位的偶极矩梯度（即原子极化张量，\verb|APT|；可选），以及原子单位的极化率导数（\verb|DPol|；可选）。该子例程在\verb|subroutine RdData1|中调用。例如：
+\item[2] 读取原子单位的直角坐标（\verb|XYZ|），原子核电荷数（\verb|ZA|），原子单位的原子量或同位素质量（\verb|AMass|；可选），
+  原子单位的直角梯度（\verb|Grad|；可选；读入后把\verb|IGrd|设为1），原子单位的直角坐标力常数矩阵（\verb|FFx|，必须是未做质量加权的对称方阵），
+  原子单位的偶极矩梯度（即原子极化张量，\verb|APT|；可选；读入后把\verb|Infred|设为1），
+  以及原子单位的极化率导数（\verb|DPol|；可选；读入后把\verb|IRaman|设为1）。该子例程在\verb|subroutine RdData1|中调用。例如：
 \end{enumerate}
 \begin{colorboxed}[oval=false,boxcolor=blue!75!black,bgcolor=blue!5!white]
 \begin{lstlisting}[language={[90]Fortran}]
 !-----------------------------------------------------------------------
 ! Read data from XXXX output
 !-----------------------------------------------------------------------
-subroutine RdXXXX(ifchk,tag,ctmp,NAtm,AMass,ZA,XYZ,FFx,APT,DPol)
-implicit real(kind=8) (a-h,o-z)
-real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(3,NAtm),FFx(3*NAtm,3*NAtm), &
-  APT(3,3*NAtm),DPol(6,3*NAtm)
-character*100 :: ctmp
-character*100 :: tag
-(...)
-return
+subroutine RdXXXX(ifchk,tag,ctmp,IGrd,Infred,IRaman,NAtm,AMass,ZA,XYZ,  &
+ Grad,FFx,APT,DPol)
+ implicit real(kind=8) (a-h,o-z)
+ real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(3,NAtm),Grad(3,NAtm), &
+   FFx(3*NAtm,3*NAtm),APT(3,3*NAtm),DPol(6,3*NAtm)
+ character*100 :: ctmp
+ character*100 :: tag
+ (...)
+ return
 end
 \end{lstlisting}\end{colorboxed}
 \begin{enumerate}

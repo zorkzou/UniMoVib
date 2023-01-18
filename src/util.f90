@@ -118,7 +118,7 @@ function EleMas(Mode,IZ)
   266.119830000d0, 267.121790000d0, 268.125670000d0, 269.128630000d0, 270.133360000d0, 277.151900000d0,&
   278.156310000d0, 281.164510000d0, 283.170540000d0, 285.177120000d0, 286.182210000d0, 289.190420000d0,&
   290.195980000d0, 293.204490000d0, 294.210460000d0, 294.213920000d0, 295.000000000d0, 299.000000000d0/
- ! averaged isotopic masses
+ ! average isotopic masses
  data (amas2(i),i=1,maxza) /  &
     1.007940000d0,   4.002602000d0,   6.941000000d0,   9.012183100d0,  10.811000000d0,  12.010700000d0,&
    14.006700000d0,  15.999400000d0,  18.998403163d0,  20.179700000d0,  22.989769280d0,  24.305000000d0,&
@@ -1515,5 +1515,94 @@ subroutine CountIrrep(Intact,iport,NAtm3,NVib,NClass,Irreps,ModMap)
 
  return
 end
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! gradient information
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,za,grd,ffx,al,fcon,dx,scr,Elm)
+ implicit real(kind=8) (a-h,o-z)
+ logical :: ifbdfchk
+ dimension :: za(NAtm), grd(3,NAtm), ffx(*), al(NAtm3,*), fcon(NAtm3), dx(3,*), scr(NAtm3,NAtm3)
+ character*3 :: Elm
+ allocatable :: grslt(:)
+
+ write(iout,"(//,1x,30('*'),/,' ***  Gradient Information  ***',/,1x,30('*'))")
+
+ write(iout,"(/,' Cartesian gradients (a.u.)',/,1x,68('-'),/,3x, &
+    'No.   Atom    ZA                 X             Y             Z',/,1x,68('-'))")
+ do i=1,NAtm
+   j = nint(za(i))
+   call ElemZA(1,Elm,j)
+   write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8)") i,Elm,j,grd(:,i)
+ end do
+ write(iout,"(1x,68('-'))")
+
+ ! Newton¨CRaphson step dX = -F^-1 * g,
+ ! see Eq. (3) in JCP, 111, 10806 (1999), where H --> F and f --> -g.
+ ! It is worse than the RFO (rational function optimization) step (see Eq. (9)) but is much simpler.
+
+ ! F^-1 calculation:
+ ! From F L = M L E, we have FF = LL E LL' where FF = X F X, LL = X^-1 L, and X = M^-1/2.
+ ! Then F^-1 = L E^-1 L'.
+ ! However AL saves renormalized L0 = L mu^-1/2, and E^-1 = mu k^-1, so F^-1 = L0 k^-1 L0'.
+ do i = 1, NVib
+   x = sign(max(abs(fcon(i)), 1.0d-8), fcon(i))
+   scr(:,i) = (1.0d0/x) * al(:,i)
+ end do
+ call DGEMM('N','T',NAtm3,NAtm3,NVib,1.d0,scr,NAtm3,al,NAtm3,0.d0,dx,NAtm3)  ! F^-1 --> dx
+ call MMpyMF(NAtm3,NAtm3,1,dx,grd,scr)
+ call AScale(NAtm3,-1.0d0,scr,dx)
+
+ allocate(grslt(5))
+ grslt = 0.0d0
+
+ do i = 1, NAtm
+   do j = 1, 3
+     grslt(1) = max(grslt(1),abs(dx(j,i)))
+     grslt(2) = grslt(2) + dx(j,i) * dx(j,i)
+     grslt(3) = max(grslt(3),abs(grd(j,i)))
+     grslt(4) = grslt(4) + grd(j,i) * grd(j,i)
+   end do
+ end do
+ grslt(2) = sqrt(grslt(2)/dble(NAtm3))
+ grslt(4) = sqrt(grslt(4)/dble(NAtm3))
+ ! dE: see Eq. (1) in JCP, 111, 10806 (1999), where f = -g.
+ call MMpyMF(1,NAtm3,NAtm3,dx,ffx,scr)
+ grslt(5) = abs(0.5d0*dotx(NAtm3,scr,dx) + dotx(NAtm3,grd,dx))
+
+ call prtconv(iout,grslt)
+
+ ! print check data for bdf
+ if(ifbdfchk) then
+   call bdfchk(iout,.false.)
+   write(iout,"('  CHECKDATA:BDFOPT:CONVERGE:',4f16.6)") grslt(1:4)
+   write(iout,"('  CHECKDATA:BDFOPT:CONVERGE:',d16.2)") grslt(5)
+   call bdfchk(iout,.true.)
+ end if
+
+ deallocate(grslt)
+
+ return
+end subroutine GradInfo
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! print BDF CHECKDATA block.
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine bdfchk(iout,ifend)
+ implicit real(kind=8) (a-h,o-z)
+ logical :: ifend
+
+ if(.not. ifend) then
+   write(iout,"(/,1x,39('+'),' DATA CHECK ',40('+'))")
+ else
+   write(iout,"(1x,37('+'),' END DATA CHECK ',38('+')),/")
+ end if
+
+ return
+end subroutine bdfchk
 
 !--- END

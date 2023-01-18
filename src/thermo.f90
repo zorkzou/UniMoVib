@@ -1,6 +1,7 @@
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
 ! Thermochemistry calculation. Input:
+! ifbdfchk: print check data for bdf
 ! NAtom   : #atoms
 ! NAtm3   : NAtom*3
 ! NVib    : #vib. modes
@@ -12,7 +13,7 @@
 ! ctmp    : scratch for characters.
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine Thermochem(iinp,iout,Intact,NAtom,NAtm3,NVib,IFAtom,IExpt,PGNAME,AMass,XYZ,Freq,Sc1,Sc2,ctmp)
+subroutine Thermochem(iinp,iout,Intact,ifbdfchk,NAtom,NAtm3,NVib,IFAtom,IExpt,PGNAME,AMass,XYZ,Freq,Sc1,Sc2,ctmp)
 implicit real(kind=8) (a-h,o-z)
 parameter(tolr=0.01d0)
 parameter( pi       = acos(-1.0d0),                                  &
@@ -38,7 +39,7 @@ character*200 :: ctmp
 character*4 :: PGNAME(2),PG
 character*1 :: L2U
 real(kind=8) :: energy(3),entropy(4)
-logical :: Intact,IFAtom,IFLin,IFRdT,IfRdP
+logical :: Intact,ifbdfchk,IFAtom,IFLin,IFRdT,IfRdP
 
 ! Eel     : Total electronic energy from Q.C. calculation (a.u.)
 ! temp    : temperature (K)
@@ -248,6 +249,13 @@ do while(.true.)
   ' Sum of electronic and thermal Free Energies:',f20.6)")zpe+Eel,eu+Eel,eh+Eel,eg+Eel
   write(iout,"(1x,84('=') )")
 
+ ! print check data for bdf
+ if(ifbdfchk) then
+   call bdfchk(iout,.false.)
+   write(iout,"('  CHECKDATA:BDFOPT:THERMO:  ',4f16.2)") zpe*H2kcal,eu*H2kcal,eh*H2kcal,eg*H2kcal
+   call bdfchk(iout,.true.)
+ end if
+
 end do
 
 1000 continue
@@ -255,7 +263,7 @@ if(.not. IFAtom) deallocate(freqtmp)
 
 return
 2000  call XError(Intact,"Please check your input of $Thermo!")
-end
+end subroutine Thermochem
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !

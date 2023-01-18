@@ -4,6 +4,12 @@ A unified interface for molecular harmonic vibrational frequency calculations.
 The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas, Texas, within the framework of the LocalMode (now LModeA) program of the Computational and Theoretical Chemistry Group (CATCO) of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
 
 ## Latest Versions
+Version 1.5.0 (Jan/19/2023).
+
+1. Checkdata is printed for [BDF](http://bdf.theochem.cn:7226).
+2. Gradient information is printed for [Gaussian](http://www.gaussian.com/), [CFour](http://www.cfour.de/) (analytical Hessian only), and UniMoVib.
+3. The format of the UniMoVib data file has been updated.
+
 Version 1.4.4 (Dec/28/2021).
 
 1. Improved GCC version 10 (gfortran) compatibility.

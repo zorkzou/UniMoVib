@@ -24,17 +24,17 @@ program UniMoVib
   character*5   :: ver
   character*12  :: dat
   character*200 :: ctmp, cname, tag
-  logical       :: Intact, ifopen
+  logical       :: Intact, ifopen, ifbdfchk
   allocatable   :: AMass(:), ZA(:), XYZ(:), Grd(:), FFx(:), APT(:), DPol(:), AL(:), Rslt(:)
   allocatable   :: Scr1(:), Scr2(:), Scr3(:), Scr4(:), Work(:)
   logical, allocatable   :: LScr(:)
   integer, allocatable   :: IScr(:)
   character*1, allocatable :: CScr(:)
   integer, allocatable   :: subsystem_idx(:),flags(:)
-  allocatable   :: AMass_sub(:), XYZ_sub(:), ZA_sub(:)   
+  allocatable   :: AMass_sub(:), XYZ_sub(:), ZA_sub(:)
 
-  ver="1.4.4"
-  dat="Dec 28, 2021"
+  ver="1.5.0"
+  dat="Jan 19, 2023"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O
@@ -98,8 +98,8 @@ program UniMoVib
     if(ierr /= 0) call XError(Intact,"Insufficient Memory (3)!")
 
   APT=0.d0
-  call RdData1(iinp,iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,IGrd,NAtm,tag,ctmp,AMass,ZA,XYZ,Grd,FFx,APT,DPol, &
-    Scr1,Scr2,Scr3,Work)
+  call RdData1(iinp,iout,idt0,idt1,idt2,ibmt,Intact,IOP,Infred,IRaman,IGrd,ifbdfchk,NAtm,tag,ctmp,AMass,ZA,XYZ,Grd,FFx, &
+    APT,DPol,Scr1,Scr2,Scr3,Work)
 
 ! read atomic masses from input
   call RdIsot(iinp,iout,Intact,IOP(4),NAtm,ctmp,AMass)
@@ -115,8 +115,8 @@ program UniMoVib
 ! 7. Solve Secular equation in Cartesian coordinates
 !    Symmetry is also analyzed therein.
 !-----------------------------------------------------------------------
-  call SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,Infred,IRaman,IGrd,NAtm,NVib,ctmp,AMass,ZA,XYZ, &
-    Grd,FFx,APT,DPol,AL,Rslt,LScr,IScr,CScr,Scr1,Scr2,Scr3,Scr4,Work)
+  call SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,Infred,IRaman,IGrd,ifbdfchk,NAtm,NVib,ctmp, &
+    AMass,ZA,XYZ,Grd,FFx,APT,DPol,AL,Rslt,LScr,IScr,CScr,Scr1,Scr2,Scr3,Scr4,Work)
 
 !-----------------------------------------------------------------------
 ! 8. GSVA - Generalized Subsystem Vibrational Analysis
@@ -136,6 +136,11 @@ program UniMoVib
  
    call GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
   end if
+
+!-----------------------------------------------------------------------
+! 9. print gradient information
+!-----------------------------------------------------------------------
+  if(IGrd /= 0) call GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,ZA,Grd,FFx,AL,Rslt,Scr1,Scr2,ctmp)
 
 !-----------------------------------------------------------------------
 ! 99. the last step

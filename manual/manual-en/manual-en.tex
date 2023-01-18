@@ -52,7 +52,7 @@
 \begin{document}
 
 \title{User's Guide of the Program \textsc{UniMoVib} \\
-\vspace{10 mm} (Ver. 1.4.4) \vspace{30 mm} \\
+\vspace{10 mm} (Ver. 1.5.0) \vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm} }
 
 \date{\today}
@@ -838,11 +838,14 @@ in your frequency calculation (this is default in \textsc{Aces}) to generate a \
 \subsection{Format of the UniMoVib data file} \label{sec:almfmt}
 \index{{UniMoVib format}@{UniMoVib format}}
 
-The \textsc{UniMoVib} data file is a case-insensitive ASCII one in free format, where the order of the first three lines is fixed and the other data blocks except \verb|END| can be in any order.
-\begin{Verbatim}[frame=single,label=Format(Ver.1.1.0 2020.10.24),labelposition=topline,rulecolor=\color{blue},fontsize=\small,baselinestretch=1.0]
-(One title line)
+The \textsc{UniMoVib} data file is a case-insensitive ASCII one in free format, where the first line is reserved for the title and the other data blocks except the keyword \verb|END| may be defined in any order.
+All the keywords must start from the first column. The comment line starts with a space or !, but cannot be in the \{Keyword$\ldots$Data\} block.
+
+\begin{Verbatim}[frame=single,label=Format(Ver.1.2.0 2023.01.19),labelposition=topline,rulecolor=\color{blue},fontsize=\small,baselinestretch=1.0]
+(One title line; for continuous multiple title lines, the first column must
+ be a space or !)
 NATM
-  (An positive integer)
+  (A positive integer)
 AMASS
   (NATM number of atomic masses;
   Use NOMASS instead or omit this block if no atomic masses provided;
@@ -859,15 +862,14 @@ FFX
   (3NATM*3NATM elements of Hessian matrix;
   Use FFXLT instead for L.T. matrix)
 APT
-  (3*3NATM elements of APT data;
+  (3*3NATM elements of APT data for IR intensity;
   Use NOAPT instead or omit this block if no APT data provided)
 DPR
-  (6*3NATM elements of polarizability derivatives;
+  (6*3NATM elements of polarizability derivatives for Raman activities;
   Use DPRSQ instead if in the form of 9*3NATM;
   Use NODPR instead or omit this block if no DPR data provided)
 END  (An optional end line)
 \end{Verbatim}
-At present only some external programs need the \verb|GRD| data.
 
 \pagebreak{}
 
@@ -883,30 +885,33 @@ To support other QC programs which can do harmonic frequency calculation, two in
 ! Read NAtm from XXXX output
 !-----------------------------------------------------------------------
 subroutine RdNAtmXXXX(ifchk,NAtm,tag,ctmp)
-implicit real(kind=8) (a-h,o-z)
-character*100 :: ctmp
-character*100 :: tag
-(...)
-return
+ implicit real(kind=8) (a-h,o-z)
+ character*100 :: ctmp
+ character*100 :: tag
+ (...)
+ return
 end
 \end{lstlisting}
 
-\item Read in Cartesian coordinates in \emph{a.u.} (\verb|XYZ|), atomic nuclear charge number (\verb|ZA|), atomic or isotopic masses in \emph{a.u.} (\verb|AMass|; optional), Cartesian force constant matrix in \emph{a.u.}
-(\verb|FFx|; a mass-unweighted square matrix), dipole moment gradient (\emph{i.e.} atomic polar tensor; APT) in \emph{a.u.}
-(\verb|APT|; optional), and polarizability derivatives in \emph{a.u.}
-(\verb|DPol|; optional). This subroutine is called in \verb|subroutine RdData1| . Example:
+\item Read in Cartesian coordinates in \emph{a.u.} (\verb|XYZ|), atomic nuclear charge number (\verb|ZA|), atomic or isotopic masses in \emph{a.u.}
+  (\verb|AMass|; optional), Cartesian gradients in \emph{a.u.} (\verb|Grad|; optional; set \verb|IGrd=1| after reading the data),
+  Cartesian force constant matrix in \emph{a.u.} (\verb|FFx|; a mass-unweighted square matrix),
+  dipole moment gradient (\emph{i.e.} atomic polar tensor; APT) in \emph{a.u.} (\verb|APT|; optional; set \verb|Infred=1| after reading the data),
+  and polarizability derivatives in \emph{a.u.} (\verb|DPol|; optional; set \verb|IRaman=1| after reading the data).
+  This subroutine is called in \verb|subroutine RdData1| . Example:
 \begin{lstlisting}[language={[90]Fortran}]
 !-----------------------------------------------------------------------
 ! Read data from XXXX output
 !-----------------------------------------------------------------------
-subroutine RdXXXX(ifchk,tag,ctmp,NAtm,AMass,ZA,XYZ,FFx,APT,DPol)
-implicit real(kind=8) (a-h,o-z)
-real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(3,NAtm),FFx(3*NAtm,3*NAtm), &
-  APT(3,3*NAtm),DPol(6,3*NAtm)
-character*100 :: ctmp
-character*100 :: tag
-(...)
-return
+subroutine RdXXXX(ifchk,tag,ctmp,IGrd,Infred,IRaman,NAtm,AMass,ZA,XYZ,  &
+ Grad,FFx,APT,DPol)
+ implicit real(kind=8) (a-h,o-z)
+ real(kind=8) :: AMass(NAtm),ZA(NAtm),XYZ(3,NAtm),Grad(3,NAtm), &
+   FFx(3*NAtm,3*NAtm),APT(3,3*NAtm),DPol(6,3*NAtm)
+ character*100 :: ctmp
+ character*100 :: tag
+ (...)
+ return
 end
 \end{lstlisting}
 

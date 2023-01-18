@@ -152,15 +152,15 @@ end
 ! Solve Secular equation in Cartesian coordinates
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,Infred,IRaman,IGrd,NAtm,NVib,ctmp,AMass, &
-                   ZA,XYZ,Grd,FFx,APT,DPol,AL,Rslt,LScr,IScr,Irname,Scr1,Scr2,Scr3,Scr4,Work)
+subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,Infred,IRaman,IGrd,ifbdfchk,NAtm,NVib,ctmp, &
+                   AMass,ZA,XYZ,Grd,FFx,APT,DPol,AL,Rslt,LScr,IScr,Irname,Scr1,Scr2,Scr3,Scr4,Work)
  implicit real(kind=8) (a-h,o-z)
  dimension :: IOP(*),AMass(*),ZA(*),XYZ(*),Grd(*),FFx(*),APT(*),DPol(*),AL(*),Rslt(*),IScr(*),Scr1(*),Scr2(*)
  ! NOTE. Scr3, Scr4, and Work are not available if IOP(9) = 1.
  dimension :: Scr3(*),Scr4(*),Work(*)
  character*4 :: PGNAME(2),Irname(NAtm*3)
  character*100 :: ctmp
- logical :: Intact,IFAtom,IfSimu,LScr(*)
+ logical :: Intact,ifbdfchk,IFAtom,IfSimu,LScr(*)
 
  IFAtom = IOP(1) == -1
  NAtm3=3*NAtm
@@ -211,7 +211,7 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,
 
  ! print normal modes results saved in Rslt
  IfSimu = IOP(1) == -3 .or. IOP(1) == -4
- call PrtNFq(iout,irep,imdf,Infred,IRaman,NAtm,NAtm3,NVib,IfSimu,IOP(2),IOP(10),IOP(16),ZA,AL,Rslt,Irname)
+ call PrtNFq(iout,irep,imdf,Infred,IRaman,ifbdfchk,NAtm,NAtm3,NVib,IfSimu,IOP(2),IOP(10),IOP(16),ZA,AL,Rslt,Irname)
 
  ! experimental frequencies
  if(IOP(3) == 1) call RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Rslt,Scr2,Irname,LScr,Work,ctmp)
@@ -231,10 +231,10 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,
 
  1000  continue
  ! Thermochemistry calculation. Frequencies are saved in Rslt(1:NVib,3/5) in a.u.
- call Thermochem(iinp,iout,Intact,NAtm,NAtm3,NVib,IFAtom,IOP(3),PGNAME,AMass,XYZ,Rslt,Scr1,Scr2,ctmp)
+ call Thermochem(iinp,iout,Intact,ifbdfchk,NAtm,NAtm3,NVib,IFAtom,IOP(3),PGNAME,AMass,XYZ,Rslt,Scr1,Scr2,ctmp)
 
  return
-end
+end subroutine SolvSec
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -832,12 +832,12 @@ end
 ! print results of normal modes
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine PrtNFq(iout,irep,imdf,Infred,IRaman,NAtm,NAtm3,NVib,IfSim,IPrint,IApprox,Ipyvibms,ZA,AL,Reslt,IRNAME)
+subroutine PrtNFq(iout,irep,imdf,Infred,IRaman,ifbdfchk,NAtm,NAtm3,NVib,IfSim,IPrint,IApprox,Ipyvibms,ZA,AL,Reslt,IRNAME)
  implicit real(kind=8) (a-h,o-z)
  parameter(au2wn=5140.48714376d0,au2dy=15.56893d0,cf=31.22307d0,au2ang4=0.52917720859d0**4)
  real(kind=8) :: ZA(*),AL(3,NAtm,*),Reslt(NAtm3,*)
  character*4 :: IRNAME(NAtm3)
- logical :: IfSim
+ logical :: ifbdfchk,IfSim
 
  ! read irreps
  rewind(irep)
@@ -965,7 +965,17 @@ subroutine PrtNFq(iout,irep,imdf,Infred,IRaman,NAtm,NAtm3,NVib,IfSim,IPrint,IApp
    !write(imdf,"(i5,3x,i5)") NAtm,NVib
  end if
 
+ ! print check data for bdf
+ if(ifbdfchk) then
+   call bdfchk(iout,.false.)
+   write(iout,"('  CHECKDATA:BDFOPT:NVIB:',11x,i4)") Nvib
+   do i = 1, Nvib
+     write(iout,"('  CHECKDATA:BDFOPT:FREQ:',3f17.1,f17.2)") Reslt(i,3)*au2wn,Reslt(i,4)*cf*cf,Reslt(i,7)*au2ang4,Reslt(i,8)
+   end do
+   call bdfchk(iout,.true.)
+ end if
+
  return
-end
+end subroutine PrtNFq
 
 !--- END

@@ -772,5 +772,52 @@ subroutine dumpir(ida1,ida2,c4)
  return
 end
 
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! print convergence information of gradients.
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine prtconv(iout,grslt)
+ implicit real(kind=8) (a-h,o-z)
+ parameter(tolx=2.5d-3, tolg=5.0d-4, tole=5.0d-6)
+ dimension :: grslt(5)
+
+ write(iout,"(/,' Convergence of gradients',/,34x,'Value     Tolerance      Converged?')")
+ nyes = 0
+ if(grslt(1) <= tolx*1.6d0) then
+   write(iout,"('  Maximum Delta-X',8x,2f14.6,12x,'Yes')") grslt(1), tolx*1.6d0
+   nyes = nyes + 1
+ else
+   write(iout,"('  Maximum Delta-X',8x,2f14.6,13x,'No')")  grslt(1), tolx*1.6d0
+ end if
+ if(grslt(2) <= tolx) then
+   write(iout,"('      RMS Delta-X',8x,2f14.6,12x,'Yes')") grslt(2), tolx
+   nyes = nyes + 1
+ else
+   write(iout,"('      RMS Delta-X',8x,2f14.6,13x,'No')")  grslt(2), tolx
+ end if
+ if(grslt(3) <= tolg*1.6d0) then
+   write(iout,"('    Maximum Force',8x,2f14.6,12x,'Yes')") grslt(3), tolg*1.6d0
+   nyes = nyes + 1
+ else
+   write(iout,"('    Maximum Force',8x,2f14.6,13x,'No')")  grslt(3), tolg*1.6d0
+ end if
+ if(grslt(4) <= tolg) then
+   write(iout,"('        RMS Force',8x,2f14.6,12x,'Yes')") grslt(4), tolg
+   nyes = nyes + 1
+ else
+   write(iout,"('        RMS Force',8x,2f14.6,13x,'No')")  grslt(4), tolg
+ end if
+ if(grslt(5) <= tole) then
+   write(iout,"(' Expected Delta-E',8x,2d14.2,12x,'Yes')") grslt(5), tole
+   nyes = nyes + 1
+ else
+   write(iout,"(' Expected Delta-E',8x,2d14.2,13x,'No')")  grslt(5), tole
+ end if
+ if(nyes /= 5) write(iout,"(/,' This geometry is not a stationary point.')")
+
+ return
+end subroutine prtconv
+
 !--- END
 
