@@ -1985,7 +1985,9 @@ call ACopy(NAtm3,XYZ,Scr)
 ! read Cartesian gradients
 do i=1,NAtm
   read(igeom,*) x,(Grd(j,i),j=1,3)
-  if(nint(x) /= nint(ZA(i))) call XError(Intact,"In the GRD file, ZA1 .ne. ZA2!")
+  ! it doesn't work for ECP basis sets
+  ! if(nint(x) /= nint(ZA(i))) call XError(Intact,"In the GRD file, ZA1 .ne. ZA2!")
+  if(nint(x) < 1 .or. nint(x) > nint(ZA(i))) call XError(Intact,"In the GRD file, ZA is not correct!")
 end do
 IGrd=1
 
