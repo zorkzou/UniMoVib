@@ -19,7 +19,7 @@
 program UniMoVib
   implicit real(kind=8) (a-h,o-z)
   parameter (NOption=18, Nrslt=8, iudt=47, imdn=48, iloc=49, igau=50, idt0=51, idt1=52, idt2=53, irep=54, ireo=55, &
-                         ibmt=56, isva=57, ixyz=58, imdf=59, imds=60 )
+                         ibmt=56, isva=57, ixyz=58, imdf=59, imds=60, imdg=61 )
   dimension     :: IOP(NOption)
   character*5   :: ver
   character*12  :: dat
@@ -33,8 +33,8 @@ program UniMoVib
   integer, allocatable   :: subsystem_idx(:),flags(:)
   allocatable   :: AMass_sub(:), XYZ_sub(:), ZA_sub(:)
 
-  ver="1.5.1"
-  dat="Feb 17, 2023"
+  ver="1.5.2"
+  dat="Aug 14, 2024"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O
@@ -72,7 +72,7 @@ program UniMoVib
 !    IOP(15)  0 (IFGSVA=.False.), 1 (IFGSVA=.True.)
 !    IOP(16)  0 (IFPYVIBMS=.False.), 1 (IFPYVIBMS=.True.)
 !-----------------------------------------------------------------------
-  call RdContrl(iinp,iout,iudt,imdn,iloc,igau,Intact,NOption,IOP,ctmp,cname)
+  call RdContrl(iinp,iout,iudt,imdn,imdg,iloc,igau,Intact,NOption,IOP,ctmp,cname)
 
 !-----------------------------------------------------------------------
 !  4. Read $qcdata
@@ -134,7 +134,7 @@ program UniMoVib
    !PRINT '(5I5)',(subsystem_idx(i),i=1,3) 
    call PartMX(NAtm,AMass,XYZ,ZA,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub) 
  
-   call GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
+   call GSVA_engine(iout,isva,imds,imdg,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
   end if
 
 !-----------------------------------------------------------------------
@@ -162,6 +162,7 @@ program UniMoVib
   if(IOP(15)== 1) close(isva)
   if(IOP(16)== 1) close(ixyz)
   if(IOP(16)== 1) close(imdf)
+  if(IOP(7)== 1 .and. IOP(15)== 1) close(imdg)
   if(IOP(15)== 1 .and. IOP(16)== 1) close(imds)
   inquire(unit=idt0,opened=ifopen)
   if(ifopen) close(idt0)
@@ -175,7 +176,7 @@ program UniMoVib
 
   call estop(Intact)
 
-end
+end program UniMoVib
 
 !--- END
 

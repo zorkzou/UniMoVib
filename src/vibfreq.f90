@@ -1,12 +1,12 @@
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ! GSVA
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
+subroutine GSVA_engine(iout,isva,imds,imdg,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_sub,FFx)
  implicit real(kind=8) (a-h,o-z)
  dimension :: IOP(*),FFx(*),AMass_sub(*),XYZ_sub(*),AMass_sub_bak(NAtm_sub),ZA_sub(*)
  integer :: subsystem_idx(*)
  allocatable :: Scr1(:),Scr2(:),Scr3(:),Scr4(:),AL(:)
- allocatable :: FFx_inv(:),Scra(:),Scrb(:),Scrc(:),Scrd(:),prod(:),prod_inv(:),FFx_subV(:)!,Rslt(:)
+ allocatable :: FFx_inv(:),Scra(:),Scrb(:),Scrc(:),Scrd(:),prod(:),prod_inv(:),FFx_subV(:)
  real(kind=8), dimension (:, :), ALLOCATABLE :: VibSp,VibSp_t,VibSp_full,VibSp_full_t,compl_m1, &
  compl_m2,compl_inv,newHes_1,FFx_sub,Rslt
 
@@ -16,11 +16,11 @@ subroutine GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,
 
  !It is required to use identical mass for all atoms
  call acopy(NAtm_sub,AMass_sub,AMass_sub_bak)
- Do J=1,NAtm_sub 
+ Do J=1,NAtm_sub
    AMass_sub(J) = 1.0d0
  End Do
 
- call MassCent(NAtm_sub,AMass_sub,XYZ_sub,Scr1,Scr2) 
+ call MassCent(NAtm_sub,AMass_sub,XYZ_sub,Scr1,Scr2)
       !PRINT '(10F7.2)',(Scr2(i),i=1,3)
 
  call MIner(.True.,NAtm_sub,AMass_sub,Scr1,Scr1(NAtm3_sub+1),Scr2,Scr2(4))
@@ -29,21 +29,21 @@ subroutine GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,
  call TRVec(.True.,NAtm_sub,NTR_sub,Im,AMass_sub,Scr1,AL,Scr1(NAtm3_sub+1),Scr2)
  NVib_sub=NAtm3_sub-NTR_sub
       !PRINT '(10I1)', NVib_sub
- 
+
  call GSorth(.True.,.True.,NAtm3_sub,NTR_sub,AL,Scr3)
-      !PRINT '(18F7.2)',(AL(i),i=1+NAtm3_sub*5,NAtm3_sub+NAtm3_sub*5) 
+      !PRINT '(18F7.2)',(AL(i),i=1+NAtm3_sub*5,NAtm3_sub+NAtm3_sub*5)
  allocate(VibSp(3*NAtm_sub,NVib_sub))
- call acopy(3*NAtm_sub*NVib_sub,AL,VibSp) 
+ call acopy(3*NAtm_sub*NVib_sub,AL,VibSp)
  allocate(VibSp_t(NVib_sub,3*NAtm_sub))
- call Transp(3*NAtm_sub,NVib_sub,VibSp,VibSp_t) 
+ call Transp(3*NAtm_sub,NVib_sub,VibSp,VibSp_t)
 
 
  !test print for matlab script - to replace b1,b2
  Do J=1,3
     !PRINT '(9E17.8)',(VibSp(i,J),i=1,9)
     !PRINT '(9E17.8)',(VibSp_t(J,i),i=1,9)
- End Do 
- 
+ End Do
+
  allocate(VibSp_full(3*NAtm,NVib_sub))
  call aclear(3*NAtm*NVib_sub,VibSp_full)
 
@@ -55,7 +55,7 @@ subroutine GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,
     Do J=1,NVib_sub
        VibSp_full(IPos1,J) = VibSp(3*(I-1)+1,J)
        VibSp_full(IPos2,J) = VibSp(3*(I-1)+2,J)
-       VibSp_full(IPos3,J) = VibSp(3*(I-1)+3,J) 
+       VibSp_full(IPos3,J) = VibSp(3*(I-1)+3,J)
     End Do
  End Do
  allocate(VibSp_full_t(NVib_sub,3*NAtm))
@@ -64,23 +64,23 @@ subroutine GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,
  Do J=1,3
      !PRINT '(18E17.8)',(VibSp_full(i,J),i=1,18)
      !PRINT '(18E17.8)',(VibSp_full_t(J,i),i=1,18)
- End Do 
- 
+ End Do
+
 
  !moore-penrose inverse of full hessian
- allocate(FFx_inv(3*NAtm*3*NAtm),Scra(3*NAtm*3*NAtm),Scrb(3*NAtm),Scrc(2*3*NAtm*3*NAtm)) 
+ allocate(FFx_inv(3*NAtm*3*NAtm),Scra(3*NAtm*3*NAtm),Scrb(3*NAtm),Scrc(2*3*NAtm*3*NAtm))
 
  call GInvM(.false.,-1,3*NAtm,FFx,FFx_inv,Scra,Scrb,Scrc)
  !PRINT '(5F18.5)',(FFx_inv(i),i=1,18) ! to check 'pinv(f)' result
  !
  call aclear(3*NAtm*3*NAtm,Scrc)
  call MPACMF(FFx_inv,FFx,Scrc,3*NAtm,3*NAtm,1)
- !PRINT '(5E10.2)',(Scrc(i),i=1,18) ! to check unit matrix 
- 
+ !PRINT '(5E10.2)',(Scrc(i),i=1,18) ! to check unit matrix
+
  !obtain FFx_sub
  ! VibSp_full_t (NVib_sub, 3N)  * FFx_inv(3N,3N) -> compl_m1(NVib_sub,3N)
  allocate(compl_m1(NVib_sub,3*NAtm))
- call MMpyMF(NVib_sub,3*NAtm,3*NAtm,VibSp_full_t,FFx_inv,compl_m1)  
+ call MMpyMF(NVib_sub,3*NAtm,3*NAtm,VibSp_full_t,FFx_inv,compl_m1)
  ! compl_m1(NVib_sub,3N) * VibSp_full(3N,NVib_sub) -> compl_m2(NVib_sub,NVib_sub)
  allocate(compl_m2(NVib_sub,NVib_sub))
  call MMpyMF(NVib_sub,3*NAtm,NVib_sub,compl_m1,VibSp_full,compl_m2)
@@ -89,42 +89,45 @@ subroutine GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,
  End Do
  ! compl_m2**-1 -> compl_inv
  allocate(compl_inv(NVib_sub,NVib_sub))
- call GInvM(.false.,-1,NVib_sub,compl_m2,compl_inv,Scra,Scrb,Scrc)  
+ call GInvM(.false.,-1,NVib_sub,compl_m2,compl_inv,Scra,Scrb,Scrc)
  Do J=1,3
      !PRINT '(3E17.8)',(compl_inv(i,J),i=1,3)
  End Do
  ! VibSp(3*NAtm_sub,NVib_sub) * compl_inv(NVib_sub,NVib_sub) -> newHes_1(3*NAtm_sub,NVib_sub)
- allocate(newHes_1(3*NAtm_sub,NVib_sub))  
+ allocate(newHes_1(3*NAtm_sub,NVib_sub))
  call MMpyMF(3*NAtm_sub,NVib_sub,NVib_sub,VibSp,compl_inv,newHes_1)
  ! newHes_1(3*NAtm_sub,NVib_sub) * VibSp_t(NVib_sub,3*NAtm_sub) -> FFx_sub(3*NAtm_sub,3*NAtm_sub)
  allocate(FFx_sub(3*NAtm_sub,3*NAtm_sub))
  allocate(FFx_subV(3*NAtm_sub*3*NAtm_sub))
- call MMpyMF(3*NAtm_sub,NVib_sub,3*NAtm_sub,newHes_1,VibSp_t,FFx_sub) 
+ call MMpyMF(3*NAtm_sub,NVib_sub,3*NAtm_sub,newHes_1,VibSp_t,FFx_sub)
  call acopy(3*NAtm_sub*3*NAtm_sub,FFx_sub,FFx_subV)
  Do J=1,3
      !PRINT '(9E17.8)',(FFx_sub(i,J),i=1,9)
  End Do
 
- !obtain freq and normal mode - vibrational analysis with correct atomic mass 
+ !obtain freq and normal mode - vibrational analysis with correct atomic mass
  call acopy(NAtm_sub,AMass_sub_bak,AMass_sub)
  call MassCent(NAtm_sub,AMass_sub,XYZ_sub,Scr1,Scr2)
  call MIner(.True.,NAtm_sub,AMass_sub,Scr1,Scr1(NAtm3_sub+1),Scr2,Scr2(4))
  call TRVec(.True.,NAtm_sub,NTR_sub,Im,AMass_sub,Scr1,AL,Scr1(NAtm3_sub+1),Scr2)
  NVib_sub=NAtm3_sub-NTR_sub
  call GSorth(.True.,.True.,NAtm3_sub,NTR_sub,AL,Scr3)
- 
+
  call VibSEq(.True.,NAtm_sub,NAtm3_sub,NVib_sub,AMass_sub,FFx_sub,AL,Scr1,Scr2,Scr3)
  call RmNoise(NSS_sub,1.0d-8,AL)
  allocate(Rslt(3*NAtm_sub,8)) ! 8 - from main.f90
  Infred = 0
- IRaman = 0 
- call NormFq(iout,Infred,IRaman,NAtm_sub,NAtm3_sub,NVib_sub,IOP(2),AMass_sub,Scra,FFx_sub,Scra,Scra,AL,Rslt,Scr1,Scr2) 
+ IRaman = 0
+ call NormFq(iout,Infred,IRaman,NAtm_sub,NAtm3_sub,NVib_sub,IOP(2),AMass_sub,Scra,FFx_sub,Scra,Scra,AL,Rslt,Scr1,Scr2)
 
  call PrtNFq_gsva(iout,NAtm_sub,NAtm3_sub,NVib_sub,IOP(2),ZA_sub,subsystem_idx,AL,Rslt,IOP(16),imds,NAtm)
  !PRINT '(9E17.8)',(Rslt(i),i=1,3)
- 
- !save ALMODE file for the subsystem as preparation to do local mode analysis with LModeA program 
- open(isva,file='gsva.almode',status='replace') 
+
+ ! save a molden file
+ if(IOP(7) == 1) call SavMDN(imdg,NAtm_sub,NAtm3_sub,NVib_sub,ZA_sub,XYZ_sub,0,AL,Rslt)
+
+ !save ALMODE file for the subsystem as preparation to do local mode analysis with LModeA program
+ open(isva,file='gsva.almode',status='replace')
  write(isva,"(' ALMODE DATA FILE (THIS TITLE CAN BE MODIFIED)')")
 
  write(isva,"('NATM')")
@@ -145,7 +148,7 @@ subroutine GSVA_engine(iout,isva,imds,IOP,NAtm,subsystem_idx,NAtm_sub,AMass_sub,
  write(isva,"('NOAPT')")
  write(isva,"(/)")
 
-end 
+end subroutine GSVA_engine
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -356,7 +359,7 @@ subroutine RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Reslt,expf,IRNAME,Ifexpf,dfre
  1020  call XError(Intact,"Ifq in $ExpFrq is out of range!")
  1030  call XError(Intact,"#Freq in $ExpFrq is out of range!")
  1040  call XError(Intact,"Frequency in $ExpFrq is out of range!")
-end
+end subroutine RdExFq
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -444,7 +447,7 @@ subroutine NormFq(iout,Infred,IRaman,NAtm,NAtm3,NVib,IPrint,AMass,ZA,FFx,APT,DPo
  end if
 
  return
-end
+end subroutine NormFq
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -516,7 +519,7 @@ subroutine GSorth(Intact,Reorder,N,M,Vec,Scr)
  end if
 
  return
-end
+end subroutine GSorth
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -681,7 +684,7 @@ subroutine VibSEqSymm(iout,ireo,Intact,NAtm,NAtm3,NVib,ISyTol,AMass,XYZ,FFx,AL,F
  deallocate(Irreps)
 
  return
-end
+end subroutine VibSEqSymm
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -729,7 +732,7 @@ subroutine VibSEq(Intact,NAtm,NAtm3,NVib,AMass,FFx,AL,Scr1,Scr2,Scr3)
  end do
 
  return
-end
+end subroutine VibSEq
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ! print results of normal modes for GSVA
@@ -805,27 +808,27 @@ subroutine PrtNFq_gsva(iout,NAtm,NAtm3,NVib,IPrint,ZA,subsystem_idx,AL,Reslt,Ipy
             do k=1,3
               write(imds,"(f11.5)") AL(k,ia,i)
             end do
-          else       
+          else
             do k=1,3
               write(imds,"(f11.5)") 0.0D0
             end do
           end if
-        end do  
+        end do
 
         if(i == NVib)then
-          write(imds,'(A)') "END"    
+          write(imds,'(A)') "END"
         else
-          write(imds,'(A)') " "      
+          write(imds,'(A)') " "
         end if
 
      end do
 
  end if
- !PRINT '(3E17.8)',(Reslt(j,3)*au2wn,j=1,3) 
+ !PRINT '(3E17.8)',(Reslt(j,3)*au2wn,j=1,3)
  !PRINT '(3E17.8)',(ZA(j),j=1,3)
 
  return
-end
+end subroutine PrtNFq_gsva
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -943,7 +946,7 @@ subroutine PrtNFq(iout,irep,imdf,Infred,IRaman,ifbdfchk,NAtm,NAtm3,NVib,IfSim,IP
    end do
  end if
 
- !save pyvibms mode file 
+ !save pyvibms mode file
  if(Ipyvibms == 1)then
    open(imdf,file='pyvibms_mode_full.txt',status='replace')
    write(imdf,"(i5,3x,i5)") NAtm,NVib
@@ -953,13 +956,13 @@ subroutine PrtNFq(iout,irep,imdf,Infred,IRaman,ifbdfchk,NAtm,NAtm3,NVib,IfSim,IP
       do j=1,NAtm
         do k=1,3
           write(imdf,"(f11.5)") AL(k,j,i)
-        end do   
-      end do  
+        end do
+      end do
 
       if(i == NVib)then
-        write(imdf,'(A)') "END"    
+        write(imdf,'(A)') "END"
       else
-        write(imdf,'(A)') " "      
+        write(imdf,'(A)') " "
       end if
    end do
    !write(imdf,"(i5,3x,i5)") NAtm,NVib

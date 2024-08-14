@@ -238,7 +238,7 @@ end
 !
 ! (*) For debugging only.
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdContrl(iinp,iout,iudt,imdn,iloc,igau,Intact,NOp,IOP,qcprog,cname)
+subroutine RdContrl(iinp,iout,iudt,imdn,imdg,iloc,igau,Intact,NOp,IOP,qcprog,cname)
 implicit real(kind=8) (a-h,o-z)
 parameter(NProg=27)
 dimension :: IOP(NOp)
@@ -478,6 +478,26 @@ if(ifmolden)then
   end if
 end if
 
+!GSVA
+if(ifgsva) then
+  IOP(15) = 1
+  if(ifmolden)then
+    open(imdg,file=cname(istr:iend)//'-gsva.molden',status='new',iostat=ioper)
+    if(ioper == 0)then
+      write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva.molden'
+      if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva.molden'
+    else
+      open(imdg,file=cname(istr:iend)//'-gsva_new.molden',status='new',iostat=ioper)
+      if(ioper > 0) then
+        write(iout,"(/,' You have to delete or rename this file first:',5x,a)") cname(istr:iend)//'-gsva_new.molden'
+        call XError(Intact,"New molden file exist!")
+      end if
+      write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva_new.molden'
+      if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva_new.molden'
+    end if
+  end if
+end if
+
 !>>>  iflocal --> IOP(8) = 0 (iflocal=.false.) or 1 (iflocal=.true.)
 if(iflocal)then
   IOP(8) = 1
@@ -512,9 +532,6 @@ if(IOP(9) /= 0) then
   if(IOP(11) == 1) call XError(Intact,"IFGauts is incompatible with IFRdNM!")
   if(IOP(12) == 1) call XError(Intact,"IFSymtz is incompatible with IFRdNM!")
 end if
-
-!GSVA
-if(ifgsva) IOP(15) = 1
 
 !PyVibMS
 if(ifpyvibms) IOP(16) = 1

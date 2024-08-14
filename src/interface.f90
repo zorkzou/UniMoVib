@@ -1312,7 +1312,7 @@ subroutine RdALMode(ifchk,Intact,Infred,IRaman,IGrd,ifbdfchk,NAtm,ctmp,AMass,ZA,
      read(ifchk,*)
 
    ! read mass
-   else if(index(ctmp,"MASS") == 1) then
+   else if(index(ctmp,"AMASS") == 1) then
      read(ifchk,*,err=2030,end=2030)(AMass(i),i=1,NAtm)
 
    else if(index(ctmp,"NOMASS") == 1) then
@@ -2198,7 +2198,9 @@ do i=1,NBlock
   iv2=min(i*8,NAtm3)
   read(ifchk,*)
   do j=1,3
-    read(ifchk,"(10x,8f14.7)",end=300)(APT(j,k),k=iv1,iv2)
+    ! old format (molpro 2015)
+    ! read(ifchk,"(10x,8f14.7)",end=300)(APT(j,k),k=iv1,iv2)
+    read(ifchk,*,end=300)ix0,(APT(j,k),k=iv1,iv2)
   end do
 end do
 ! debye/ang --> a.u.
