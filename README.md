@@ -4,6 +4,12 @@ A unified interface for molecular harmonic vibrational frequency calculations.
 The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas, Texas, within the framework of the LocalMode (now LModeA) program of the Computational and Theoretical Chemistry Group (CATCO) of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
 
 ## Latest Versions
+Version 1.5.3 (Jul/28/2025).
+
+1. Print IR intensities and Raman activities in Molden file.
+2. User may define the file names of saved data.
+3. Grimme's quasi-rigid-rotor-harmonic-oscillator method (QRRHO; see Chem. Eur. J. 18, 9955, 2012) may be used to calculate entropy and Gibbs free energy (by Prof. Zikuang Wang).
+
 Version 1.5.2 (Aug/14/2024).
 
 1. Bug fix in reading "AMASS" from the UniMoVib data file.

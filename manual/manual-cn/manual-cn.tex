@@ -8,7 +8,7 @@
 \title{
 \vspace{-3cm}
 \zihao{1}\hei\textsc{UniMoVib}使用手册  \\
-\vspace{1cm} \zihao{3}（1.5.0版）\vspace{20 mm} \\
+\vspace{1cm} \zihao{3}（1.5.3版）\vspace{20 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{10 mm}}
 
 \author{
@@ -179,22 +179,28 @@ make
 
 \bigskip{}\noindent
 \verb|IFSAVE|：（\verb|.True.|/\verb|.False.|）把原子质量（受\verb|Isotop|影响），直角坐标，Hessian矩阵（受\verb|IFExp|影响），APT矩阵保存到纯文本数据文件*.umv中。该关键词不能与\verb|QCProg="AtomCalc"|或\verb|"UniMoVib"|同时用。默认：\verb|.False.|。关于数据格式，参见附录\ref{sec:almfmt}。
+如果保存到非默认的文件中，可以用\verb|FNMSAVE|指定文件名。
 
 \bigskip{}\noindent
-\verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|之外，保存\textsc{Molden}文件，它可以用\href{https://www.theochem.ru.nl/molden/}{\textsc{Molden}} 或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|
+\verb|IFMOLDEN|：（\verb|.True.|/\verb|.False.|）除了\verb|QCProg="AtomCalc"|之外，保存\textsc{Molden}文件，它可以用\href{https://www.theochem.ru.nl/molden/}{\textsc{Molden}} 或\href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}}程序打开，用于显示分子结构和振动模式。默认：\verb|.False.|。
+如果保存到非默认的文件中，可以用\verb|FNMMOLDEN|指定文件名。
 
 \bigskip{}\noindent
 \verb|IFPYVIBMS|：（\verb|.True.|/\verb|.False.|）保存\textsc{PyVibMS}数据文件，可以用\href{https://pymol.org/}{\textsc{PyMOL}}
-的\href{https://github.com/smutao/PyVibMS}{\textsc{PyVibMS}}插件打开，用于显示分子结构和振动模式。默认：\verb|.False.|
+的\href{https://github.com/smutao/PyVibMS}{\textsc{PyVibMS}}插件打开，用于显示分子结构和振动模式。默认：\verb|.False.|。
+%如果保存到非默认的文件中，可以用\verb|FNMPYVIBMS|指定文件名。
 
 \bigskip{}\noindent
 \verb|IFLOCAL|：（\verb|.True.|/\verb|.False.|）保存数据文件，用于\textsc{LModeA}程序的局域模式分析（主页：\\
 \href{https://sites.smu.edu/dedman/catco/}{https://sites.smu.edu/dedman/catco/}）。
 该关键词不能用于\verb|QCProg="AtomCalc"|。默认：\verb|.False.|。
+如果保存到非默认的文件中，可以用\verb|FNMLOCAL|指定文件名。
 
 \bigskip{}\noindent
 \verb|IFGauTS|：（\verb|.True.|/\verb|.False.|）把结构和Hessian矩阵存为\textsc{Gaussian}的输入文件模板，用于过渡态优化计算。该关键词不能用于
-\verb|QCProg="AtomCalc"|。默认：\verb|.False.|。注意：此输入对于ONIOM计算类型无效，因为\textsc{Gaussian}此时只能使用默认的冗余内坐标进行优化。
+\verb|QCProg="AtomCalc"|。默认：\verb|.False.|。
+如果保存到非默认的文件中，可以用\verb|FNMGauTS|指定文件名。
+注意：此输入对于ONIOM计算类型无效，因为\textsc{Gaussian}此时只能使用默认的冗余内坐标进行优化。
 
 \subsection{专业级关键词} \label{subsec:inp-qcdata-expert}
 
@@ -372,6 +378,13 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 \item[ ]\verb|  = "XXXX"|：直接指定点群名称，特别适用于程序不支持的高点群，例如，\verb|"D10h"|。不要忘记加上引号。
 \end{description}
 
+\bigskip{}\noindent
+\verb|IFQRRHO|：（\verb|.True.|/\verb|.False.|）在计算熵、Gibbs自由能时，
+是否用Grimme的准刚性转子$-$谐振子（QRRHO）方法（参见：\textit{Chem. Eur. J.} 18(32), 9955-9964, 2012）。
+QRRHO会使得较大体系，尤其是涉及非共价相互作用和/或柔性的体系的Gibbs自由能、熵的计算精度提高，而对于刚性小体系的计算结果几乎没有影响。
+默认为\verb|.False.|，表示使用传统的刚性转子$-$谐振子方法（RRHO）。
+
+\bigskip{}
 在以上关键词中除了\verb|Eel|以外，都会影响Gibbs自由能的结果。
 
 输入组之后是额外提供的温度（若\verb|Temp| < 0）或压强（若\verb|Press| < 0）值，每行一个数值，连续多行，直到遇到空行或输入结束为止。例如，

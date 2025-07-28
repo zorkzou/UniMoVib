@@ -12,6 +12,10 @@
 ! Sc1,Sc2 : scratch. Size = NAtm3*NAtm3
 ! ctmp    : scratch for characters.
 !
+! wzk20250526: note: the "au" unit here, as used in e.g. au2wn, differs from the
+! usual definition of au. That's why I redefined a few conversion factors
+! (freqtomom, aktoau)
+!
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine Thermochem(iinp,iout,Intact,ifbdfchk,NAtom,NAtm3,NVib,IFAtom,IExpt,PGNAME,AMass,XYZ,Freq,Sc1,Sc2,ctmp)
 implicit real(kind=8) (a-h,o-z)
@@ -32,14 +36,19 @@ parameter( pi       = acos(-1.0d0),                                  &
            H2kJ     = H2Jou*avogadro*1.0d-03,                        &   ! Hartree to kJ/mol
            H2kcal   = H2kJ/Cal2Jou,                                  &   ! Hartree to kcal/mol
            Rval     = avogadro*boltzman/(1.0d3*H2kJ),                &   ! R =8.31447247 J/(K*Mol) = 3.16681476d-6 au/K
-           au2wn    = sqrt(avogadro*H2Jou/1.0d1)/(2*pi*clight*b2met) )   ! au (freq) to wavenumber (=5140.4871)
+           au2wn    = sqrt(avogadro*H2Jou/1.0d1)/(2*pi*clight*b2met),&   ! au (freq) to wavenumber (=5140.4871)
+!          constants required by QRRHO
+           Bav      = 1d-44 / 9.10938291e-31 / b2met**2,             &   ! average moment of inertia (atomic units)
+           omega0   = 100.d0,                                        &   ! threshold frequency (wavenumbers)
+           freqtomom= 100.d0*b2met*137.035999139d0*4*pi,             &   ! freq (wavenumbers) to inverse of mom. of inertia
+           aktoau   = boltzman/clight*137.035999139d0*b2met*2*pi/planck) ! Kelvin to au. Not the same as cf4
 
 real(kind=8) :: AMass(NAtom),XYZ(3,NAtom),Freq(NAtm3,*),Sc1(3,*),Sc2(*)
 character*200 :: ctmp
 character*4 :: PGNAME(2),PG
 character*1 :: L2U
-real(kind=8) :: energy(3),entropy(4)
-logical :: Intact,ifbdfchk,IFAtom,IFLin,IFRdT,IfRdP
+real(kind=8) :: energy(3),entropy(4),mup
+logical :: Intact,ifbdfchk,IFAtom,IFLin,IFRdT,IfRdP,ifqrrho
 
 ! Eel     : Total electronic energy from Q.C. calculation (a.u.)
 ! temp    : temperature (K)
@@ -48,7 +57,8 @@ logical :: Intact,ifbdfchk,IFAtom,IFLin,IFRdT,IfRdP
 ! PG =1   : use the point group without mass
 !     2   : use the point group with mass (default)
 !     xxxx: specify the name of point group, for example, D10h
-namelist/Thermo/Eel,NDeg,temp,press,scale,sctol,PG
+! ifqrrho : QRRHO (.true.) or RRHO (.false.)
+namelist/Thermo/Eel,NDeg,temp,press,scale,sctol,PG,ifqrrho
 allocatable  :: freqtmp(:)
 
 write(iout,"(//,1x,45('*'),/, ' ***   Thermal Contributions to Energies   ***',/, 1x,45('*'))")
@@ -62,6 +72,7 @@ sctol=0.d0
 IFRdT=.false.
 IfRdP=.false.
 PG="2    "
+ifqrrho=.false.
 
 ! to rot temperatures
 cf1 = planck * planck / (boltzman*8.d0*Pi*Pi*b2met*b2met*amu2kg)
@@ -90,8 +101,9 @@ VMas = ASum(AMass,NAtom)
 if(IFAtom) then
 
   write(iout,"(/, &
-  ' Atomic mass               :',4x,f13.6,4x,'AMU',/,    &
-  ' Electronic total energy   :',4x,f13.6,4x,'Hartree' )")VMas,Eel
+  ' Atomic mass               :',4x,f13.6,4x,'AMU',/,     &
+  ' Electronic total energy   :',4x,f13.6,4x,'Hartree',/, &
+  ' Degeneracy of state       :',7x,i3 )") VMas, Eel, max(NDeg,1)
 
 else
   scale=abs(scale)
@@ -120,10 +132,17 @@ else
   write(iout,"(/, &
   ' Molecular mass            :',4x,f13.6,4x,'AMU',/,    &
   ' Electronic total energy   :',4x,f13.6,4x,'Hartree',/,&
+  ' Degeneracy of state       :',7x,i3,/,                &
   ' Scaling factor of Freq.   :',4x,f13.6,/,             &
-  ' Tolerance of scaling      :',4x,f13.6,4x,'cm^-1',/,  &
+  ' Tolerance of scaling      :',4x,f13.6,4x,'cm^-1' )") VMas, Eel, max(NDeg,1), scale, sctol
+  if(ifqrrho) then
+    write(iout,"(' Rotational entropy',8x,':',9x,'QRRHO')")
+  else
+    write(iout,"(' Rotational entropy',8x,':',9x,'RRHO')")
+  end if
+  write(iout,"( &
   ' Rotational symmetry number:',4x,i6,/,                &
-  ' The ',a4,' point group is used to calculate rotational entropy.' )") VMas,Eel,scale,sctol,NSigma,PG
+  ' The ',a4,' point group is used to calculate rotational entropy.' )") NSigma, PG
 
 ! calculate principal axes and moments of inertia --> Sc1(:,1:4)
   call RotCons(Intact,NAtom,AMass,XYZ,Sc1,Sc2)
@@ -213,12 +232,24 @@ do while(.true.)
     if(VT <= 1.d0) cycle
 
     energy(3)=energy(3) + Rval * VT / (exp(VTT) - 1.d0)
-    entropy(3)=entropy(3) + Rval * ( VTT/(exp(VTT) - 1.d0) - log(1.d0 - exp(-VTT)) )
+
+    if(ifqrrho)then
+      ! Grimme, Chem. Eur. J. 2012, 18, 9955.
+      ! All intermediates in atomic units
+      w = 1.d0/(1.d0+(omega0/au2wn/freqtmp(i))**4)
+      Sv = Rval * ( VTT/(exp(VTT) - 1.d0) - log(1.d0 - exp(-VTT)) )
+      mup = 1.d0/(freqtmp(i)*au2wn*freqtomom)
+      mup = mup*Bav/(mup+Bav)
+      Sr = Rval * (0.5d0 + log(sqrt(2*pi*mup*temp*aktoau)) )
+      entropy(3)=entropy(3) + Sv*w+Sr*(1-w)
+    else
+      entropy(3)=entropy(3) + Rval * ( VTT/(exp(VTT) - 1.d0) - log(1.d0 - exp(-VTT)) )
+    end if
   end do
 
   ! electronic contribution
   !energy(4) = Eel
-  entropy(4)=Rval*log(dble(NDeg))
+  entropy(4)=Rval*log(dble(max(NDeg,1)))
   !write(iout,"(4f22.6)")entropy*temp*H2kcal
 
   ! ZPE

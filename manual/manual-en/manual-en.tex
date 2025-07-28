@@ -52,7 +52,7 @@
 \begin{document}
 
 \title{User's Guide of the Program \textsc{UniMoVib} \\
-\vspace{10 mm} (Ver. 1.5.0) \vspace{30 mm} \\
+\vspace{10 mm} (Ver. 1.5.3) \vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm} }
 
 \date{\today}
@@ -281,32 +281,46 @@ Default: \verb|.False.|
 
 \bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFSAVE}}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{FNMSAVE}}
 \verb|IFSAVE|: (\verb|.True.|/\verb|.False.|) Save the atomic masses (affected by
 \verb|Isotop|), Cartesian coordinates, Hessian matrix (affected by
 \verb|IFExp|), and the APT matrix into a plain text data file *.umv. This keyword
-doesn't work with \verb|QCProg="AtomCalc"| or \verb|"UniMoVib"|. Default: \verb|.False.| See Appendix \ref{sec:almfmt} for the format.
+doesn't work with \verb|QCProg="AtomCalc"| or \verb|"UniMoVib"|. Default: \verb|.False.| See Appendix \ref{sec:almfmt} for the format. \\
+If saved to a non-default file, \verb|FNMSAVE| may be used to specify the file name.
 
 \bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFMOLDEN}}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{FNMMOLDEN}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!MOLDEN}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Gabedit}
-\verb|IFMOLDEN|: (\verb|.True.|/\verb|.False.|) Save a \textsc{Molden} file except for \verb|QCProg="AtomCalc"|, which may be opened by the \href{https://www.theochem.ru.nl/molden/}{\textsc{Molden}} or \href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}} program to view geometry and normal modes. Default: \verb|.False.|
+\verb|IFMOLDEN|: (\verb|.True.|/\verb|.False.|) Save a \textsc{Molden} file except for \verb|QCProg="AtomCalc"|, which may be opened by the \href{https://www.theochem.ru.nl/molden/}{\textsc{Molden}} or \href{http://gabedit.sourceforge.net/}{\textsc{Gabedit}} program to view geometry and normal modes. Default: \verb|.False.|  \\
+If saved to a non-default file, \verb|FNMMOLDEN| may be used to specify the file name.
 
 \bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFPYVIBMS}}
+%\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{FNMPYVIBMS}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!PyMOL}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!PyVibMS}
-\verb|IFPYVIBMS|: (\verb|.True.|/\verb|.False.|) Save \textsc{PyVibMS} data files which may be used by the \href{https://pymol.org/}{\textsc{PyMOL}} plugin \href{https://github.com/smutao/PyVibMS}{\textsc{PyVibMS}} to view geometry and normal modes. Default: \verb|.False.|
+\verb|IFPYVIBMS|: (\verb|.True.|/\verb|.False.|) Save \textsc{PyVibMS} data files which may be used by the \href{https://pymol.org/}{\textsc{PyMOL}} plugin \href{https://github.com/smutao/PyVibMS}{\textsc{PyVibMS}} to view geometry and normal modes.
+Default: \verb|.False.|
+%Default: \verb|.False.|  \\
+%If saved to a non-default file, \verb|FNMPYVIBMS| may be used to specify the file name.
 
 \bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFLOCAL}}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{FNMLOCAL}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!LModeA}
-\verb|IFLOCAL|: (\verb|.True.|/\verb|.False.|) Save a data file for the local mode analysis by \textsc{LModeA} (URL: \href{https://sites.smu.edu/dedman/catco/}{https://sites.smu.edu/dedman/catco/}). It doesn't work with \verb|QCProg="AtomCalc"|. Default: \verb|.False.|
+\verb|IFLOCAL|: (\verb|.True.|/\verb|.False.|) Save a data file for the local mode analysis using \textsc{LModeA} (URL: \href{https://sites.smu.edu/dedman/catco/}{https://sites.smu.edu/dedman/catco/}). It doesn't work with \verb|QCProg="AtomCalc"|.
+Default: \verb|.False.|  \\
+If saved to a non-default file, \verb|FNMLOCAL| may be used to specify the file name.
 
 \bigskip{}\bigskip{}
 \index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{IFGauTS}}
+\index{{\texttt{\$Contrl} group}@{\texttt{\$Contrl} group}!\texttt{FNMGauTS}}
 \index{{Quantum chemistry program}@{Quantum chemistry program}!Gaussian}
-\verb|IFGauTS|: (\verb|.True.|/\verb|.False.|) Save a templet input file for \textsc{Gaussian} with Cartesian coordinates and Hessian, which (after some modifications) may be used for the calculaion of transition state optimization. It doesn't work with \verb|QCProg="AtomCalc"|. Default: \verb|.False.| \\
+\verb|IFGauTS|: (\verb|.True.|/\verb|.False.|) Save a templet input file for \textsc{Gaussian} with Cartesian coordinates and Hessian, which (after some modifications) may be used for the calculaion of transition state optimization. It doesn't work with \verb|QCProg="AtomCalc"|.
+Default: \verb|.False.|  \\
+If saved to a non-default file, \verb|FNMGauTS| may be used to specify the file name. \\
 Since the ONIOM method in \textsc{Gaussian} uses redundant coordinates only, this templet doesn't work in this case.
 
 \subsubsection{Keywords for experts} \label{subsec:inp-qcdata-expert}
@@ -597,8 +611,20 @@ not correct.
 \item[ ]\verb|  = "XXXX"|: specify the name of point group, which is useful for the high symmetry not supported by the program, for example, \verb|"D10h"|. Don't forget the quotes.
 \end{description}
 
+\bigskip{}
+\index{{\texttt{\$Thermo} group}@{\texttt{\$Thermo} group}!\texttt{IFQRRHO}}
+\verb|IFQRRHO|: (\verb|.True.|/\verb|.False.|)
+Grimme's quasi-rigid-rotor-harmonic-oscillator (QRRHO) method is used when calculating entropy and Gibbs free energy
+(see \textit{Chem. Eur. J.} 18(32), 9955-9964, 2012).
+QRRHO may improve the accuracy of Gibbs free energy and entropy calculations for larger systems,
+especially those involving non-covalent interactions and/or flexible systems,
+while having almost no effect on the results of rigid small systems.
+Default: \verb|.False.|, meaning that the usual rigid-rotor-harmonic-oscillator (RRHO) approximation is used.
+
+\bigskip{}
 Gibbs free energy may be affected by all of the above keywords except \verb|Eel|.
 
+\bigskip{}
 If \verb|Temp| < 0 or \verb|Press| < 0, a list of additional temperatures or pressures will be provided. One value per line. The program will
 read the values until a blank line or the end is encountered.
 For example,

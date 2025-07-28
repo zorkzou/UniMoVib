@@ -238,13 +238,14 @@ end
 !
 ! (*) For debugging only.
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdContrl(iinp,iout,iudt,imdn,imdg,iloc,igau,Intact,NOp,IOP,qcprog,cname)
+subroutine RdContrl(iinp,iout,iudt,imdn,imdg,iloc,igau,Intact,NOp,IOP,qcprog,cname,fnmsave,fnmmolden,fnmlocal,fnmgauts)
 implicit real(kind=8) (a-h,o-z)
 parameter(NProg=27)
 dimension :: IOP(NOp)
 logical :: Intact,ifconc,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms
-character*200 :: qcprog, cname
-namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms
+character*200 :: qcprog, cname, fnmsave, fnmmolden, fnmlocal, fnmgauts
+namelist/Contrl/qcprog,ifconc,Isotop,ISyTol,ifexp,ifsave,ifmolden,iflocal,ifrdnm,ifapprx,ifgauts,ifsymtz,ifgsva,ifpyvibms,  &
+  & fnmsave,fnmmolden,fnmlocal,fnmgauts
 character*9,allocatable  :: DATFMT(:)
 
 IOP=0
@@ -264,6 +265,12 @@ ifgauts  = .false.
 ifsymtz  = .false.
 ifgsva   = .false.
 ifpyvibms= .false.
+
+! customized file names
+fnmsave   = ' '
+fnmmolden = ' '
+fnmlocal  = ' '
+fnmgauts  = ' '
 
 rewind(iinp)
 read(iinp,Contrl,end=100,err=10)
@@ -447,34 +454,63 @@ if(M == 0) M = 1
 IOP(5) = SIGN(M*10+ABS(N),N)
 
 !>>>  ifsave --> IOP(6)
-if(ifsave) IOP(6) = 1
-! UniMoVib (ALM) data file
-if(IOP(6) == 1)then
-  istr=nonspace(cname)
-  iend=LEN_TRIM(cname)
-
-  open(iudt,file=cname(istr:iend)//'.umv')
-  write(iout,"(' UniMoVib file:',3x,a)") cname(istr:iend)//'.umv'
-  if(Intact) write(*,"(' UniMoVib file:',3x,a)") cname(istr:iend)//'.umv'
+if(ifsave) then
+  IOP(6) = 1
+  ! UniMoVib (ALM) data file
+  if(len_trim(fnmsave) == 0) then
+    istr=nonspace(cname)
+    iend=LEN_TRIM(cname)
+    open(iudt,file=cname(istr:iend)//'.umv')
+    write(iout,"(' UniMoVib file:',3x,a)") cname(istr:iend)//'.umv'
+    if(Intact) write(*,"(' UniMoVib file:',3x,a)") cname(istr:iend)//'.umv'
+  else
+    istr=nonspace(fnmsave)
+    iend=LEN_TRIM(fnmsave)
+    open(iudt,file=fnmsave(istr:iend),iostat=ioper)
+    if(ioper /= 0) then
+      istr=nonspace(cname)
+      iend=LEN_TRIM(cname)
+      fnmsave = cname(istr:iend)//'.umv'
+      istr=nonspace(fnmsave)
+      iend=LEN_TRIM(fnmsave)
+    end if
+    write(iout,"(' UniMoVib file:',3x,a)") fnmsave(istr:iend)
+    if(Intact) write(*,"(' UniMoVib file:',3x,a)") fnmsave(istr:iend)
+  end if
 end if
 
 !>>>  ifmolden --> IOP(7) = 0 (ifmolden=.false.) or 1 (ifmolden=.true.)
 if(ifmolden)then
   IOP(7) = 1
-  istr=nonspace(cname)
-  iend=LEN_TRIM(cname)
-  open(imdn,file=cname(istr:iend)//'.molden',status='new',iostat=ioper)
-  if(ioper == 0)then
-    write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
-    if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
-  else
-    open(imdn,file=cname(istr:iend)//'_new.molden',status='new',iostat=ioper)
-    if(ioper > 0) then
-      write(iout,"(/,' You have to delete or rename this file first:',5x,a)") cname(istr:iend)//'_new.molden'
-      call XError(Intact,"New molden file exist!")
+  if(len_trim(fnmmolden) == 0) then
+    istr=nonspace(cname)
+    iend=LEN_TRIM(cname)
+    open(imdn,file=cname(istr:iend)//'.molden',status='new',iostat=ioper)
+    if(ioper == 0)then
+      write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
+      if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'.molden'
+    else
+      open(imdn,file=cname(istr:iend)//'_new.molden',status='new',iostat=ioper)
+      if(ioper > 0) then
+        write(iout,"(/,' You have to delete or rename this file first:',5x,a)") cname(istr:iend)//'_new.molden'
+        call XError(Intact,"New molden file exist!")
+      end if
+      write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'_new.molden'
+      if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'_new.molden'
     end if
-    write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'_new.molden'
-    if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'_new.molden'
+  else
+    istr=nonspace(fnmmolden)
+    iend=LEN_TRIM(fnmmolden)
+    open(imdn,file=fnmmolden(istr:iend),iostat=ioper)
+    if(ioper /= 0) then
+      istr=nonspace(cname)
+      iend=LEN_TRIM(cname)
+      fnmmolden = cname(istr:iend)//'.molden'
+      istr=nonspace(fnmmolden)
+      iend=LEN_TRIM(fnmmolden)
+    end if
+    write(iout,"(' MOLDEN file:',5x,a)") fnmmolden(istr:iend)
+    if(Intact) write(*,"(' MOLDEN file:',5x,a)") fnmmolden(istr:iend)
   end if
 end if
 
@@ -482,18 +518,33 @@ end if
 if(ifgsva) then
   IOP(15) = 1
   if(ifmolden)then
-    open(imdg,file=cname(istr:iend)//'-gsva.molden',status='new',iostat=ioper)
-    if(ioper == 0)then
-      write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva.molden'
-      if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva.molden'
-    else
-      open(imdg,file=cname(istr:iend)//'-gsva_new.molden',status='new',iostat=ioper)
-      if(ioper > 0) then
-        write(iout,"(/,' You have to delete or rename this file first:',5x,a)") cname(istr:iend)//'-gsva_new.molden'
-        call XError(Intact,"New molden file exist!")
+    if(len_trim(fnmmolden) == 0) then
+      open(imdg,file=cname(istr:iend)//'-gsva.molden',status='new',iostat=ioper)
+      if(ioper == 0)then
+        write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva.molden'
+        if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva.molden'
+      else
+        open(imdg,file=cname(istr:iend)//'-gsva_new.molden',status='new',iostat=ioper)
+        if(ioper > 0) then
+          write(iout,"(/,' You have to delete or rename this file first:',5x,a)") cname(istr:iend)//'-gsva_new.molden'
+          call XError(Intact,"New molden file exist!")
+        end if
+        write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva_new.molden'
+        if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva_new.molden'
       end if
-      write(iout,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva_new.molden'
-      if(Intact) write(*,"(' MOLDEN file:',5x,a)") cname(istr:iend)//'-gsva_new.molden'
+    else
+      istr=nonspace(fnmmolden)
+      iend=LEN_TRIM(fnmmolden)
+      open(imdg,file=fnmmolden(istr:iend)//'-gsva.molden',iostat=ioper)
+      if(ioper /= 0) then
+        istr=nonspace(cname)
+        iend=LEN_TRIM(cname)
+        fnmmolden = cname(istr:iend)//'-gsva.molden'
+        istr=nonspace(fnmmolden)
+        iend=LEN_TRIM(fnmmolden)
+      end if
+      write(iout,"(' MOLDEN file:',5x,a)") fnmmolden(istr:iend)
+      if(Intact) write(*,"(' MOLDEN file:',5x,a)") fnmmolden(istr:iend)
     end if
   end if
 end if
@@ -501,9 +552,24 @@ end if
 !>>>  iflocal --> IOP(8) = 0 (iflocal=.false.) or 1 (iflocal=.true.)
 if(iflocal)then
   IOP(8) = 1
-  open(iloc,file='localmode.dat')
-  write(iout,"(' LOCALMODE file:',2x,'localmode.dat')")
-  if(Intact) write(*,"(' LOCALMODE file:',2x,'localmode.dat')")
+  if(len_trim(fnmlocal) == 0) then
+    open(iloc,file='localmode.dat')
+    write(iout,"(' LOCALMODE file:',2x,'localmode.dat')")
+    if(Intact) write(*,"(' LOCALMODE file:',2x,'localmode.dat')")
+  else
+    istr=nonspace(fnmlocal)
+    iend=LEN_TRIM(fnmlocal)
+    open(imdn,file=fnmlocal(istr:iend),iostat=ioper)
+    if(ioper /= 0) then
+      istr=nonspace(cname)
+      iend=LEN_TRIM(cname)
+      fnmlocal = cname(istr:iend)//'-localmode.dat'
+      istr=nonspace(fnmlocal)
+      iend=LEN_TRIM(fnmlocal)
+    end if
+    write(iout,"(' LOCALMODE file:',2x,a)") fnmlocal(istr:iend)
+    if(Intact) write(*,"(' LOCALMODE file:',2x,a)") fnmlocal(istr:iend)
+  end if
 end if
 
 !>>>  ifrdnm --> IOP(9) = 0 (ifrdnm=.false.) or 1 (ifrdnm=.true.)
@@ -515,9 +581,24 @@ if(ifapprx) IOP(10) = 1
 !>>>  ifgauts --> IOP(11) = 0 (ifgauts=.false.) or 1 (ifgauts=.true.)
 if(ifgauts) then
   IOP(11) = 1
-  open(igau,file='gaussian-ts.gjf')
-  write(iout,"(' TS input file:',3x,'gaussian-ts.gjf')")
-  if(Intact) write(*,"(' TS input file:',3x,'gaussian-ts.gjf')")
+  if(len_trim(fnmgauts) == 0) then
+    open(igau,file='gaussian-ts.gjf')
+    write(iout,"(' TS input file:',3x,'gaussian-ts.gjf')")
+    if(Intact) write(*,"(' TS input file:',3x,'gaussian-ts.gjf')")
+  else
+    istr=nonspace(fnmgauts)
+    iend=LEN_TRIM(fnmgauts)
+    open(imdn,file=fnmgauts(istr:iend),iostat=ioper)
+    if(ioper /= 0) then
+      istr=nonspace(cname)
+      iend=LEN_TRIM(cname)
+      fnmgauts = cname(istr:iend)//'-ts.gjf'
+      istr=nonspace(fnmgauts)
+      iend=LEN_TRIM(fnmgauts)
+    end if
+    write(iout,"(' TS input file:',3x,a)") fnmgauts(istr:iend)
+    if(Intact) write(*,"(' TS input file:',3x,a)") fnmgauts(istr:iend)
+  end if
 end if
 
 !>>>  ifsymtz --> IOP(12) = 0 (ifsymtz=.false.) or 1 (ifsymtz=.true.)
@@ -537,7 +618,7 @@ end if
 if(ifpyvibms) IOP(16) = 1
 
 return
-end
+end subroutine RdContrl
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -799,7 +880,7 @@ subroutine prtconv(iout,grslt)
  parameter(tolx=2.5d-3, tolg=5.0d-4, tole=5.0d-6)
  dimension :: grslt(5)
 
- write(iout,"(/,' Convergence of gradients',/,34x,'Value     Tolerance      Converged?')")
+ write(iout,"(/,' Convergence of gradients',/,1x,68('-'),/,34x,'Value     Tolerance      Converged?',/,1x,68('-'))")
  nyes = 0
  if(grslt(1) <= tolx*1.6d0) then
    write(iout,"('  Maximum Delta-X',8x,2f14.6,12x,'Yes')") grslt(1), tolx*1.6d0
@@ -831,6 +912,7 @@ subroutine prtconv(iout,grslt)
  else
    write(iout,"(' Expected Delta-E',8x,2d14.2,13x,'No')")  grslt(5), tole
  end if
+ write(iout,"(1x,68('-'))")
  if(nyes /= 5) write(iout,"(/,' This geometry is not a stationary point.')")
 
  return

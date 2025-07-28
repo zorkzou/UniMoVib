@@ -30,11 +30,12 @@ program UniMoVib
   logical, allocatable   :: LScr(:)
   integer, allocatable   :: IScr(:)
   character*1, allocatable :: CScr(:)
+  character*200, allocatable :: fnames(:)
   integer, allocatable   :: subsystem_idx(:),flags(:)
   allocatable   :: AMass_sub(:), XYZ_sub(:), ZA_sub(:)
 
-  ver="1.5.2"
-  dat="Aug 14, 2024"
+  ver="1.5.3"
+  dat="Jul 28, 2025"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O
@@ -72,7 +73,9 @@ program UniMoVib
 !    IOP(15)  0 (IFGSVA=.False.), 1 (IFGSVA=.True.)
 !    IOP(16)  0 (IFPYVIBMS=.False.), 1 (IFPYVIBMS=.True.)
 !-----------------------------------------------------------------------
-  call RdContrl(iinp,iout,iudt,imdn,imdg,iloc,igau,Intact,NOption,IOP,ctmp,cname)
+  allocate(fnames(4))
+  call RdContrl(iinp,iout,iudt,imdn,imdg,iloc,igau,Intact,NOption,IOP,ctmp,cname,fnames(1),fnames(2),fnames(3),fnames(4))
+  deallocate(fnames)
 
 !-----------------------------------------------------------------------
 !  4. Read $qcdata

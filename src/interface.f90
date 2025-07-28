@@ -4360,50 +4360,66 @@ end
 !
 ! Save Molden file (imdn).
 !
-! The frequencies are saved in Freq(:,3) or Freq(:,5) in a.u.
+! Rslt(:,3)   Theoretical frequencies in a.u.
+! Rslt(:,5)   Experimentally corrected frequencies in a.u. if Reslt(:,6) = 1.0
+! Rslt(:,4)   I.R. Intensities
+! Rslt(:,7)   Raman scattering activities
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SavMDN(imdn,NAtm,NAtm3,NVib,ZA,XYZ,IExpt,AL,Freq)
-implicit real(kind=8) (a-h,o-z)
-parameter(au2wn=5140.48714376d0,au2ang=0.52917720859d0)
-real(kind=8) :: ZA(*),XYZ(3,*),AL(NAtm3,*),Freq(NAtm3,*)
-character*3 :: Elm
+subroutine SavMDN(imdn,Infred,IRaman,NAtm,NAtm3,NVib,ZA,XYZ,IExpt,AL,Rslt)
+ implicit real(kind=8) (a-h,o-z)
+ parameter(au2wn=5140.48714376d0,au2ang=0.52917720859d0,cf=31.22307d0,au2ang4=0.52917720859d0**4)
+ real(kind=8) :: ZA(*),XYZ(3,*),AL(NAtm3,*),Rslt(NAtm3,*)
+ character*3 :: Elm
 
-rewind(imdn)
-write(imdn,"('[Molden Format]')")
-write(imdn,"('[Atoms] Angs')")
-do i=1,NAtm
-  iza = nint(ZA(i))
-  call ElemZA(1,Elm,iza)
-  write(imdn,"(a3,2x,2i6,2x,3f20.10)") Elm,i,iza,(XYZ(j,i)*au2ang,j=1,3)
-end do
-write(imdn,"('[GTO]',//)")
+ rewind(imdn)
+ write(imdn,"('[Molden Format]')")
+ write(imdn,"('[Atoms] Angs')")
+ do i=1,NAtm
+   iza = nint(ZA(i))
+   call ElemZA(1,Elm,iza)
+   write(imdn,"(a3,2x,2i6,2x,3f20.10)") Elm,i,iza,(XYZ(j,i)*au2ang,j=1,3)
+ end do
+ write(imdn,"('[GTO]',//)")
 
-write(imdn,"('[FREQ]')")
-if(IExpt == 0)then
-  j=3
-else
-  j=5
-end if
-do i=1,NVib
-  write(imdn,"(f14.4)")Freq(i,j)*au2wn
-end do
-write(imdn,"('[FR-COORD]')")
-do i=1,NAtm
-  iza = nint(ZA(i))
-  call ElemZA(1,Elm,iza)
-  write(imdn,"(a3,2x,3f20.10)")Elm,(XYZ(j,i),j=1,3)
-end do
-write(imdn,"('[FR-NORM-COORD]')")
-do i=1,NVib
-  write(imdn,"(2x,'vibration',1x,i8)")i
-  write(imdn,"(3f20.10)")(AL(j,i),j=1,NAtm3)
-end do
+ write(imdn,"('[FREQ]')")
+ if(IExpt == 0)then
+   j=3
+ else
+   j=5
+ end if
+ do i=1,NVib
+   write(imdn,"(f14.4)") Rslt(i,j)*au2wn
+ end do
+ write(imdn,"('[FR-COORD]')")
+ do i=1,NAtm
+   iza = nint(ZA(i))
+   call ElemZA(1,Elm,iza)
+   write(imdn,"(a3,2x,3f20.10)") Elm,(XYZ(j,i),j=1,3)
+ end do
+ write(imdn,"('[FR-NORM-COORD]')")
+ do i=1,NVib
+   write(imdn,"(2x,'vibration',1x,i8)")i
+   write(imdn,"(3f20.10)") (AL(j,i),j=1,NAtm3)
+ end do
 
-write(imdn,"(/)")
+ if(Infred == 1) then
+   write(imdn,"('[INT]')")
+   if(IRaman == 1) then
+     do i=1,NVib
+       write(imdn,"(2f14.4)") Rslt(i,4)*cf*cf, Rslt(i,7)*au2ang4
+     end do
+   else
+     do i=1,NVib
+       write(imdn,"(f14.4)") Rslt(i,4)*cf*cf
+     end do
+   end if
+ end if
 
-return
-end
+ write(imdn,"(/)")
+
+ return
+end subroutine SavMDN
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !

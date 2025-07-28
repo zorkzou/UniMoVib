@@ -1331,7 +1331,7 @@ function ASum(A,N)
  implicit real(kind=8) (a-h,o-z)
  real(kind=8) :: A(N)
 
- ASum = Sum(A,N)
+ ASum = Sum(A)
 
  return
 end

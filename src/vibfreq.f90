@@ -124,7 +124,7 @@ subroutine GSVA_engine(iout,isva,imds,imdg,IOP,NAtm,subsystem_idx,NAtm_sub,AMass
  !PRINT '(9E17.8)',(Rslt(i),i=1,3)
 
  ! save a molden file
- if(IOP(7) == 1) call SavMDN(imdg,NAtm_sub,NAtm3_sub,NVib_sub,ZA_sub,XYZ_sub,0,AL,Rslt)
+ if(IOP(7) == 1) call SavMDN(imdg,Infred,IRaman,NAtm_sub,NAtm3_sub,NVib_sub,ZA_sub,XYZ_sub,0,AL,Rslt)
 
  !save ALMODE file for the subsystem as preparation to do local mode analysis with LModeA program
  open(isva,file='gsva.almode',status='replace')
@@ -224,7 +224,7 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,
    ZA,XYZ,Grd,FFx,APT,DPol,IOP(3),AL,Rslt,Scr2,Scr3,WORK,Scr4)
 
  ! save a molden file
- if(IOP(7) == 1) call SavMDN(imdn,NAtm,NAtm3,NVib,ZA,XYZ,IOP(3),AL,Rslt)
+ if(IOP(7) == 1) call SavMDN(imdn,Infred,IRaman,NAtm,NAtm3,NVib,ZA,XYZ,IOP(3),AL,Rslt)
 
  ! save localmode.dat (part II)
  if(IOP(8) == 1) call SavLOC(iloc,irep,NAtm3,IOP(3),Rslt,PGNAME,ctmp)
