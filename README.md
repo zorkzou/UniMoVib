@@ -8,7 +8,7 @@ Version 1.5.3 (Jul/28/2025).
 
 1. Print IR intensities and Raman activities in Molden file.
 2. User may define the file names of saved data.
-3. Grimme's quasi-rigid-rotor-harmonic-oscillator method (QRRHO; see Chem. Eur. J. 18, 9955, 2012) may be used to calculate entropy and Gibbs free energy (by Prof. Zikuang Wang).
+3. Grimme's quasi-rigid-rotor-harmonic-oscillator method (QRRHO; see [Chem. Eur. J. 18, 9955, 2012](https://doi.org/10.1002/chem.201200497) ) may be used to calculate entropy and Gibbs free energy (by Prof. Zikuang Wang).
 
 Version 1.5.2 (Aug/14/2024).
 
