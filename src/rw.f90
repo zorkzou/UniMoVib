@@ -911,7 +911,7 @@ subroutine prtconv(iout,grslt)
  else
    write(iout,"(9x,'RMS grad',8x,2f14.6,13x,'No')")  grslt(4), tolg
  end if
- if(grslt(5) <= tole) then
+ if(abs(grslt(5)) <= tole) then
    write(iout,"('     Expected d-E',8x,2es14.2,12x,'Yes')") grslt(5), tole
    nyes = nyes + 1
  else
