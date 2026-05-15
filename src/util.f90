@@ -18,7 +18,7 @@ subroutine obt_idx(iout,flags,subsystem_idx,NAtm)
  write(iout, '(10I5)'),(subsystem_idx(i),i=1,J-1)
 
  return
-end
+end subroutine obt_idx
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -42,7 +42,7 @@ subroutine PartMX(NAtm,AMass,XYZ,ZA,subsystem_idx,NAtm_sub,AMass_sub,XYZ_sub,ZA_
  !PRINT '(10F7.2)',(AMass_sub(i),i=1,3)
  !PRINT '(10F7.2)',(XYZ_sub(i,2),i=1,3)
  return
-end
+end subroutine PartMX
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -83,7 +83,7 @@ subroutine ElemZA(Mode,el,iza)
  end if
 
  return
-end
+end subroutine ElemZA
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -157,7 +157,7 @@ function EleMas(Mode,IZ)
  end if
 
  return
-end
+end function EleMas
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -174,7 +174,7 @@ subroutine MasLib(Mode,NAtm,AMass,ZA)
  end do
 
  return
-end
+end subroutine MasLib
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -192,7 +192,7 @@ function AIRCrg(ip,AtmAPT)
  AIRCrg = AIRCrg / dble(sum(ip))
 
  return
-end
+end function AIRCrg
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -215,46 +215,7 @@ subroutine planar(NAtm,XYZ,ip)
  end do
 
  return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! distance between points a and b
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function distance(a,b)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: a(3),b(3),c(3)
-
- call ASub(3,a,b,c)
- distance=sqrt( dotx(3,c,c) )
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! bond angle a-b-c (0~pi rad.)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function BAngle(a,b,c)
- implicit real(kind=8) (a-h,o-z)
- parameter(One=1.d0)
- real(kind=8) :: a(3),b(3),c(3),tmp(3,2)
-
- call ASub(3,a,b,tmp(1,1))
- call ASub(3,c,b,tmp(1,2))
- d12=sqrt( dotx(3,tmp(1,1),tmp(1,1)) )
- d32=sqrt( dotx(3,tmp(1,2),tmp(1,2)) )
- call AScale(3,One/d12,tmp(1,1),tmp(1,1))
- call AScale(3,One/d32,tmp(1,2),tmp(1,2))
- cphi=dotx(3,tmp(1,1),tmp(1,2))
- ! because of numerical error, |cphi| can be larger than 1
- if(abs(cphi) > One) cphi = sign(One,cphi)
- BAngle=acos(cphi)
-
- return
-end
+end subroutine planar
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -270,41 +231,7 @@ subroutine rmnumb(N,cha)
  end do
 
  return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! C(*) = A(*) - B(*)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine ASub(N,A,B,C)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N),B(N),C(N)
-
- !Do I = 1,N
- !  C(I) = A(I) - B(I)
- !end do
- C = A - B
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! C(*) = A(*) + B(*)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- subroutine AAdd(N,A,B,C)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N),B(N),C(N)
-
- !Do I = 1,N
- !  C(I) = A(I) + B(I)
- !end do
- C = A + B
-
- return
-end
+end subroutine rmnumb
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -321,7 +248,7 @@ subroutine charu2l(cha)
  end do
 
  return
-end
+end subroutine charu2l
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -338,7 +265,7 @@ subroutine charl2u(cha)
  end do
 
  return
-end
+end subroutine charl2u
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -356,7 +283,7 @@ function L2U(letter)
  endif
 
  return
-end
+end function L2U
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -374,7 +301,7 @@ function U2L(letter)
  endif
 
  return
-end
+end function U2L
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -397,7 +324,7 @@ function nonspace(string)
  nonspace=i
 
  return
-end
+end function nonspace
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -414,7 +341,7 @@ subroutine XError(Intact,inf)
  call estop(Intact)
 
  return
-end
+end subroutine XError
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -433,367 +360,7 @@ subroutine estop(Intact)
  stop
 
  return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! generate a unit matrix
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine UMAT(N,U)
- implicit real(kind=8) (a-h,o-z)
-
- parameter(one=1.d0)
- real(kind=8) :: U(N,N)
-
- call AClear(N*N,U)
- do I = 1,N
-   U(i,i)=one
- end do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! B(*) = c * A(*)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine AScale(N,c,A,B)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N),B(N)
-
- !Do I = 1,N
- !  B(I) = c*A(I)
- !end do
- B = c * A
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! symmetric square matrix --> lower triangular matrix
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine Sq2Tr(N,S,T)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: T(*),S(N,N)
-
- ii=0
- Do i=1,N
-   Do j=1,i
-     ii=ii+1
-     T(ii)=(S(j,i)+S(i,j))*0.5d0
-   end Do
- end Do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! lower triangular matrix --> symmetric square matrix
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine LT2Sqr(N,T,S)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: T(*),S(N,N)
-
- k=0
- do i=1,N
-   do j=1,i-1
-     k=k+1
-     S(j,i)=T(k)
-     S(i,j)=T(k)
-   end do
-   k=k+1
-   S(i,i)=T(k)
- end do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! It returns the maximum element of array A. IMax is the index of the largest element.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function ArMax(N,IMax,A)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N)
- Save Zero
- Data Zero/0.0d0/
-
- If(N < 1) then
-   ArMax = Zero
-   IMax = 0
- else
-   IMax = 1
-   Do I = 2, N
-     If(A(I) > A(IMax)) IMax = I
-   end do
-   ArMax = A(IMax)
- endIf
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! It returns the minimum element of array A. IMin is the index of the smallest element.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Function ArMin(N,IMin,A)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N)
- Save Zero
- Data Zero/0.0d0/
-
- If(N < 1) then
-   ArMin = Zero
-   IMin = 0
- else
-   IMin = 1
-   Do I = 2, N
-     If(A(I) < A(IMin)) IMin = I
-   end do
-   ArMin = A(IMin)
- endIf
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! vector A dot_product vector B
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function dotx(N,A,B)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N),B(N)
-
- dotx = dot_product(A,B)
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! calculate the 2nd derivatives of the nuclear repulsion energy: ENR = Sum_i,j(Z_i * Z_j / R_i,j)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine DDerNRE(NAtm,Z,xyz,FFx,DAT,D2)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: Z(*),xyz(3,*),FFx(NAtm*3,NAtm*3),DAT(5),D2(6)
-
- NAtm3 = NAtm*3
- call AClear(NAtm3*NAtm3,FFx)
-
- do i=1,NAtm
-   ix = 3*(i-1)+1
-   iy = 3*(i-1)+2
-   iz = 3*(i-1)+3
-   do j=1,i-1
-     jx = 3*(j-1)+1
-     jy = 3*(j-1)+2
-     jz = 3*(j-1)+3
-
- !   (1) x_i - x_j
- !   (2) y_i - y_j
- !   (3) z_i - z_j
- !   (4) Z_i * Z_j / r_i,j^3
- !   (5) 3 * Z_i * Z_j / r_i,j^5
-     DAT(1) = xyz(1,i) - xyz(1,j)
-     DAT(2) = xyz(2,i) - xyz(2,j)
-     DAT(3) = xyz(3,i) - xyz(3,j)
-     RR = dotx(3,DAT,DAT)
-     DAT(4) = Z(i) * Z(j) / (RR * sqrt(RR))
-     DAT(5) = DAT(4) * 3.d0 / RR
-
- !   2nd derivative terms:
- !   dx_i*dx_j,
- !   dx_i*dy_j, dy_i*dy_j,
- !   dx_i*dz_j, dy_i*dz_j, dz_i*dz_j
-     D2(1) = -DAT(5)*DAT(1)*DAT(1) + DAT(4)
-     D2(2) = -DAT(5)*DAT(1)*DAT(2)
-     D2(3) = -DAT(5)*DAT(2)*DAT(2) + DAT(4)
-     D2(4) = -DAT(5)*DAT(1)*DAT(3)
-     D2(5) = -DAT(5)*DAT(2)*DAT(3)
-     D2(6) = -DAT(5)*DAT(3)*DAT(3) + DAT(4)
-
- !   2nd derivatives
-     FFx(ix,jx) = D2(1)
-     FFx(ix,jy) = D2(2)
-     FFx(ix,jz) = D2(4)
-     FFx(iy,jx) = D2(2)
-     FFx(iy,jy) = D2(3)
-     FFx(iy,jz) = D2(5)
-     FFx(iz,jx) = D2(4)
-     FFx(iz,jy) = D2(5)
-     FFx(iz,jz) = D2(6)
-
-     FFx(jx,ix) = D2(1)
-     FFx(jy,ix) = D2(2)
-     FFx(jz,ix) = D2(4)
-     FFx(jx,iy) = D2(2)
-     FFx(jy,iy) = D2(3)
-     FFx(jz,iy) = D2(5)
-     FFx(jx,iz) = D2(4)
-     FFx(jy,iz) = D2(5)
-     FFx(jz,iz) = D2(6)
-
-   end do
- end do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! Wrapper routine for DGEMM.
-! Note! MAXN should be the same as NX.
-! MATRIX MULTIPLICATION PACKAGE FOR SQUARE MATRICES ONLY.
-! IQ=
-! 1  C=A*B
-! 2  C=A(TRANSPOSE)*B
-! 3  C=A*B(TRANSPOSE)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine MPACMF(A,B,C,MAXN,NX,IQ)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(MAXN,MAXN),B(MAXN,MAXN),C(MAXN,MAXN)
-
- call AClear(NX*NX,C)                                          ! Zero the product
-
- goto (10,20,30), IQ
- 10 call DGEMM('N','N',NX,NX,NX,1.d0,A,NX,B,NX,0.d0,C,NX)      ! C=A*B
- return
-
- 20 call DGEMM('T','N',NX,NX,NX,1.d0,A,NX,B,NX,0.d0,C,NX)      ! C=A(TRANSPOSE)*B
- return
-
- 30 call DGEMM('N','T',NX,NX,NX,1.d0,A,NX,B,NX,0.d0,C,NX)      ! C=A*B(TRANSPOSE)
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! Calculate square-root matrix X=S^1/2 and/or its (general) inverse
-! Xi. Here S must be a SYMMETRIC matrix.
-! Mode > 0: Calculate X
-!      < 0: Calculate Xi
-!      = 0: Calculate both
-! Scratch Scr(N,M), M = max(2*N,4)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine SqrtMp(Intact,Mode,N,S,X,Xi,E,A,Scr)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: S(N,N),X(N,N),Xi(N,N),E(N,N),A(N),Scr(N,*)
- logical :: Intact
-
- call ACopy(N*N,S,E)
- LWork=2*N*max(N,2)
- call DSYEV('V','L', N, E, N, A, Scr, LWork, Info)
- if(INFO /= 0) call XError(Intact,"SqrtMp")
-
- if(Mode == 0)then
-   call pDiagSq(N,0,X,A)
-   call MPACMF(E,X,Scr,N,N,1)
-   call MPACMF(Scr,E,X,N,N,3)
-   call pDiagSq(N,1,Xi,A)
-   call MPACMF(E,Xi,Scr,N,N,1)
-   call MPACMF(Scr,E,Xi,N,N,3)
- else if(Mode > 0)then
-   call pDiagSq(N,0,X,A)
-   call MPACMF(E,X,Scr,N,N,1)
-   call MPACMF(Scr,E,X,N,N,3)
- else
-   call pDiagSq(N,1,Xi,A)
-   call MPACMF(E,Xi,Scr,N,N,1)
-   call MPACMF(Scr,E,Xi,N,N,3)
- end if
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! General inverse enhanced version of DiagSqrt.
-! A is a diagonal matrix with diagonal terms
-! Indx = 0, sqrt(B)
-!     /= 0, sqrt(B)**-1 if B(i) > 0.
-! It's assumed that B(i) >= 0. It doesn't work if there are negative elements in B, which is not checked.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine pDiagSq(N,Indx,A,B)
- implicit real(kind=8) (a-h,o-z)
- parameter(eps=1.d-12)
- real(kind=8) :: A(N,N),B(N)
-
- call AClear(N*N,A)
- if(Indx==0) then
-   Do i=1,N
-     A(i,i)=sqrt(abs(B(i)))
-   endDo
- else
-   Do i=1,N
-     if(abs(B(i)) > eps) A(i,i)=1.d0/sqrt(abs(B(i)))
-   endDo
- endIf
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! B(*) = A(*)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine ACopy(N,A,B)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N),B(N)
-
- !Do I = 1,N
- !  B(I) = A(I)
- !end do
- B = A
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! Routine to clear N elements in array A.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine AClear(N,A)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N)
-
- !Do I = 1,N
- !  A(I) = 0.0d0
- !end do
- A = 0.0d0
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! Routine to clear N characters
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine CClear(N,CA)
- implicit real(kind=8) (a-h,o-z)
- Character*(*) :: CA
-
- Do I = 1,N
-   CA(I:I) = " "
- end do
-
- return
-end
+end subroutine estop
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -878,108 +445,7 @@ subroutine Frq2FFX(NAtm3,NVib,AMass,Freq,AL,FFX,Scr,WORK,EIG)
  call Symtrz(NAtm3,WORK,FFX)
 
  return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! X is (general) inverse of square matrix S.
-! ISYMM = 1: S is symmetric
-!         0: S is not symmetric
-!        -1: S is symmetric, but S should be symmetrized first
-! Scr(N,M): scratch, M = max(2*N,4)
-! S and X can be the same matrix.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine GInvM(Intact,ISYMM,N,S,X,E,A,Scr)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: S(N,N),X(N,N),E(N,N),A(N),Scr(N,N,*)
- logical :: Intact
-
- if(ISYMM == 0)then
- ! E = S * S^T will be diagonalized
-   call MPACMF(S,S,E,N,N,3)
- else if(ISYMM > 0)then
- ! E = S will be diagonalized
-   call ACopy(N*N,S,E)
- else
- ! E = (S + S^T)/2 will be diagonalized
-   call Symtrz(N,S,E)
- end if
- LWork=2*N*max(N,2)
- call DSYEV('V','L', N, E, N, A, Scr, LWork, Info)
- if(INFO /= 0) call XError(Intact,"GInvM")
-
- call DiagIv(N,Scr(1,1,1),A)
- call MPACMF(E,Scr(1,1,1),Scr(1,1,2),N,N,1)
- if(ISYMM == 0)then
- ! Scr(:,:,1) = Inv(S * S^T)
-   call MPACMF(Scr(1,1,2),E,Scr(1,1,1),N,N,3)
- ! X = S^T * Inv(S * S^T)
-   call MPACMF(S,Scr(1,1,1),Scr(1,1,2),N,N,2)
-   call ACopy(N*N,Scr(1,1,2),X)
- else
-   call MPACMF(Scr(1,1,2),E,X,N,N,3)
- end if
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! A is a diagonal matrix with diagonal terms 1/B(i).
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine DiagIv(N,A,B)
- implicit real(kind=8) (a-h,o-z)
- parameter(eps=1.d-12)
- real(kind=8) :: A(N,N),B(N)
-
- call AClear(N*N,A)
- Do i=1,N
-   if(abs(B(i)) > eps) A(i,i)=1.d0/B(i)
- endDo
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! symmetrize A by B = (A + A')/2
-!
-! A is (nearly) symmetric; A and B can be the same matrix
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine Symtrz(N,A,B)
- implicit real(kind=8) (a-h,o-z)
- parameter(half=0.5d0)
- real(kind=8) :: A(N,N),B(N,N)
-
- do i=1,N
-   do j=1,i-1
-     B(j,i)=(A(j,i)+A(i,j))*half
-     B(i,j)=B(j,i)
-   end do
-   B(i,i)=A(i,i)
- end do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! save square S(3,3,N) to L.T. A(6,N)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine S9to6(N,S,A)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(6,N),S(9,N)
-
- do i=1,N
-   call Sq2Tr(3,S(1,i),A(1,i))
- end do
-
- return
-end
+end subroutine Frq2FFX
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -1040,7 +506,7 @@ subroutine TRVec(Intact,NAtm,NTR,Imiss,AMass,XYZCM,AL,ROT,ALtmp)
  end if
 
  return
-end
+end subroutine TRVec
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -1074,7 +540,7 @@ subroutine MIner(Intact,NAtm,AMass,XYZCM,RI,E,WORK)
  call DiagS1(Intact,3,RI,E,WORK)
 
  return
-end
+end subroutine MIner
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -1120,50 +586,7 @@ subroutine MIner2(Intact,NAtm,AMass,XYZCM,RI,E,WORK)
  call DiagS1(Intact,3,RI,E,WORK)
 
  return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! c = a - b, where a<0 or b<0 is a imaginary value
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine cplxsub(a,b,c)
- implicit real(kind=8) (a-h,o-z)
- parameter(Zero=0.0d0)
- real(kind=8) :: c(2)
-
- c = Zero
- if(a >= Zero) then
-   c(1) = a
- else
-   c(2) = a
- end if
-
- if(b >= Zero) then
-   c(1) = c(1) - b
- else
-   c(2) = c(2) - b
- end if
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! Solve A * L = L * e, where A is symmetric, and L will be saved in A. The size of W must be 3N or larger.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine DiagS1(Intact,N,A,E,W)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N,N),E(N),W(*)
- logical :: Intact
-
- LWORK=3*N
- Call DSYEV('V','L',N,A,N,E,W,LWORK,INFO)
- if(INFO /= 0) call XError(Intact,"DiagS1")
-
- return
-end
+end subroutine MIner2
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -1192,113 +615,7 @@ subroutine MassCent(NAtm,AMass,XYZ,XYZCM,CM)
  end do
 
  return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! B = A + A^T. A is symmetric; A and B can be the same matrix.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine TrAdd(N,A,B)
- Implicit Real*8(A-H,O-Z)
- real(kind=8) :: A(N,N),B(N,N)
-
- do i=1,N
-   do j=1,i-1
-     B(j,i)=A(j,i)+A(i,j)
-     B(i,j)=B(j,i)
-   end do
-   B(i,i)=A(i,i)+A(i,i)
- end do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! AT(N,M) = A(M,N)^T
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine Transp(M,N,A,AT)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(M,N),AT(N,M)
-
- do i=1,N
-   do j=1,M
-     AT(i,j) = A(j,i)
-   end do
- end do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! C(I,J) = Sum(K) A(I,K) * B(K,J); C = A * B
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine MMpyMF(L,M,N,A,B,C)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(L,M), B(M,N), C(L,N)
- Save Zero,One
- Data Zero/0.0d0/,One/1.0d0/
-
- call AClear(L*N,C)
- call DGEMM('N','N',L,N,M,One,A,L,B,M,Zero,C,L)
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! B = A - I; A and B can be the same matrix.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine MSubI(N,A,B)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) A(N,N),B(N,N)
-
- Do I = 1, N
-   Do J = 1, N
-     B(J,I) = A(J,I)
-     if(I == J) B(J,I) = B(J,I) - 1.d0
-   end do
- end do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! remove numerical noise
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RmNoise(N,tol,A)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N)
-
- Do I = 1,N
-   if(abs(A(I)) < tol) A(I)=0.0d0
- end do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! B(*) = B(*) + c * A(*)
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine AccAB(N,c,A,B)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(*),B(*)
-
- Do I = 1,N
-   B(I) = B(I) + c*A(I)
- end do
-
- return
-end
+end subroutine MassCent
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -1320,134 +637,7 @@ function IfrmCha(N,Word)
  100   IfrmCha = 0
 
  return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! sum shell; if A is not a one-dimensional array, the intrinsic function Sum doesn't work.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function ASum(A,N)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N)
-
- ASum = Sum(A)
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! multiplication; If IfRm0=.True., get rid of tiny values.
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function AMultip(A,N,IfRm0,eps)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: A(N)
- logical :: IfRm0
-
- AMultip = 1.0d0
- do i=1,N
-   if(IfRm0 .and. abs(A(i)) < eps) cycle
-   AMultip = AMultip*A(i)
- end do
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! MULT33 performs a eulerian rotation on a symmetry operation.
-!
-! The symmetry operation stored in ELEM is subjected to the operation stored in FMAT: ELEM = FMAT * ELEM * FMAT^T
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine mult33(fmat,elem,SC1)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: fmat(3,3),elem(3,3),SC1(3,3)
-
- call AClear(9,SC1)
- do i = 1, 3
-   do j = 1, 3
-     do k = 1, 3
-       do l = 1, 3
-         SC1(i,j) = SC1(i,j) + fmat(i,l)*fmat(j,k)*elem(l,k)
-       end do
-     end do
-   end do
- end do
- call Acopy(9,SC1,elem)
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! renormalization of an array
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine renorm(N,A)
- implicit real(kind=8) (a-h,o-z)
- parameter(one=1.0d0)
- real(kind=8) :: A(N)
-
- v = one/sqrt( dotx(N,A,A) )
- call ascale(N,v,A,A)
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! cross product c = a x b
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine CrossX(a,b,c)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: a(3),b(3),c(3)
-
- c(1) = a(2)*b(3) - a(3)*b(2)
- c(2) = a(3)*b(1) - a(1)*b(3)
- c(3) = a(1)*b(2) - a(2)*b(1)
-
- return
-end
-
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-!
-! It performs a 3x3 rotation operation:
-! mode >=0: XYZ = XYZ * ROT
-!      < 0: XYZ = XYZ * ROT^-1 = XYZ * ROT^T
-!
-!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine rotopr(Natom,mode,ROT,XYZ,SCR)
- implicit real(kind=8) (a-h,o-z)
- real(kind=8) :: XYZ(3,Natom),ROT(3,3),SCR(3)
-
- if(mode >= 0) then
-   do i=1,Natom
-     call acopy(3,XYZ(1,i),SCR)
-     call aclear(3,XYZ(1,i))
-     do j=1,3
-       do k=1,3
-         XYZ(j,i)=XYZ(j,i)+ROT(k,j)*SCR(k)
-       end do
-     end do
-   end do
- else
-   do i=1,Natom
-     call acopy(3,XYZ(1,i),SCR)
-     call aclear(3,XYZ(1,i))
-     do j=1,3
-       do k=1,3
-         XYZ(j,i)=XYZ(j,i)+ROT(j,k)*SCR(k)
-       end do
-     end do
-   end do
- end if
-
- return
-end
+end function IfrmCha
 
 !xxx!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !xxx!
@@ -1467,7 +657,7 @@ end
 !xxx intwsp = N
 !xxx
 !xxx return
-!xxxend
+!xxxend function intwsp
 
 !xxx!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !xxx!
@@ -1480,7 +670,7 @@ end
 !xxx ichawsp = (N - 1) / 8 + 1
 !xxx
 !xxx return
-!xxxend
+!xxxend function ichawsp
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -1514,21 +704,27 @@ subroutine CountIrrep(Intact,iport,NAtm3,NVib,NClass,Irreps,ModMap)
  end do
 
  return
-end
+end subroutine CountIrrep
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
 ! gradient information
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,za,grd,ffx,al,fcon,dx,scr,Elm)
+subroutine GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,amass,za,xyz,grd,ffx,al,Rslt,dx,scr,Elm)
  implicit real(kind=8) (a-h,o-z)
+ parameter(eps=1.0d-10)
  logical :: ifbdfchk
- dimension :: za(NAtm), grd(3,NAtm), ffx(*), al(NAtm3,*), fcon(NAtm3), dx(3,*), scr(NAtm3,NAtm3)
+ dimension :: amass(NAtm), za(NAtm), xyz(NAtm3), grd(3,NAtm), ffx(*), al(NAtm3,*), Rslt(NAtm3,*), dx(NAtm3), &
+   scr(NAtm3,NAtm3)
  character*3 :: Elm
- allocatable :: grslt(:)
+ allocatable :: avec(:,:), gvib(:), grslt(:)
 
  write(iout,"(//,1x,30('*'),/,' ***  Gradient Information  ***',/,1x,30('*'))")
+ if(NAtm < 2) then
+   write(iout,"(' N.A.')")
+   return
+ end if
 
  write(iout,"(/,' Cartesian gradients (a.u.)',/,1x,68('-'),/,3x, &
     'No.   Atom    ZA                 X             Y             Z',/,1x,68('-'))")
@@ -1539,36 +735,95 @@ subroutine GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,za,grd,ffx,al,fcon,dx,scr,Elm)
  end do
  write(iout,"(1x,68('-'))")
 
- ! Newton¨CRaphson step dX = -F^-1 * g,
- ! see Eq. (3) in JCP, 111, 10806 (1999), where H --> F and f --> -g.
- ! It is worse than the RFO (rational function optimization) step (see Eq. (9)) but is much simpler.
+ allocate(avec(NAtm3,NVib), gvib(NVib), grslt(5))
 
- ! F^-1 calculation:
- ! From F L = M L E, we have FF = LL E LL' where FF = X F X, LL = X^-1 L, and X = M^-1/2.
- ! Then F^-1 = L E^-1 L'.
- ! However AL saves renormalized L0 = L mu^-1/2, and E^-1 = mu k^-1, so F^-1 = L0 k^-1 L0'.
+ ! Restoring the purely vibrational eigenvectors (LL) of the vibrational secular equation.
+ ! Translations and rotations have been projected out.
+ !
+ ! F * L = M * L * E  -->  FF * LL = LL * E,
+ ! where FF = X * F * X, LL = Y * L, X = M^-1/2, and Y = M^1/2.
+ !
+ ! For the renormalized vibrational normal modes stored in the first NVib columns of AL,
+ ! L = AL * XR
+ ! where XR = MR^-1/2 and MR = AL' * M * AL.
+ ! So, LL = Y * AL * XR, saved in avec.
+ !
+ ! Note: AL is affected by isotopes and therefore cannot be used for geometry optimization.
  do i = 1, NVib
-   x = sign(max(abs(fcon(i)), 1.0d-8), fcon(i))
-   scr(:,i) = (1.0d0/x) * al(:,i)
+   am = 0.0d0
+   jm = 0
+   do j = 1, NAtm3
+     ja = (j-1)/3 + 1
+     avec(j,i) = al(j,i) * sqrt(amass(ja) / Rslt(i,2))
+     if(am < abs(avec(j,i))) then
+       am = abs(avec(j,i))
+       jm = j
+     end if
+   end do
+   ! Flip the phase if the element with the largest absolute value (the first one among
+   ! equal values) is negative.
+   if(avec(jm,i) < 0.0d0) avec(:,i) = -avec(:,i)
  end do
- call DGEMM('N','T',NAtm3,NAtm3,NVib,1.d0,scr,NAtm3,al,NAtm3,0.d0,dx,NAtm3)  ! F^-1 --> dx
- call MMpyMF(NAtm3,NAtm3,1,dx,grd,scr)
- call AScale(NAtm3,-1.0d0,scr,dx)
 
- allocate(grslt(5))
- grslt = 0.0d0
+ ! gradients in the vibrational space
+ call MMpyMF(1,NAtm3,NVib,grd,avec,gvib)
 
- do i = 1, NAtm
-   do j = 1, 3
-     grslt(1) = max(grslt(1),abs(dx(j,i)))
-     grslt(2) = grslt(2) + dx(j,i) * dx(j,i)
-     grslt(3) = max(grslt(3),abs(grd(j,i)))
-     grslt(4) = grslt(4) + grd(j,i) * grd(j,i)
+ ! displacement required to find the minimum on the surface using Newton-Raphson step
+ ! dX = F^-1 * g'.
+ ! See Eq. (3) in JCP, 111, 10806 (1999), where H --> F and f --> g'.
+ ! It is worse than the RFO (rational function optimization) step (see Eq. (9)) but is much simpler.
+ !
+ ! In the vibrational space, the above equation needs to be modified as follows
+ ! dX = FF^-1 * G' = LL' * E^+1 * LL * LL' * g' = LL' * E^-1 * g'.
+ ! (it needs to be derived in NAtm3-dimensional space, and then the rotational and translational modes
+ ! can be discarded.)
+ dx = 0.0d0
+ do i = 1, NAtm3
+   do j = 1, NVib
+     eige = Rslt(j,1) / Rslt(j,2)
+     if(abs(eige) < eps) eige = sign(eps,eige)
+     dx(i) = dx(i) + avec(i,j) * gvib(j) / eige
    end do
  end do
+
+ !write(iout,"(/,' Displacements (a.u.)',/,1x,68('-'),/,3x, &
+ !   'No.   Atom    ZA                 X             Y             Z',/,1x,68('-'))")
+ !do i=1,NAtm
+ !  j = nint(za(i))
+ !  call ElemZA(1,Elm,j)
+ !  write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8)") i,Elm,j,dx(3*i-2:3*i)
+ !end do
+ !write(iout,"(1x,68('-'))")
+
+ ! Rotate XYZ_new (= XYZ + dx) to the orientation that maximizes overlap with XYZ,
+ ! then recalculate displacements. This step may reduce the RMS displacement.
+ scr(:,1) = xyz
+ scr(:,2) = xyz + dx
+ call rotmole(iout,NAtm,scr(1,1),scr(1,2),scr(1,3))
+ dx = scr(:,2) - scr(:,1)
+
+ !write(iout,"(/,' Rotated displacements (a.u.)',/,1x,68('-'),/,3x, &
+ !   'No.   Atom    ZA                 X             Y             Z',/,1x,68('-'))")
+ !do i=1,NAtm
+ !  j = nint(za(i))
+ !  call ElemZA(1,Elm,j)
+ !  write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8)") i,Elm,j,dx(3*i-2:3*i)
+ !end do
+ !write(iout,"(1x,68('-'))")
+
+ grslt = 0.0d0
+
+ do i = 1, NAtm3
+   ia = (i-1)/3 + 1
+   ix = i - 3*ia +3
+   grslt(1) = max(grslt(1),abs(dx(i)))
+   grslt(3) = max(grslt(3),abs(grd(ix,ia)))
+ end do
+ grslt(2) = dotx(NAtm3,dx,dx)
  grslt(2) = sqrt(grslt(2)/dble(NAtm3))
+ grslt(4) = dotx(NAtm3,grd,grd)
  grslt(4) = sqrt(grslt(4)/dble(NAtm3))
- ! dE: see Eq. (1) in JCP, 111, 10806 (1999), where f = -g.
+ ! dE: see Eq. (1) in JCP, 111, 10806 (1999).
  call MMpyMF(1,NAtm3,NAtm3,dx,ffx,scr)
  grslt(5) = abs(0.5d0*dotx(NAtm3,scr,dx) + dotx(NAtm3,grd,dx))
 
@@ -1582,10 +837,156 @@ subroutine GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,za,grd,ffx,al,fcon,dx,scr,Elm)
    call bdfchk(iout,.true.)
  end if
 
- deallocate(grslt)
+ deallocate(avec, gvib, grslt)
 
  return
 end subroutine GradInfo
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! gradient information
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!subroutine GradInfo_old(iout,ifbdfchk,NAtm,NAtm3,NVib,za,grd,ffx,al,fcon,dx,scr,Elm)
+! implicit real(kind=8) (a-h,o-z)
+! logical :: ifbdfchk
+! dimension :: za(NAtm), grd(3,NAtm), ffx(*), al(NAtm3,*), fcon(NAtm3), dx(3,*), scr(NAtm3,NAtm3)
+! character*3 :: Elm
+! allocatable :: grslt(:)
+!
+! write(iout,"(//,1x,30('*'),/,' ***  Gradient Information  ***',/,1x,30('*'))")
+! if(NAtm < 2) then
+!   write(iout,"(' N.A.')")
+!   return
+! end if
+!
+! write(iout,"(/,' Cartesian gradients (a.u.)',/,1x,68('-'),/,3x, &
+!    'No.   Atom    ZA                 X             Y             Z',/,1x,68('-'))")
+! do i=1,NAtm
+!   j = nint(za(i))
+!   call ElemZA(1,Elm,j)
+!   write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8)") i,Elm,j,grd(:,i)
+! end do
+! write(iout,"(1x,68('-'))")
+!
+! ! Newton-Raphson step dX = -F^-1 * g,
+! ! see Eq. (3) in JCP, 111, 10806 (1999), where H --> F and f --> -g.
+! ! It is worse than the RFO (rational function optimization) step (see Eq. (9)) but is much simpler.
+!
+! ! F^-1 calculation:
+! ! From F L = M L E, we have FF = LL E LL' where FF = X F X, LL = X^-1 L, and X = M^-1/2.
+! ! Then F^-1 = L E^-1 L'.
+! ! However AL saves renormalized L0 = L mu^-1/2, and E^-1 = mu k^-1, so F^-1 = L0 k^-1 L0'.
+! do i = 1, NVib
+!   x = sign(max(abs(fcon(i)), 1.0d-8), fcon(i))
+!   scr(:,i) = (1.0d0/x) * al(:,i)
+! end do
+! call DGEMM('N','T',NAtm3,NAtm3,NVib,1.d0,scr,NAtm3,al,NAtm3,0.d0,dx,NAtm3)  ! F^-1 --> dx
+! call MMpyMF(NAtm3,NAtm3,1,dx,grd,scr)
+! call AScale(NAtm3,-1.0d0,scr,dx)
+!
+! allocate(grslt(5))
+! grslt = 0.0d0
+!
+! do i = 1, NAtm
+!   do j = 1, 3
+!     grslt(1) = max(grslt(1),abs(dx(j,i)))
+!     grslt(2) = grslt(2) + dx(j,i) * dx(j,i)
+!     grslt(3) = max(grslt(3),abs(grd(j,i)))
+!     grslt(4) = grslt(4) + grd(j,i) * grd(j,i)
+!   end do
+! end do
+! grslt(2) = sqrt(grslt(2)/dble(NAtm3))
+! grslt(4) = sqrt(grslt(4)/dble(NAtm3))
+! ! dE: see Eq. (1) in JCP, 111, 10806 (1999), where f = -g.
+! call MMpyMF(1,NAtm3,NAtm3,dx,ffx,scr)
+! grslt(5) = abs(0.5d0*dotx(NAtm3,scr,dx) + dotx(NAtm3,grd,dx))
+!
+! call prtconv(iout,grslt)
+!
+! ! print check data for bdf
+! if(ifbdfchk) then
+!   call bdfchk(iout,.false.)
+!   write(iout,"('  CHECKDATA:BDFOPT:CONVERGE:',4f16.6)") grslt(1:4)
+!   write(iout,"('  CHECKDATA:BDFOPT:CONVERGE:',d16.2)") grslt(5)
+!   call bdfchk(iout,.true.)
+! end if
+!
+! deallocate(grslt)
+!
+! return
+!end subroutine GradInfo_old
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! rotate the probe coordinates (in xyz1) with the best fit superimposition of the target coordinates (in xyz0).
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine rotmole(iout,natom,xyz0,xyz1,scr)
+ implicit real(kind=8) (a-h,o-z)
+ dimension :: xyz0(3,natom), xyz1(3,natom), scr(*)
+ allocatable   :: rmat(:)
+
+ ! calculate rotation matrix
+ allocate(rmat(9))
+ call qrotmole(0,iout,natom,xyz0,xyz1,rmat,scr)
+
+ ! rotate the probe coordinates
+ call rotvec(natom,-1,rmat,xyz1,scr)
+
+ deallocate(rmat)
+
+ return
+end subroutine rotmole
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! This subroutine determines the rotation matrix for the best fit superimposition of two molecular Coordinates.
+!
+! The basic method was described in S. K. Kearsley, Acta Cryst. A45, 208 (1989), and coded in the PDBSUP program by B.Rupp and
+! S.Parkin at LLNL (1996).
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine qrotmole(iprint,iout,natm,cartarget,carprobe,rmat,scr)
+ implicit real(kind=8) (a-h,o-z)
+ dimension cartarget(3,natm), carprobe(3,natm), rmat(3,3), scr(4,4)
+ allocatable :: dxp(:,:), dxm(:,:), qmat(:,:), eige(:)
+
+ allocate(dxp(3,natm), dxm(3,natm), qmat(4,4), eige(4))
+
+ ! translate the molecules to their geometric centers
+ call shift(natm,scr,cartarget)
+ call shift(natm,scr,carprobe)
+ if(iprint > 0) then
+   write(iout,"(' Cartesian coordinates of target molecule:')")
+   do i = 1, natm
+     write(iout,"(3f20.12)") cartarget(:,i)
+   end do
+   write(iout,"(' Cartesian coordinates of probe molecule:')")
+   do i = 1, natm
+     write(iout,"(3f20.12)") carprobe(:,i)
+   end do
+ end if
+
+ ! coordinate differences: plus and minus
+ dxp = carprobe + cartarget
+ dxm = carprobe - cartarget
+
+ ! construct Kearsley's Q-matrix
+ call conqmt(iprint,iout,natm,dxp,dxm,qmat)
+
+ ! diagonalize Q: Q * L = L * A
+ call DiagS1(.false.,4,qmat,eige,scr)
+ ! Acta Cryst. (1989). A45, 208-210.
+ ! See the bottom right corner of page 209 about r.m.s. deviation.
+ if(iprint > 0) write(imol,"(/,' RMS deviation: ',f7.4)") sqrt(abs(eige(1))/dble(natm))
+
+ ! construct the best fit rotation matrix using the eigenvectors
+ call conrot(iprint,iout,qmat,rmat)
+
+ deallocate(dxp, dxm, qmat, eige)
+
+end subroutine qrotmole
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !

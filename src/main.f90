@@ -34,8 +34,8 @@ program UniMoVib
   integer, allocatable   :: subsystem_idx(:),flags(:)
   allocatable   :: AMass_sub(:), XYZ_sub(:), ZA_sub(:)
 
-  ver="1.5.3"
-  dat="Jul 28, 2025"
+  ver="1.5.4"
+  dat="May 15, 2026"
 
 !-----------------------------------------------------------------------
 ! 1. Assign I/O
@@ -143,7 +143,7 @@ program UniMoVib
 !-----------------------------------------------------------------------
 ! 9. print gradient information
 !-----------------------------------------------------------------------
-  if(IGrd /= 0) call GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,ZA,Grd,FFx,AL,Rslt,Scr1,Scr2,ctmp)
+  if(IGrd /= 0) call GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,AMass,ZA,XYZ,Grd,FFx,AL,Rslt,Scr1,Scr2,ctmp)
 
 !-----------------------------------------------------------------------
 ! 99. the last step

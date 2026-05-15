@@ -235,7 +235,7 @@ select case(IOP(1))
     call RdORCA(idt0,ctmp,Intact,Infred,IRaman,NAtm,AMass,ZA,XYZ,FFx,APT,DPol,Scr1)
 
   case(5)  ! CFour
-    call RdCFour(idt0,idt1,tag,ctmp,Intact,IfFXX,Infred,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,Scr1,Scr2,Scr3,ScrD)
+    call RdCFour(idt0,idt1,idt2,tag,ctmp,Intact,IfFXX,Infred,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,Scr1,Scr2,Scr3,ScrD)
 
   case(6)  ! Molpro
     call RdMolp(idt0,tag,ctmp,Intact,Infred,NAtm,AMass,ZA,XYZ,FFx,APT)
@@ -1797,11 +1797,11 @@ end
 ! Read data from CFour *.out
 !
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subroutine RdCFour(ifchk,igeom,tag,ctmp,Intact,IfFXX,Infred,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,Scr1,Scr2,Scr3,Scr4)
+subroutine RdCFour(ifchk,igeom,ihess,tag,ctmp,Intact,IfFXX,Infred,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,Scr1,Scr2,Scr3,Scr4)
  implicit real(kind=8) (a-h,o-z)
  real(kind=8) :: AMass(*),ZA(*),XYZ(3,*),Grd(3,*),FFx(NAtm*3,*),APT(3,*),Scr1(*),Scr2(*),Scr3(*),Scr4(*)
  character*100 :: tag,ctmp
- logical :: Intact,IfFXX,itrue,ChkAFRQCfour
+ logical :: Intact, IfFXX, itrue, ChkAFRQCfour, iffcm
 
  ! Is the GRD file available?
  inquire(unit=igeom,opened=itrue)
@@ -1810,13 +1810,39 @@ subroutine RdCFour(ifchk,igeom,tag,ctmp,Intact,IfFXX,Infred,IGrd,NAtm,AMass,ZA,X
 
  if(itrue) then
    call RdCFourA(ifchk,igeom,tag,ctmp,Intact,Infred,IGrd,NAtm,AMass,ZA,XYZ,Grd,FFx,APT,Scr1)
+   ! Is the FCMFINAL/FCM file available?
+   inquire(unit=ihess,opened=iffcm)
+   ! read FFx from the FCM file
+   if(iffcm) call RdCFourFCM(ifchk,ihess,ctmp,Intact,NAtm,FFx)
  else
    Infred= 0
    call RdCFourN(ifchk,tag,ctmp,Intact,IfFXX,NAtm,AMass,ZA,XYZ,FFx,Scr1,Scr2,Scr3,Scr4)
  end if
 
  return
-end
+end subroutine RdCFour
+
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!
+! Read FFX from the FCM file (FCM or FCMFINAL, but not FCM000). Required by analytic Hessians of SCF.
+!
+!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subroutine RdCFourFCM(ifchk,ihess,ctmp,Intact,NAtm,FFx)
+ implicit real(kind=8) (a-h,o-z)
+ logical :: Intact
+ character*100 :: ctmp
+ real(kind=8) :: FFx(*)
+
+ rewind(ihess)
+ read(ihess,"(a100)",err=100,end=100) ctmp
+ read(ctmp,*,err=100,end=100) i, j
+ if(i /= NAtm .and. j /= NAtm*3 .and. j /= NAtm*6) call XError(Intact,"The FCM file is for a different molecule!")
+
+ read(ihess,*) (FFx(i), i = 1, NAtm*NAtm*9)
+
+ return
+ 100   call XError(Intact,"Non-standard FCM file!")
+end subroutine RdCFourFCM
 
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !

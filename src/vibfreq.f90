@@ -61,10 +61,10 @@ subroutine GSVA_engine(iout,isva,imds,imdg,IOP,NAtm,subsystem_idx,NAtm_sub,AMass
  allocate(VibSp_full_t(NVib_sub,3*NAtm))
  call Transp(3*NAtm,NVib_sub,VibSp_full,VibSp_full_t)
 
- Do J=1,3
+ !Do J=1,3
      !PRINT '(18E17.8)',(VibSp_full(i,J),i=1,18)
      !PRINT '(18E17.8)',(VibSp_full_t(J,i),i=1,18)
- End Do
+ !End Do
 
 
  !moore-penrose inverse of full hessian
@@ -186,7 +186,7 @@ subroutine SolvSec(iinp,iout,idt0,irep,ireo,iudt,imdn,iloc,igau,imdf,Intact,IOP,
  ! Scr1 and Scr2 will be destroyed
 
  if (IOP(9) == 1) then
- ! read vibrational normal modes
+   ! read vibrational normal modes
    call RdNmMod(idt0,Intact,NAtm3,NTR,NVib,IOP,AMass,AL,Scr1)
  else
    ! generate m.w. vectors of vibrations by Gram-Schmidt orthogonalization
@@ -269,7 +269,7 @@ subroutine RdExFq(iinp,iout,irep,Intact,NAtm3,NVib,Reslt,expf,IRNAME,Ifexpf,dfre
    Ifexpf(1:NVib) = .true.
    Reslt(:,6)=one
  else
-   ! theor. frequencies are saved in Reslt(1:NVib,3) in a.u.
+   ! theoretical frequencies are saved in Reslt(1:NVib,3) in a.u.
    do i=1,NVib
      expf(i)=Reslt(i,3)*au2wn
    end do

@@ -4,6 +4,11 @@ A unified interface for molecular harmonic vibrational frequency calculations.
 The UniMoVib program was originally written by Wenli Zou in FORTRAN 77 during 2014 and 2015 at Southern Methodist University (SMU), Dallas, Texas, within the framework of the LocalMode (now LModeA) program of the Computational and Theoretical Chemistry Group (CATCO) of SMU. This work was supported by the NSF grants CHE 1152357 and CHE 1464906. Guidance from the late Dr. Dieter Cremer is acknowledged. After being rewritten in Fortran 90 in the spring of 2017, UniMoVib has been released as a stand-alone program.
 
 ## Latest Versions
+Version 1.5.4 (May/15/2026).
+
+1. A new Newton-Raphson step for stationary point test.
+2. Analytical hessian matrix at the SCF level printed in the standard output file of [CFour](http://www.cfour.de/) is incorrect, which should be read from the FCMFINAL file.
+
 Version 1.5.3 (Jul/28/2025).
 
 1. Print IR intensities and Raman activities in Molden file.
@@ -94,31 +99,31 @@ Version 1.3.0 (Apr/29/2020).
 * [Adf](http://www.scm.com/)
 * Ampac 2.x. See [Semichem, Inc.](http://www.semichem.com/)
 * [Amsol](http://comp.chem.umn.edu/amsol/)
-* [BDF](http://182.92.69.169:7226/)
+* [BDF](https://bdf-manual.readthedocs.io/zh_CN/latest/)
 * [CFour](http://www.cfour.de/)
 * [Columbus](http://www.univie.ac.at/columbus/)
 * [CP2k](http://www.cp2k.org/)
 * [Crystal](http://www.crystal.unito.it/)
 * [Dalton](http://daltonprogram.org/)
 * [deMon2k](http://www.demon-software.com/public_html/)
-* [Dmol3](http://accelrys.com/)
+* [Dmol3](https://www.3ds.com/products/biovia/materials-studio)
 * [Fhi-Aims](https://aimsclub.fhi-berlin.mpg.de/)
 * [Firefly](http://classic.chem.msu.su/gran/gamess/)
 * [Gabedit](http://gabedit.sourceforge.net/)
 * [Gamess](http://www.msg.chem.iastate.edu/gamess/)
 * [Gamess-UK](http://www.cfs.dl.ac.uk/)
 * [Gaussian](http://www.gaussian.com/)
-* [Hyperchem](http://www.hyper.com/)
+* [Hyperchem](http://www.hypercubeusa.com/)
 * [Jaguar](http://www.schrodinger.com/)
 * [Molcas](http://www.molcas.org/) and [OpenMolcas](https://gitlab.com/Molcas/OpenMolcas)
 * [Molden](https://www.theochem.ru.nl/molden/)
 * [Molpro](http://www.molpro.net/)
 * [Mopac](http://openmopac.net/). See also Mo-g in [Scigress](http://www.scigress.com/)
-* [NWChem](http://www.nwchem-sw.org/index.php/Main_Page)
+* [NWChem](https://nwchemgit.github.io/)
 * [Orca](https://orcaforum.kofo.mpg.de)
 * [Pqs](http://www.pqs-chem.com/)
 * [Psi4](http://www.psicode.org/)
 * [Q-Chem](http://www.q-chem.com/)
 * [Spartan](http://www.wavefun.com/)
-* [Turbomole](http://www.cosmologic.de/)
+* [Turbomole](https://www.turbomole.org/)
 * [xTB](https://github.com/grimme-lab/xtb/)

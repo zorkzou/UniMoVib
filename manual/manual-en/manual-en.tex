@@ -52,7 +52,7 @@
 \begin{document}
 
 \title{User's Guide of the Program \textsc{UniMoVib} \\
-\vspace{10 mm} (Ver. 1.5.3) \vspace{30 mm} \\
+\vspace{10 mm} (Ver. 1.5.4) \vspace{30 mm} \\
 \includegraphics[width=50.0mm]{fig/logo} \vspace{30 mm} }
 
 \date{\today}
@@ -407,8 +407,8 @@ neglected if you are not interested in the IR intensities.
 \index{{Quantum chemistry program}@{Quantum chemistry program}!CFour}
 \item \textsc{CFour}
   \begin{description}
-  \item For analytical frequency (\texttt{VIB=ANALYTIC}): *.out file (by \verb|FCHK|) + GRD
-  (by \verb|GEOM|). \textbf{Not suggested for Hartree-Fock calculations!}
+  \item For analytical frequency (\texttt{VIB=ANALYTIC}): *.out file (by \verb|FCHK|), GRD
+  (by \verb|GEOM|), and optional FCMFINAL (by \verb|HESS|). \textbf{For Hartree-Fock analytical frequency, FCMFINAL is required!!!}
   \index{{Quantum chemistry program}@{Quantum chemistry program}!MOLDEN}
   \item For both numerical frequency (\texttt{VIB=FINDIF}) and analytical frequency: Use the \textsc{Molden} file. However, no IR intensities.
   See also \texttt{MOLDEN} below.
@@ -843,6 +843,7 @@ in your frequency calculation (this is default in \textsc{Aces}) to generate a \
 
 \begin{enumerate}
   \item In the case of analytical frequency by Hartree-Fock, the Hessian matrix and APT matrix printed in the *.out file can be wrong.
+  The Hessian matrix must be read from a separate FCMFINAL or FCM file.
 
   \item If only a single *.out file is specified by \verb|FCHK|, \textsc{UniMoVib} tries to construct the Hessian matrix. However this may do not work well due to some defects and errors in the printed normal modes by \textsc{CFour},
   \begin{itemize}

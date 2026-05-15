@@ -16,7 +16,7 @@ COMPFLAGS  = -O3 -w -fPIC
 #            Looking for .o & .mod files here!
 COMPFLAGS += -I$(OBJ) -J$(OBJ)
 
-SRC90      = interface.f90  main.f90  rw.f90  symmetry.f90  thermo.f90  util.f90  vibfreq.f90
+SRC90      = interface.f90  main.f90  math.f90  rw.f90  symmetry.f90  thermo.f90  util.f90  vibfreq.f90
 SRC77      = BLAS.f  LAPACK.f
 MODS       = 
 

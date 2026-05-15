@@ -19,7 +19,7 @@ COMPFLAGS += -I$(OBJ) -module $(OBJ)
 # MKLROOT    = /opt/compiler/parallel_studio_xe_2020/mkl
 COMPFLAGS += -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64  -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -ldl -i8
 
-SRC90      = interface.f90  main.f90  rw.f90  symmetry.f90  thermo.f90  util.f90  vibfreq.f90
+SRC90      = interface.f90  main.f90  math.f90  rw.f90  symmetry.f90  thermo.f90  util.f90  vibfreq.f90
 MODS       = 
 
 F90OBJ     = $(addprefix $(OBJ)/, $(SRC90:.f90=.o))
