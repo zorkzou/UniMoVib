@@ -713,8 +713,8 @@ end subroutine CountIrrep
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subroutine GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,amass,za,xyz,grd,ffx,al,Rslt,dx,scr,Elm)
  implicit real(kind=8) (a-h,o-z)
- parameter(eps=1.0d-10)
- logical :: ifbdfchk
+ parameter(eps=1.0d-10,trustmx=0.3d0,au2ang=0.52917720859d0)
+ logical :: ifbdfchk, ifscaldx
  dimension :: amass(NAtm), za(NAtm), xyz(NAtm3), grd(3,NAtm), ffx(*), al(NAtm3,*), Rslt(NAtm3,*), dx(NAtm3), &
    scr(NAtm3,NAtm3)
  character*3 :: Elm
@@ -774,24 +774,37 @@ subroutine GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,amass,za,xyz,grd,ffx,al,Rslt,d
  ! It is worse than the RFO (rational function optimization) step (see Eq. (9)) but is much simpler.
  !
  ! In the vibrational space, the above equation needs to be modified as follows
- ! dX = FF^-1 * G' = LL' * E^+1 * LL * LL' * g' = LL' * E^-1 * g'.
+ ! dX = FF^-1 * G' = LL' * E^+1 * LL * LL' * g' = LL' * E^+1 * g'.
  ! (it needs to be derived in NAtm3-dimensional space, and then the rotational and translational modes
  ! can be discarded.)
  dx = 0.0d0
  do i = 1, NAtm3
    do j = 1, NVib
-     eige = Rslt(j,1) / Rslt(j,2)
-     if(abs(eige) < eps) eige = sign(eps,eige)
-     dx(i) = dx(i) + avec(i,j) * gvib(j) / eige
+     xtmp = Rslt(j,1) / Rslt(j,2)
+     if(abs(xtmp) < eps) xtmp = sign(eps,xtmp)
+     dx(i) = avec(i,j) * gvib(j) / xtmp
    end do
  end do
 
- !write(iout,"(/,' Displacements (a.u.)',/,1x,68('-'),/,3x, &
+ ! avoid using a too large step
+ xtmp = sqrt(dotx(NAtm3,dx,dx))
+ ifscaldx = .false.
+ if(xtmp > trustmx) then
+   ifscaldx = .true.
+   dx = dx * (trustmx/xtmp)
+ end if
+
+ !if(ifscaldx) then
+ !  write(iout,"(/,' Scaled displacements (a.u.)')")
+ !else
+ !  write(iout,"(/,' Displacements (a.u.)')")
+ !end if
+ !write(iout,"(1x,68('-'),/,3x, &
  !   'No.   Atom    ZA                 X             Y             Z',/,1x,68('-'))")
  !do i=1,NAtm
  !  j = nint(za(i))
  !  call ElemZA(1,Elm,j)
- !  write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8)") i,Elm,j,dx(3*i-2:3*i)
+ !  write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8)") i, Elm, j, dx(3*i-2:3*i)
  !end do
  !write(iout,"(1x,68('-'))")
 
@@ -802,14 +815,14 @@ subroutine GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,amass,za,xyz,grd,ffx,al,Rslt,d
  call rotmole(iout,NAtm,scr(1,1),scr(1,2),scr(1,3))
  dx = scr(:,2) - scr(:,1)
 
- !write(iout,"(/,' Rotated displacements (a.u.)',/,1x,68('-'),/,3x, &
- !   'No.   Atom    ZA                 X             Y             Z',/,1x,68('-'))")
- !do i=1,NAtm
- !  j = nint(za(i))
- !  call ElemZA(1,Elm,j)
- !  write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8)") i,Elm,j,dx(3*i-2:3*i)
- !end do
- !write(iout,"(1x,68('-'))")
+ write(iout,"(/,' Displacements for the next step (Angstrom)',/,1x,68('-'),/,3x, &
+    'No.   Atom    ZA                 X             Y             Z',/,1x,68('-'))")
+ do i=1,NAtm
+   j = nint(za(i))
+   call ElemZA(1,Elm,j)
+   write(iout,"(i6,4x,a3,1x,i5,8x,3f14.8)") i, Elm, j, au2ang*dx(3*i-2:3*i)
+ end do
+ write(iout,"(1x,68('-'))")
 
  grslt = 0.0d0
 
@@ -825,7 +838,7 @@ subroutine GradInfo(iout,ifbdfchk,NAtm,NAtm3,NVib,amass,za,xyz,grd,ffx,al,Rslt,d
  grslt(4) = sqrt(grslt(4)/dble(NAtm3))
  ! dE: see Eq. (1) in JCP, 111, 10806 (1999).
  call MMpyMF(1,NAtm3,NAtm3,dx,ffx,scr)
- grslt(5) = abs(0.5d0*dotx(NAtm3,scr,dx) + dotx(NAtm3,grd,dx))
+ grslt(5) = 0.5d0*dotx(NAtm3,scr,dx) - dotx(NAtm3,grd,dx)
 
  call prtconv(iout,grslt)
 
@@ -900,7 +913,7 @@ end subroutine GradInfo
 ! grslt(4) = sqrt(grslt(4)/dble(NAtm3))
 ! ! dE: see Eq. (1) in JCP, 111, 10806 (1999), where f = -g.
 ! call MMpyMF(1,NAtm3,NAtm3,dx,ffx,scr)
-! grslt(5) = abs(0.5d0*dotx(NAtm3,scr,dx) + dotx(NAtm3,grd,dx))
+! grslt(5) = abs(0.5d0*dotx(NAtm3,scr,dx) - dotx(NAtm3,grd,dx))
 !
 ! call prtconv(iout,grslt)
 !
