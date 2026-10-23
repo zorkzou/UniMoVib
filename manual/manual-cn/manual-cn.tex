@@ -348,6 +348,8 @@ dipgrad（通过\verb|DDIP|），其中\verb|DDIP|是可选的，若对红外强
 
 计算方法参见\textit{J. Chem. Theory Comput.} 14, 2558 (2018)和\textit{Theor. Chem. Acc.} 140, 31 (2021)。
 
+使用GSVA方法的代表性工作见第\ref{sec:gsva-cite}节。
+
 \section{\texttt{\$Thermo}输入组} \label{sec:inp-thermo}
 
 该输入组控制热化学计算。关键词有：
@@ -554,6 +556,18 @@ The CH4 molecule is defined by atoms 1-5 in this CH4@C60 complex.
 
 关于GSVA的更多输入示例，见： \\
 \href{https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples} {https://github.com/smutao/UniMoVib/tree/master/test/Gaussian09/gsva-paper-examples}
+
+
+\section{GSVA方法的代表性应用} \label{sec:gsva-cite}
+
+以下是使用了\textsc{UniMoVib}中GSVA方法的部分代表性工作（不完全列表）：
+\begin{enumerate}
+\item Y. Liu, X. Wang, X. Ma, C. Li, and M. Dupuis, DFT electronic structure and vibrational signatures of intermediates in water oxidation on perovskite NaTaO$_3$, \textit{J. Phys. Chem. C} \textbf{127}, 21514--21525 (2023). \url{https://doi.org/10.1021/acs.jpcc.3c02777}
+\item L. Rassouli, M. Shakiba, A. V. Akimov, X. Ma, and M. Dupuis, Excitons in hematite Fe$_2$O$_3$: Short-time dynamics from TD-DFT and non-adiabatic dynamics theories, \textit{J. Phys. Chem. C} \textbf{128}, 13681--13693 (2024). \url{https://doi.org/10.1021/acs.jpcc.4c03247}
+\item L. Rassouli, \textit{Computational Design of Photocatalytic Materials for Solar Energy Conversion: A Case Study on Electronic Structure and Early-Time Dynamics of Exciton in Hematite}, Ph.D. Dissertation, University at Buffalo, The State University of New York (2025). \url{https://www.proquest.com/openview/98b339c42100f804fb986694cd8247b8}
+\item X. Ma, \textit{Computational Investigation of Excited-State Dynamics, Exciton Structures, and Vibrational Characteristics in Transition Metal Oxides}, Ph.D. Dissertation, University at Buffalo, The State University of New York (2026). \url{https://www.proquest.com/openview/eb1b99e089cc80b89041ddfbe7b096e8/1?cbl=18750&diss=y}
+\end{enumerate}
+
 
 \chapter{已知问题} \label{part:problem}
 
